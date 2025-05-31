@@ -1,0 +1,606 @@
+/* Add specific page class */
+.people-page {
+  /* Potential page-specific overrides if needed */
+}
+
+/* Adjust main content when sidebar is collapsed */
+.people-page .main-content.sidebar-collapsed {
+  margin-left: var(--sidebar-collapsed-width);
+  width: calc(100% - var(--sidebar-collapsed-width));
+  transition: margin-left 0.3s ease, width 0.3s ease;
+}
+
+/* Remove old container styles if dashboard layout handles it */
+/* .people-container { ... } */
+
+/* Remove old top bar styles if handled by dashboard.css */
+/* .top-bar { ... } */
+/* .top-bar-right { ... } */
+/* ... other top bar elements ... */
+
+/* --- Scoped Dashboard Layout Styles --- */
+
+/* Main Content Area */
+.people-page .course-main-area {
+  background-color: var(--nova-bg-primary, #ffffff);
+  border: 1px solid var(--nova-border-strong, #000000);
+  border-radius: var(--nova-border-radius, 12px);
+  padding: var(--nova-spacing-xl, 24px);
+  margin-top: var(--nova-spacing-xl, 24px);
+}
+
+/* Navigation Tabs - Scoped and styled for People page */
+.people-page .course-nav {
+  display: flex;
+  gap: var(--nova-spacing-sm, 8px);
+  margin-bottom: var(--nova-spacing-xl, 24px); /* Space below tabs */
+  /* border-bottom: none; */ /* No border on the nav container itself */
+}
+
+.people-page .nav-tab {
+  padding: var(--nova-spacing-sm, 8px) var(--nova-spacing-lg, 16px);
+  border: 1px solid var(--nova-border-color, #e0e0e0); /* Light gray border */
+  background: var(--nova-bg-primary, #ffffff); /* White background */
+  color: var(--nova-text-primary, #000000); /* Black text */
+  cursor: pointer;
+  font-size: var(--nova-font-size-base, 14px);
+  font-weight: 500;
+  transition: color 0.2s, background-color 0.2s, border-color 0.2s;
+  border-radius: var(--nova-border-radius-sm, 8px);
+  outline: none; /* Remove default focus outline */
+}
+
+.people-page .nav-tab:hover {
+  /* Black background, white text on hover */
+  color: var(--nova-text-white, #ffffff);
+  background-color: var(--nova-bg-dark, #000000); 
+  border-color: var(--nova-border-strong, #000000); /* Black border on hover */
+}
+
+.people-page .nav-tab.active {
+  /* Black background, white text when active */
+  color: var(--nova-text-white, #ffffff);
+  background-color: var(--nova-bg-dark, #000000); 
+  border-color: var(--nova-border-strong, #000000); /* Black border when active */
+  font-weight: 500;
+}
+
+.people-page .nav-tab:focus-visible {
+  outline: 2px solid var(--nova-primary-focus, #1a73e8); /* Use focus ring */
+  outline-offset: 2px;
+}
+
+/* --- Original People Content Styles - Adjusted & Scoped --- */
+
+/* Inner container for people list */
+.people-page .people-content {
+  background-color: var(--nova-bg-primary, #ffffff);
+  border-radius: var(--nova-border-radius-sm, 8px); /* Slightly smaller radius inside */
+  border: 1px solid var(--nova-border-strong, #000000); /* Black border */
+  /* overflow: hidden; */ /* Removed - was clipping dropdown */
+  /* Remove padding here, apply to sections instead */
+}
+
+/* Adjust self-unenroll container */
+.people-page .self-unenroll-container {
+  padding: var(--nova-spacing-lg, 16px); /* Add padding around button */
+  border-bottom: 1px solid var(--nova-border-strong, #000000); /* Black separator */
+  display: flex;
+  justify-content: flex-end;
+}
+
+/* Style self unenroll button (using class, not inline styles) */
+.people-page .self-unenroll-button {
+  background-color: var(--nova-danger-bg, #f44336); /* Use danger variable */
+  color: var(--nova-danger-text, white);
+  border: none;
+  padding: var(--nova-spacing-sm, 8px) var(--nova-spacing-lg, 16px);
+  border-radius: var(--nova-border-radius-sm, 8px);
+  cursor: pointer;
+  display: inline-flex; 
+  align-items: center;
+  gap: var(--nova-spacing-sm, 8px);
+  font-size: var(--nova-font-size-sm, 13px); /* Slightly smaller font */
+  font-weight: 500;
+  transition: background-color 0.2s;
+}
+
+.people-page .self-unenroll-button:hover {
+  background-color: var(--nova-danger-bg-hover, #d32f2f); /* Darker red on hover */
+}
+
+/* Professor & Students Sections */
+.people-page .professor-section,
+.people-page .students-section {
+  padding: var(--nova-spacing-xl, 24px); /* Add padding within sections */
+  border-top: 1px solid var(--nova-border-strong, #000000); /* Black separator */
+}
+
+/* Remove top border for the first section */
+.people-page .people-content > section:first-child {
+   border-top: none; 
+}
+
+
+/* Section Header - Flexbox for layout */
+.people-page .section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between; /* Title left, group right */
+  margin-bottom: var(--nova-spacing-lg, 16px);
+  padding-bottom: var(--nova-spacing-md, 12px); /* Space before list */
+  /* Add bottom border if needed visually, image doesn't show strong one here */
+  /* border-bottom: 1px solid var(--nova-border-color, #e0e0e0); */ 
+}
+
+.people-page .section-header h2 {
+  margin: 0;
+  font-size: var(--nova-font-size-xl, 20px); /* Larger header font */
+  color: var(--nova-text-primary, #000000);
+  font-weight: 600; /* Bolder */
+}
+
+/* Group for count and add button */
+.people-page .section-header .header-right-group {
+    display: flex;
+    align-items: center;
+    gap: var(--nova-spacing-md, 12px);
+}
+
+.people-page .student-count {
+  font-size: var(--nova-font-size-base, 14px);
+  color: var(--nova-text-secondary, #5f6368);
+  font-weight: 500;
+}
+
+/* Style for add icons button (HiUserPlus) */
+.people-page .action-icon-button {
+  background: none;
+  border: 1px solid var(--nova-border-color, #e0e0e0); /* Light gray border */
+  color: var(--nova-text-primary, #000000); /* Black icon */
+  cursor: pointer;
+  padding: var(--nova-spacing-sm, 8px); /* Square padding */
+  border-radius: var(--nova-border-radius-sm, 8px); /* Match button style */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s, border-color 0.2s, color 0.2s;
+  line-height: 1; /* Ensure icon centers vertically */
+}
+
+.people-page .action-icon-button:hover {
+  background-color: var(--nova-bg-tertiary, #f1f3f4); /* Light gray background */
+  border-color: var(--nova-border-color-hover, #bdbdbd); /* Slightly darker border */
+}
+
+.people-page .action-icon-button:focus-visible {
+    outline: 2px solid var(--nova-primary-focus, #1a73e8);
+    outline-offset: 1px;
+}
+
+
+/* List Item Styles */
+.people-page .person-item {
+  display: flex;
+  align-items: center;
+  padding: var(--nova-spacing-md, 12px) 0; /* Vertical padding, no horizontal */
+  border-top: 1px solid var(--nova-border-color-light, #ededed); /* Lighter separator */
+  gap: var(--nova-spacing-md, 12px); /* Gap between elements */
+}
+
+/* Remove border above first item in each list */
+.people-page .professor-section .person-item:first-of-type,
+.people-page .students-list .person-item:first-of-type {
+    border-top: none;
+}
+
+.people-page .person-avatar {
+  width: 40px; /* Slightly larger avatar */
+  height: 40px;
+  border-radius: 50%;
+  overflow: hidden;
+  /* margin-right: var(--nova-spacing-lg, 16px); Replaced by gap */
+  background-color: var(--nova-bg-tertiary, #f1f3f4); /* Placeholder bg */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 500;
+  flex-shrink: 0; 
+}
+
+.people-page .person-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.people-page .avatar-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--nova-primary, #1a73e8); /* Use primary color */
+  color: white;
+  font-weight: 500;
+  font-size: 1rem; 
+}
+
+.people-page .person-name {
+  flex-grow: 1; 
+  font-size: var(--nova-font-size-base, 14px);
+  color: var(--nova-text-primary, #000000);
+  font-weight: 500; /* Medium weight */
+}
+
+/* More Options Button & Container */
+.people-page .more-options {
+  /* position: relative; */ /* REMOVE: No longer needed for positioning context */
+  margin-left: auto; /* Keep pushing button to the right */
+}
+
+.people-page .more-options-button {
+  /* Re-style to be just the icon, no border/bg */
+  background: none;
+  border: none;
+  color: var(--nova-text-secondary, #5f6368); 
+  cursor: pointer;
+  padding: var(--nova-spacing-xs, 4px);
+  border-radius: 50%; /* Circular hover */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s, color 0.2s;
+}
+
+.people-page .more-options-button:hover {
+  background-color: var(--nova-bg-hover, rgba(0,0,0,0.05));
+  color: var(--nova-text-primary, #000000); 
+}
+
+.people-page .more-options-button:focus-visible {
+    outline: 2px solid var(--nova-primary-focus, #1a73e8);
+    outline-offset: 1px;
+}
+
+
+/* Animation for dropdown */
+@keyframes fadeInPeopleActionMenu {
+  from { opacity: 0; transform: translateY(-5px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Action Menu (was dropdown-menu) */
+.people-page .people-action-menu {
+  position: fixed; 
+  background-color: var(--nova-bg-primary, white);
+  z-index: 9999; 
+  border-radius: var(--nova-border-radius-sm, 8px);
+  box-shadow: var(--nova-shadow-md, 0 4px 8px rgba(0,0,0,0.15));
+  border: 1px solid var(--nova-border-color, #e0e0e0);
+  min-width: 180px;
+  overflow: hidden; 
+  padding: var(--nova-spacing-sm, 8px) 0;
+  visibility: visible; 
+  animation: fadeInPeopleActionMenu 0.15s ease-out forwards; /* Use renamed animation */
+}
+
+.people-page .people-action-item { /* Renamed */
+  display: flex;
+  align-items: center;
+  gap: var(--nova-spacing-md, 12px);
+  padding: var(--nova-spacing-sm, 8px) var(--nova-spacing-lg, 16px);
+  font-size: var(--nova-font-size-base, 14px);
+  width: 100%;
+  text-align: left;
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  color: var(--nova-text-primary, #000000); 
+  line-height: 1.4;
+}
+
+.people-page .people-action-item span { /* Renamed */
+    flex-grow: 1; 
+}
+
+.people-page .people-action-item svg { /* Renamed */
+    flex-shrink: 0; 
+}
+
+.people-page .people-action-item:hover { /* Renamed */
+  background-color: var(--nova-bg-hover, rgba(0,0,0,0.05));
+}
+
+/* Specific action item colors */
+.people-page .people-action-item.kick { /* Renamed */
+  color: var(--nova-text-warning, #e67c00);
+}
+.people-page .people-action-item.kick svg { /* Renamed */
+    color: var(--nova-text-warning, #e67c00);
+}
+.people-page .people-action-item.kick:hover { /* Renamed */
+    background-color: var(--nova-warning-bg-light, rgba(230, 124, 0, 0.1));
+}
+
+.people-page .people-action-item.ban { /* Renamed */
+  color: var(--nova-text-danger, #d93025);
+}
+.people-page .people-action-item.ban svg { /* Renamed */
+    color: var(--nova-text-danger, #d93025);
+}
+.people-page .people-action-item.ban:hover { /* Renamed */
+     background-color: var(--nova-danger-bg-light, rgba(217, 48, 37, 0.1));
+}
+
+
+/* Loading/Error Styles - Minor Adjustments */
+.people-page .loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 300px; /* Ensure it takes some space */
+  padding: var(--nova-spacing-xxl, 32px);
+  color: var(--nova-text-secondary, #5f6368);
+}
+
+.people-page .loading-spinner {
+  border: 4px solid var(--nova-bg-hover, rgba(0,0,0,0.1));
+  border-radius: 50%;
+  border-top-color: var(--nova-primary, #1a73e8);
+  width: 36px; /* Slightly larger */
+  height: 36px;
+  animation: spin 1s linear infinite;
+  margin-bottom: var(--nova-spacing-lg, 16px); /* Increased margin */
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.people-page .error-container {
+  display: flex;
+  flex-direction: column; /* Center content vertically */
+  align-items: center;
+  justify-content: center;
+  min-height: 300px; 
+  padding: var(--nova-spacing-xxl, 32px);
+}
+
+.people-page .error-message {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: var(--nova-text-danger, #d93025);
+  max-width: 500px;
+  text-align: center;
+}
+
+.people-page .error-message svg {
+    color: var(--nova-text-danger, #d93025); /* Ensure icon uses danger color */
+    font-size: 48px; 
+    margin-bottom: var(--nova-spacing-lg, 16px);
+}
+
+.people-page .error-message p {
+    margin-bottom: var(--nova-spacing-lg, 16px);
+    color: var(--nova-text-primary, #000000); /* Use primary text color for message */
+    font-size: var(--nova-font-size-base, 14px);
+}
+
+.people-page .retry-button {
+  /* Use standard button styling from dashboard/global styles if possible */
+  /* Fallback styles: */
+  background-color: var(--nova-primary, #1a73e8);
+  color: white;
+  border: none;
+  padding: var(--nova-spacing-md, 10px) var(--nova-spacing-xl, 20px);
+  border-radius: var(--nova-border-radius-sm, 8px);
+  cursor: pointer;
+  font-size: var(--nova-font-size-base, 14px);
+  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--nova-spacing-sm, 8px);
+  margin-top: var(--nova-spacing-lg, 16px);
+  transition: background-color 0.2s;
+}
+
+.people-page .retry-button:hover {
+    background-color: var(--nova-primary-dark, #1765cc);
+}
+
+/* Basic Loading state placeholders */
+.sidebar.loading, .top-bar.loading {
+    background-color: var(--nova-bg-secondary, #f8f9fa);
+}
+
+.main-content.loading .loading-container {
+    min-height: calc(100vh - 120px); /* Example calculation based on header/footer */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Empty state for student list */
+.people-page .students-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--nova-spacing-xxl, 32px) var(--nova-spacing-lg, 16px);
+  min-height: 150px; /* Give it some minimum height */
+  text-align: center;
+  color: var(--nova-text-secondary, #5f6368);
+}
+
+.people-page .students-empty-state svg {
+  margin-bottom: var(--nova-spacing-lg, 16px);
+  color: var(--nova-text-light, #9aa0a6); /* Lighter icon color */
+}
+
+.people-page .students-empty-state p {
+  font-size: var(--nova-font-size-base, 14px);
+  font-weight: 500;
+}
+
+/* REMOVE Conflicting Sidebar Submenu Styles from People.css */
+/* 
+// Add styles for submenu trigger and open state 
+.sidebar-nav .submenu-trigger {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+
+.sidebar-nav .submenu-toggle {
+    transition: transform 0.2s ease-in-out;
+}
+
+.sidebar-nav .submenu-toggle.open {
+    transform: rotate(180deg);
+}
+
+.sidebar-nav .submenu {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease-in-out;
+    padding-left: var(--nova-spacing-lg, 16px); // Indent submenu items 
+}
+
+.sidebar-nav .submenu.open {
+    max-height: 500px; // Adjust as needed for content 
+} 
+*/ 
+
+/* --- Banned Section Styles --- */
+.people-page .banned-section {
+  /* Remove padding/border as it's handled by tab content */
+  /* padding: var(--nova-spacing-xl, 24px); */
+  /* border-top: 1px solid var(--nova-border-strong, #000000); */
+}
+
+.people-page .banned-section .section-header {
+  /* Uses existing .section-header styles */
+}
+
+.people-page .banned-count {
+  /* Similar to student-count */
+  font-size: var(--nova-font-size-base, 14px);
+  color: var(--nova-text-secondary, #5f6368);
+  font-weight: 500;
+}
+
+.people-page .banned-list {
+  /* Container for banned items */
+}
+
+.people-page .banned-item {
+  /* Uses person-item base styles */
+  composes: person-item;
+  /* Maybe add subtle difference, e.g., slightly dimmed */
+  opacity: 0.8;
+}
+
+.people-page .banned-actions {
+  margin-left: auto; /* Push button to right */
+}
+
+.people-page .unban-button {
+  background-color: var(--nova-success-bg, #4CAF50); /* Green background */
+  color: var(--nova-success-text, white);
+  border: none;
+  padding: var(--nova-spacing-sm, 8px) var(--nova-spacing-md, 12px); /* Slightly less padding */
+  border-radius: var(--nova-border-radius-sm, 8px);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--nova-spacing-xs, 4px); /* Smaller gap */
+  font-size: var(--nova-font-size-sm, 13px);
+  font-weight: 500;
+  transition: background-color 0.2s;
+}
+
+.people-page .unban-button:hover {
+  background-color: var(--nova-success-bg-hover, #388E3C); /* Darker green */
+}
+
+.people-page .banned-empty-state {
+  /* Similar to students-empty-state */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--nova-spacing-xxl, 32px) var(--nova-spacing-lg, 16px);
+  min-height: 100px; /* Lower min height */
+  text-align: center;
+  color: var(--nova-text-secondary, #5f6368);
+}
+
+.people-page .banned-empty-state svg {
+  margin-bottom: var(--nova-spacing-md, 12px);
+  color: var(--nova-text-light, #9aa0a6);
+}
+
+.people-page .banned-empty-state p {
+  font-size: var(--nova-font-size-base, 14px);
+}
+
+/* --- Tab Styles for People Page --- */
+.people-page .people-tab-container {
+  border-top: 1px solid var(--nova-border-strong, #000000); /* Separator above tabs */
+  margin-top: var(--nova-spacing-xl, 24px); /* Space above tabs */
+}
+
+.people-page .people-tabs {
+  display: flex;
+  gap: var(--nova-spacing-sm, 8px);
+  padding: var(--nova-spacing-lg, 16px) var(--nova-spacing-xl, 24px); /* Padding around tabs */
+  border-bottom: 1px solid var(--nova-border-strong, #000000); /* Separator below tabs */
+}
+
+.people-page .people-tabs .tab-btn {
+  /* Use styles similar to course-nav tabs */
+  padding: var(--nova-spacing-sm, 8px) var(--nova-spacing-lg, 16px);
+  border: 1px solid var(--nova-border-color, #e0e0e0);
+  background: var(--nova-bg-primary, #ffffff);
+  color: var(--nova-text-primary, #000000);
+  cursor: pointer;
+  font-size: var(--nova-font-size-base, 14px);
+  font-weight: 500;
+  transition: color 0.2s, background-color 0.2s, border-color 0.2s;
+  border-radius: var(--nova-border-radius-sm, 8px);
+  outline: none;
+}
+
+.people-page .people-tabs .tab-btn:hover {
+  color: var(--nova-text-white, #ffffff);
+  background-color: var(--nova-bg-dark, #000000); 
+  border-color: var(--nova-border-strong, #000000); 
+}
+
+.people-page .people-tabs .tab-btn.active {
+  color: var(--nova-text-white, #ffffff);
+  background-color: var(--nova-bg-dark, #000000); 
+  border-color: var(--nova-border-strong, #000000); 
+  font-weight: 500;
+}
+
+.people-page .people-tabs .tab-btn:focus-visible {
+  outline: 2px solid var(--nova-primary-focus, #1a73e8); 
+  outline-offset: 2px;
+}
+
+.people-page .people-tab-content section {
+  /* Remove padding and border from sections themselves */
+  padding: var(--nova-spacing-xl, 24px); 
+  border-top: none; /* Remove top border */
+}
+
+/* Optional: Add padding directly to the content container if sections lose theirs */
+.people-page .people-tab-content {
+   /* padding: var(--nova-spacing-xl, 24px); */
+} 

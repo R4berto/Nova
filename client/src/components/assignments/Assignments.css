@@ -1,0 +1,4727 @@
+/* Z-index Hierarchy - Highest values appear in front */
+:root {
+  --z-base: 1000;               /* Base z-index for standard UI elements */
+  --z-assignment-details: 3000; /* Base z-index for assignment details modals */
+  --z-modal: 5000;              /* Base z-index for regular modal overlays */
+  --z-grading-modal: 7000;      /* For grading modal overlay */
+  --z-file-modal: 9000;         /* For file preview modal overlay - highest priority */
+}
+
+/* Fix for container width and ensure it fills the available height */
+.assignments-container {
+  padding: 20px;
+  max-width: 100%;
+  margin: 0 auto;
+  min-height: calc(100vh - 180px); /* Adjust for header/footer */
+  display: flex;
+  flex-direction: column;
+}
+
+/* Ensure content grows to fill available space */
+.assignments-content {
+  flex: 1;
+}
+
+/* Basic modal overlay - ensure high specificity with assignments-container */
+.assignments-container .modal-overlay,
+.assignments-container.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: var(--z-modal);
+}
+
+/* Modal content classes - ensure high specificity */
+.assignments-container .modal-content,
+.assignments-container.modal-content {
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+  width: 100%;
+  max-width: 700px;
+  max-height: 90vh;
+  overflow-y: auto;
+  position: relative;
+  z-index: calc(var(--z-modal) + 1);
+}
+
+/* Lower z-index for assignment details overlay - make sure it's below regular modals */
+.assignments-container .modal-overlay.assignment-details-overlay,
+.assignments-container.modal-overlay.assignment-details-overlay {
+  z-index: var(--z-assignment-details);
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Lower z-index for assignment details modal - make sure it's below regular modals */
+.assignments-container .modal-content.assignment-details-modal,
+.assignments-container.modal-content.assignment-details-modal {
+  z-index: calc(var(--z-assignment-details) + 1);
+  width: 1000px; /* Fixed width */
+  height: 700px; /* Fixed height */
+  max-width: 90%; /* For smaller screens */
+  max-height: 90vh; /* For smaller screens */
+  display: flex;
+  flex-direction: column;
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  overflow-y: auto;
+  position: relative;
+}
+
+/* Specific modal overlays */
+.assignments-container .modal-overlay.grading-modal-overlay,
+.assignments-container.modal-overlay.grading-modal-overlay {
+  z-index: var(--z-grading-modal);
+}
+
+.assignments-container .modal-overlay.file-preview-overlay,
+.assignments-container .modal-overlay.file-selection-overlay,
+.assignments-container.modal-overlay.file-preview-overlay,
+.assignments-container.modal-overlay.file-selection-overlay {
+  z-index: var(--z-file-modal);
+}
+
+/* Specific modal content */
+.assignments-container .modal-content.grading-modal,
+.assignments-container.modal-content.grading-modal {
+  z-index: calc(var(--z-grading-modal) + 1);
+  max-width: 90%;
+  width: 900px;
+  max-height: 90vh;
+}
+
+.assignments-container .modal-content.file-preview-modal,
+.assignments-container .modal-content.file-selection-modal,
+.assignments-container.modal-content.file-preview-modal,
+.assignments-container.modal-content.file-selection-modal {
+  z-index: calc(var(--z-file-modal) + 1);
+}
+
+.assignments-container .file-preview-modal,
+.assignments-container.file-preview-modal {
+  max-width: 90%;
+  width: 900px;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+  overflow: hidden;
+}
+
+/* Student submissions content for proper layering */
+.assignments-container .student-submission-details {
+  display: flex;
+  align-items: center;
+  padding: 12px 16px;
+  border: 1px solid #000000; /* Changed from #e0e0e0 to black */
+  border-radius: 8px;
+  margin-bottom: 10px;
+  background-color: #fff;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  flex-wrap: wrap; /* Allow content to wrap when needed */
+  position: relative;
+  z-index: var(--z-base); /* Base z-index for normal content */
+}
+
+/* Rest of existing CSS follows */
+/* This is overridden by the rule at the top */
+
+/* Top Bar Styles */
+.assignments-container .top-bar {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  padding: 12px 24px;
+  background-color: white;
+  border: 1px solid #000000;
+  border-radius: 12px;
+  margin-bottom: 20px;
+}
+
+.top-bar-right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.user-profile {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+}
+
+.user-info {
+  text-align: right;
+}
+
+.user-name {
+  font-weight: 500;
+  color: #202124;
+  font-size: 14px;
+}
+
+.user-role {
+  color: #5f6368;
+  font-size: 12px;
+}
+
+.avatar {
+  width: 40px;
+  height: 40px;
+  background-color: #1a73e8;
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-weight: 500;
+  font-size: 16px;
+}
+
+/* Navigation Tabs */
+.course-nav {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 24px;
+  border-bottom: 1px solid #e0e0e0;
+  padding-bottom: 8px;
+}
+
+.nav-tab {
+  padding: 8px 16px;
+  border: none;
+  background: none;
+  color: #5f6368;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: color 0.2s;
+}
+
+.nav-tab:hover {
+  color: #1a73e8;
+}
+
+.nav-tab.active {
+  color: #1a73e8;
+  border-bottom: 2px solid #1a73e8;
+}
+
+.assignments-container h1 {
+  font-size: 24px;
+  font-weight: 600;
+  color: #111827;
+  margin-bottom: 16px;
+}
+
+.assignments-container p {
+  color: #6b7280;
+  font-size: 16px;
+}
+
+/* --- Assignment Creation Form Styles --- */
+/* Specificity: Target the creation form container within the assignments content area */
+.assignments-content .assignment-form-container {
+  background-color: #ffffff;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  margin-top: 24px;
+  margin-bottom: 32px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  overflow: hidden; /* Ensures child elements adhere to border-radius */
+}
+
+/* Specificity: Target the header within the creation form container */
+.assignments-content .assignment-form-container .form-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 24px;
+  background-color: #f8f9fa; /* Light header background */
+  border-bottom: 1px solid #e0e0e0;
+}
+
+/* Specificity: Target h3 within the form header */
+.assignments-content .assignment-form-container .form-header h3 {
+  font-size: 18px;
+  font-weight: 500;
+  color: #202124;
+  margin: 0;
+}
+
+/* Specificity: Target the close button within the form header */
+.assignments-content .assignment-form-container .form-header .close-form {
+  background: none;
+  border: none;
+  color: #5f6368;
+  font-size: 20px;
+  cursor: pointer;
+  padding: 4px;
+  line-height: 1;
+  transition: color 0.2s;
+}
+
+.assignments-content .assignment-form-container .form-header .close-form:hover {
+  color: #202124;
+}
+
+/* Specificity: Target the form element itself */
+.assignments-content .assignment-form-container .assignment-form {
+  padding: 24px;
+}
+
+/* Specificity: Target form groups within the creation form */
+.assignments-content .assignment-form-container .form-group {
+  margin-bottom: 20px;
+  border: 2px solid #000000; /* Add black solid border */
+  border-radius: 4px;
+  padding: 16px; /* Add padding for better spacing */
+}
+
+/* Specificity: Target labels within form groups */
+.assignments-content .assignment-form-container .form-group label {
+  display: block;
+  font-size: 14px;
+  font-weight: 500;
+  color: #3c4043;
+  margin-bottom: 8px;
+}
+
+/* Specificity: Target text/number inputs within form groups */
+.assignments-content .assignment-form-container .form-group input[type="text"],
+.assignments-content .assignment-form-container .form-group input[type="number"],
+.assignments-content .assignment-form-container .form-group input[type="datetime-local"],
+.assignments-content .assignment-form-container .form-group textarea {
+  width: 100%;
+  padding: 10px 12px;
+  border: 2px solid #000000; /* Changed from 1px solid #dadce0 to black */
+  border-radius: 4px;
+  font-size: 14px;
+  color: #202124;
+  box-sizing: border-box;
+  transition: border-color 0.2s;
+}
+
+/* Specificity: Focus state for inputs/textarea */
+.assignments-content .assignment-form-container .form-group input[type="text"]:focus,
+.assignments-content .assignment-form-container .form-group input[type="number"]:focus,
+.assignments-content .assignment-form-container .form-group input[type="datetime-local"]:focus,
+.assignments-content .assignment-form-container .form-group textarea:focus {
+  border-color: #1a73e8;
+  outline: none;
+  box-shadow: 0 0 0 1px #1a73e8; /* Subtle focus ring */
+}
+
+/* Specificity: Target textarea specifically for height */
+.assignments-content .assignment-form-container .form-group textarea {
+  min-height: 120px;
+  resize: vertical; /* Allow vertical resizing */
+}
+
+/* Specificity: Target form rows for side-by-side layout */
+.assignments-content .assignment-form-container .form-row {
+  display: flex;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+/* Specificity: Ensure form groups within a row take up equal space */
+.assignments-content .assignment-form-container .form-row .form-group {
+  flex: 1;
+  margin-bottom: 0; /* Remove bottom margin as row handles spacing */
+}
+
+/* Specificity: Style the attachment button label */
+.assignments-content .assignment-form-container .form-group .attach-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background-color: #f1f3f4;
+  color: #3c4043;
+  border: 1px solid #dadce0;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: background-color 0.2s, border-color 0.2s;
+  margin-bottom: 0; /* Override default label margin */
+}
+
+.assignments-content .assignment-form-container .form-group .attach-btn:hover {
+  background-color: #e8eaed;
+  border-color: #c6cace;
+}
+
+/* Specificity: Style the attachments list */
+.assignments-content .assignment-form-container .attachments-list {
+  margin-top: 16px;
+  border: 1px dashed #dadce0;
+  border-radius: 4px;
+  padding: 12px;
+  background-color: #f8f9fa;
+}
+
+.assignments-content .assignment-form-container .attachments-list h4 {
+  margin-top: 0;
+  margin-bottom: 12px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #5f6368;
+}
+
+/* Specificity: Individual file attachment item */
+.assignments-content .assignment-form-container .file-attachment {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 0;
+  font-size: 13px;
+  border-bottom: 1px solid #e8eaed;
+}
+.assignments-content .assignment-form-container .file-attachment:last-child {
+  border-bottom: none;
+}
+
+.assignments-content .assignment-form-container .file-attachment .file-name {
+  color: #202124;
+  flex-grow: 1;
+  margin-right: 8px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.assignments-content .assignment-form-container .file-attachment .file-size {
+  color: #5f6368;
+  margin-right: 8px;
+  flex-shrink: 0;
+}
+
+/* Specificity: Remove file button */
+.assignments-content .assignment-form-container .file-attachment .remove-file {
+  background: none;
+  border: none;
+  color: #5f6368;
+  cursor: pointer;
+  padding: 4px;
+  line-height: 1;
+  font-size: 14px;
+  flex-shrink: 0;
+  transition: color 0.2s;
+}
+
+.assignments-content .assignment-form-container .file-attachment .remove-file:hover {
+  color: #d93025; /* Red color on hover for delete action */
+}
+
+/* Specificity: Form actions container */
+.assignments-content .assignment-form-container .form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  padding-top: 24px;
+  border-top: 1px solid #e0e0e0; /* Separator line */
+  margin-top: 40px; /* Increased from 24px to 40px for more space above editor-attachments */
+}
+
+/* Specificity: General button styles within form actions */
+.assignments-content .assignment-form-container .form-actions button {
+  padding: 10px 20px;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s, border-color 0.2s, color 0.2s, box-shadow 0.2s;
+  border: 1px solid transparent;
+}
+
+/* Specificity: Cancel button style */
+.assignments-content .assignment-form-container .form-actions .cancel-btn {
+  background-color: #ffffff;
+  color: #5f6368;
+  border-color: #dadce0;
+}
+
+.assignments-content .assignment-form-container .form-actions .cancel-btn:hover {
+  background-color: #f8f9fa;
+  border-color: #c6cace;
+}
+
+/* Specificity: Submit button style */
+.assignments-content .assignment-form-container .form-actions .submit-btn,
+.modal-content .assignment-form .form-actions .submit-btn { /* Target both create and edit forms */
+  background-color: #000000; /* Black background */
+  color: #ffffff !important; /* White text with !important to ensure visibility */
+  border-color: #000000; /* Black border */
+  font-weight: 600; /* Make text bold for better visibility */
+  font-size: 15px; /* Slightly larger font */
+}
+
+/* Removing hover effect for submit button */
+.assignments-content .assignment-form-container .form-actions .submit-btn:hover,
+.modal-content .assignment-form .form-actions .submit-btn:hover {
+  background-color: #000000; /* Keep black background on hover */
+  border-color: #000000; /* Keep black border on hover */
+  box-shadow: none; /* Remove any box shadow on hover */
+  color: #ffffff !important; /* Ensure text stays white on hover */
+}
+
+/* --- Styles for Text Formatting Toolbar --- */
+/* Specificity: Target toolbar within description form-group */
+.assignments-content .assignment-form-container .form-group .formatting-toolbar,
+.modal-content .assignment-form .form-group .formatting-toolbar {
+  display: flex;
+  gap: 4px;
+  border: 1px solid #dadce0;
+  border-bottom: none; /* Attach to top of textarea */
+  padding: 6px 8px;
+  background-color: #f8f9fa;
+  border-radius: 4px 4px 0 0; /* Rounded top corners */
+}
+
+/* Specificity: Target buttons within the toolbar */
+.assignments-content .assignment-form-container .form-group .formatting-toolbar button,
+.modal-content .assignment-form .form-group .formatting-toolbar button {
+  background: none;
+  border: 1px solid transparent;
+  color: #5f6368;
+  cursor: pointer;
+  padding: 4px 6px;
+  font-size: 16px; /* Icon size */
+  line-height: 1;
+  border-radius: 3px;
+  transition: background-color 0.2s, color 0.2s;
+}
+
+.assignments-content .assignment-form-container .form-group .formatting-toolbar button:hover,
+.modal-content .assignment-form .form-group .formatting-toolbar button:hover {
+  background-color: #e8eaed;
+  color: #202124;
+}
+
+/* Specificity: Adjust textarea border radius to connect with toolbar */
+.assignments-content .assignment-form-container .form-group textarea,
+.modal-content .assignment-form .form-group textarea {
+  border-radius: 0 0 4px 4px; /* Rounded bottom corners */
+  border-top-color: transparent; /* Hide top border visually */
+  margin-top: -1px; /* Overlap slightly with toolbar border */
+}
+
+/* Specificity: Adjust focus style for textarea with toolbar */
+.assignments-content .assignment-form-container .form-group textarea:focus,
+.modal-content .assignment-form .form-group textarea:focus {
+  border-color: #1a73e8;
+  border-top-color: #1a73e8; /* Show top border on focus */
+  outline: none;
+  box-shadow: 0 0 0 1px #1a73e8; /* Subtle focus ring */
+  position: relative; /* Ensure focus shadow overlaps correctly */
+  z-index: 1;
+}
+
+/* Specificity: Divider within the toolbar */
+.assignments-content .assignment-form-container .form-group .formatting-toolbar .divider,
+.assignments-container .modal-content .assignment-form .form-group .formatting-toolbar .divider {
+  width: 1px;
+  background-color: #dadce0;
+  margin: 4px 6px; /* Vertical margin to align with buttons, horizontal margin for spacing */
+  align-self: stretch; /* Make it fill the height of the toolbar */
+}
+
+/* --- End Text Formatting Toolbar Styles --- */
+
+/* --- End Assignment Creation Form Styles --- */
+
+/* Adjust existing styles if needed to accommodate new form */
+/* Example: Ensure add button has spacing */
+.assignment-header-section {
+  margin-bottom: 24px;
+  display: flex;
+  justify-content: flex-end; /* Keep button to the right */
+}
+
+.add-assignment-btn {
+  background-color: #000000;
+  color: #ffffff;
+  border: 2px solid #000000;
+  padding: 12px 24px;
+  border-radius: 6px;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.2s ease;
+}
+
+.add-assignment-btn:hover {
+  background-color: #333333;
+  border-color: #333333;
+  color: #ffffff;
+}
+
+/* --- Styles for Assignment Cards (Example adjustments might be needed) --- */
+.assignments-list {
+  /* Add some spacing between cards if needed */
+  display: flex;
+  flex-direction: column;
+  gap: 20px; 
+}
+
+.assignment-card {
+  background-color: #ffffff;
+  border: 1px solid #000000;
+  border-radius: 8px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  overflow: visible; /* Changed from hidden to visible to show menus */
+  margin-bottom: 16px;
+  transition: all 0.3s ease;
+}
+
+.assignment-card.collapsed {
+  border: 1px solid #000000;
+}
+
+.assignment-card.expanded {
+  border: 1px solid #000000;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.assignment-content {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease, opacity 0.3s ease;
+  opacity: 0;
+}
+
+.assignment-content.visible {
+  max-height: 2000px; /* Large enough to show all content */
+  opacity: 1;
+}
+
+.assignment-content.hidden {
+  max-height: 0;
+  opacity: 0;
+}
+
+/* Style other elements like .assignment-header, .assignment-title, etc. */
+/* Existing styles below this point need review for conflicts */
+
+.assignment-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: relative;
+  padding: 16px 20px;
+  border-bottom: 1px solid #e8eaed;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  min-height: 60px;
+  overflow: visible; /* Ensure menus aren't clipped */
+}
+
+.assignment-header:hover {
+  background-color: #f8f9fa;
+  border-radius: 8px 8px 0 0; /* Match the card's border radius for the top */
+}
+
+.assignment-card.expanded .assignment-header {
+  border-bottom: 1px solid #e8eaed;
+}
+
+.assignment-card.collapsed .assignment-header {
+  border-bottom: none;
+}
+
+.assignment-icon {
+  margin-right: 16px;
+  color: #5f6368;
+  flex-shrink: 0;
+}
+
+.assignment-icon svg {
+  width: 24px;
+  height: 24px;
+  fill: #5f6368;
+}
+
+.assignment-title {
+  flex: 1 1 auto;
+  margin-right: 16px;
+  min-width: 0;
+}
+
+.assignment-title h3 {
+  margin: 0 0 4px 0;
+  font-size: 16px;
+  font-weight: 500;
+  color: #202124;
+}
+
+.assignment-meta {
+  flex-shrink: 0;
+  margin-right: 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 350px;
+}
+
+.assignment-meta .date-container {
+  flex: 1;
+  text-align: left;
+}
+
+.assignment-meta .points-container {
+  flex: 0 0 auto;
+  text-align: right;
+  min-width: 100px;
+}
+
+/* Add specific style for no-due-date */
+.assignment-meta .no-due-date {
+  font-size: 13px;
+  color: #5f6368;
+  font-style: italic;
+}
+
+/* Update due-date */
+.assignment-meta .due-date {
+  font-size: 13px;
+  color: #5f6368;
+}
+
+/* Update points */
+.assignment-meta .points {
+  font-size: 13px;
+  color: #5f6368;
+}
+
+.expand-indicator {
+  flex-shrink: 0;
+  margin-left: 16px;
+}
+
+.assignment-card.expanded .expand-indicator {
+  transform: rotate(180deg);
+}
+
+.assignment-actions {
+  flex-shrink: 0;
+  margin-left: 16px;
+  position: relative;
+  z-index: 20;
+  overflow: visible;
+}
+
+.options-toggle {
+  background: none;
+  border: none;
+  color: #5f6368;
+  cursor: pointer;
+  padding: 8px;
+  margin: -8px;
+  line-height: 1;
+}
+
+.options-toggle:hover {
+  color: #202124;
+}
+
+.options-menu {
+  z-index: 1000;
+  position: absolute;
+  right: 0;
+  top: 100%;
+  min-width: 120px;
+  background: white;
+  border: 1px solid #dadce0;
+  border-radius: 4px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  padding: 8px 0;
+  display: block;
+}
+
+.options-menu button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: none;
+  border: none;
+  padding: 8px 16px;
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+  font-size: 14px;
+  color: #3c4043;
+}
+
+.options-menu button:hover {
+  background-color: #f1f3f4;
+}
+
+.options-menu button svg {
+  font-size: 14px;
+  color: #5f6368;
+}
+
+/* Add styles for edit/delete buttons if needed */
+.edit-btn svg { color: #14A38B; } /* Changed from #1a73e8 to #14A38B */
+.delete-btn svg { color: #FF7171; } /* Changed from #d93025 to #FF7171 */
+
+.options-menu .edit-button {
+  /* Keep default color */
+  color: #14A38B; /* Added explicit text color to match the SVG */
+}
+
+.options-menu .edit-button svg {
+  color: #14A38B; /* Ensure svg icon matches the text color */
+}
+
+.options-menu .delete-button {
+  color: #FF7171; /* Changed from #d93025 (var(--nova-text-delete)) to #FF7171 */
+}
+
+.options-menu .delete-button svg {
+  color: #FF7171; /* Changed from #d93025 (var(--nova-text-delete)) to #FF7171 */
+}
+
+.assignment-description {
+  padding: 20px 20px 16px;
+  font-size: 14px;
+  color: #3c4043;
+  line-height: 1.5;
+  border-bottom: 1px solid #e8eaed;
+}
+.assignment-description:last-child {
+  border-bottom: none;
+}
+
+.assignment-attachments,
+.submission-section,
+.submissions-section {
+  padding: 16px 20px;
+  border-bottom: 1px solid #e8eaed;
+}
+.assignment-attachments:last-child,
+.submission-section:last-child,
+.submissions-section:last-child {
+  border-bottom: none;
+}
+
+/* Additional styling for the Google Classroom look */
+.assignment-card .assignment-content {
+  background-color: #fff;
+  padding: 0;
+}
+
+.assignment-card.expanded .assignment-content {
+  border-top: 1px solid #e0e0e0;
+}
+
+.assignment-attachments h4,
+.submission-section h4,
+.submissions-section h4 {
+  margin-top: 0;
+  margin-bottom: 12px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #5f6368;
+}
+
+/* Re-use attachment list styles */
+.assignment-attachments .attachments-list {
+  border: none;
+  padding: 0;
+  background: none;
+  margin-top: 8px;
+}
+.assignment-attachments .file-attachment {
+  padding: 6px 0;
+}
+.assignment-attachments .file-attachment a {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: #1a73e8;
+  text-decoration: none;
+  font-size: 13px;
+}
+.assignment-attachments .file-attachment a:hover {
+  text-decoration: underline;
+}
+.assignment-attachments .file-attachment a svg {
+  font-size: 14px;
+}
+.assignment-attachments .file-attachment .file-size {
+  margin-left: 8px;
+}
+
+/* --- Styles for Modal (Edit Form) --- */
+/* Ensure high specificity to override potential global modal styles */
+.assignments-container .modal-overlay.assignment-details-overlay,
+.assignments-container.modal-overlay.assignment-details-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: var(--z-modal);
+}
+
+/* Higher z-index for the attachment removal overlay - should be above all other modals */
+.assignments-container .modal-overlay.attachment-removal-overlay,
+.assignments-container.modal-overlay.attachment-removal-overlay {
+  z-index: calc(var(--z-file-modal) + 100) !important; /* Use file modal level + 100 to ensure it's above everything */
+}
+
+/* Higher z-index for file preview overlay */
+.assignments-container .modal-overlay.file-preview-overlay,
+.assignments-container.modal-overlay.file-preview-overlay {
+  z-index: var(--z-file-modal) !important; /* Higher than all other overlays */
+}
+
+/* Lower z-index for assignment details overlay */
+.assignments-container .modal-overlay.assignment-details-overlay,
+.assignments-container.modal-overlay.assignment-details-overlay {
+  z-index: var(--z-assignment-details); /* Lower than attachment removal overlay */
+}
+
+.assignments-container .modal-content.assignment-details-modal,
+.assignments-container.modal-content.assignment-details-modal {
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+  width: 100%;
+  max-width: 700px;
+  max-height: 90vh;
+  overflow-y: auto;
+  position: relative;
+  z-index: calc(var(--z-assignment-details) + 1);
+}
+
+/* Assignment details modal should have a fixed size for both tabs */
+.assignments-container .modal-content.assignment-details-modal,
+.assignments-container.modal-content.assignment-details-modal {
+  width: 1000px; /* Fixed width */
+  height: 700px; /* Fixed height */
+  max-width: 90%; /* For smaller screens */
+  max-height: 90vh; /* For smaller screens */
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  z-index: calc(var(--z-assignment-details) + 1); /* Higher than overlay */
+}
+
+/* Attachment removal modal should have highest z-index - above all other modals */
+.assignments-container .modal-content.attachment-removal-modal,
+.assignments-container.modal-content.attachment-removal-modal {
+  z-index: calc(var(--z-file-modal) + 101) !important; /* Higher than attachment-removal-overlay, highest z-index */
+  position: relative;
+}
+
+.assignments-container .modal-header,
+.assignments-container .modal-content .modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 24px;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.assignments-container .modal-header h3,
+.assignments-container .modal-content .modal-header h3 {
+  font-size: 18px;
+  font-weight: 500;
+  color: #202124;
+  margin: 0;
+}
+
+.assignments-container .close-modal,
+.assignments-container .modal-content .close-modal {
+  background: none;
+  border: none;
+  color: #5f6368;
+  font-size: 20px;
+  cursor: pointer;
+  padding: 4px;
+  line-height: 1;
+  transition: color 0.2s;
+}
+
+.assignments-container .close-modal:hover,
+.assignments-container .modal-content .close-modal:hover {
+  color: #202124;
+}
+
+/* Apply the same form styles from creation form to the edit form */
+.assignments-container .modal-content .assignment-form {
+  padding: 24px;
+  overflow-y: auto;
+  flex-grow: 1;
+}
+
+/* Use existing form group, input, textarea, row, button styles by leveraging shared classes */
+/* Ensure high specificity if needed */
+
+
+.assignments-container .modal-content .assignment-form .form-actions {
+  flex-shrink: 0;
+  margin-top: 48px; /* Increased from auto to 48px for consistent spacing */
+  padding-top: 24px;
+  border-top: 1px solid #e0e0e0;
+}
+
+/* --- Styles for Attachment Removal Modal --- */
+.assignments-container .attachment-removal-modal .modal-body {
+  padding: 20px 24px;
+}
+
+.assignments-container .attachment-removal-modal .attachment-name {
+  display: flex;
+  align-items: center;
+  background-color: #f8f9fa;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  padding: 10px 12px;
+  margin: 12px 0;
+  font-size: 14px;
+}
+
+.assignments-container .attachment-removal-modal .warning-text {
+  font-size: 13px;
+  color: #d93025; /* Warning color */
+  margin-top: 8px;
+}
+
+.assignments-container .attachment-removal-modal .modal-actions {
+  padding: 16px 24px;
+  border-top: 1px solid #e0e0e0;
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  background-color: #f8f9fa;
+}
+
+/* Danger button style for removal confirm */
+.assignments-container .danger-btn {
+  background-color: #d93025 !important; /* Use important if needed to override */
+  color: white !important;
+  border-color: #d93025 !important;
+}
+
+.assignments-container .danger-btn:hover {
+  background-color: #b0261e !important;
+  border-color: #b0261e !important;
+}
+
+
+/* Ensure editor-content also allows scrolling if needed, although form handles it */
+.assignments-container .modal-content .assignment-form .editor-content {
+   overflow: auto; /* Redundant? Form handles scroll, but safe */
+}
+
+/* Re-add Specificity: Basic styles for the contentEditable div */
+.assignments-content .assignment-form-container .form-group .editor-content,
+.assignments-container .modal-content .assignment-form .form-group .editor-content {
+  width: 100%;
+  /* Default min-height */
+  min-height: 120px; 
+  padding: 10px 12px;
+  border: 1px solid #dadce0;
+  border-radius: 0 0 4px 4px; /* Connected to toolbar */
+  border-top-color: transparent; /* Hide top border visually */
+  margin-top: -1px; /* Overlap slightly with toolbar border */
+  font-size: 14px;
+  color: #202124;
+  box-sizing: border-box;
+  resize: vertical; /* Allow vertical resizing if needed */
+  overflow: auto; /* Add scrollbars if content overflows */
+  background-color: white; /* Ensure background is white */
+  line-height: 1.5; /* Improve readability */
+}
+
+/* Re-add Placeholder styling */
+.assignments-content .assignment-form-container .form-group .editor-content:empty:before,
+.assignments-container .modal-content .assignment-form .form-group .editor-content:empty:before {
+  content: attr(data-placeholder);
+  color: #adb5bd; /* Placeholder text color */
+  pointer-events: none;
+  display: block; /* For line break */
+}
+
+/* Re-add Adjust focus style for editor-content */
+.assignments-content .assignment-form-container .form-group .editor-content:focus,
+.assignments-container .modal-content .assignment-form .form-group .editor-content:focus {
+  border-color: #1a73e8;
+  border-top-color: #1a73e8; 
+  outline: none;
+  box-shadow: 0 0 0 1px #1a73e8; 
+  position: relative; 
+  z-index: 1;
+}
+
+/* Specificity: Increase min-height ONLY for editor in the modal */
+.assignments-container .modal-content .assignment-form .form-group .editor-content {
+  min-height: 80px; /* Adjust this value as needed for ~2 lines */
+}
+
+/* Specificity: Divider within the toolbar */
+.assignments-content .assignment-form-container .form-group .formatting-toolbar .divider,
+.assignments-container .modal-content .assignment-form .form-group .formatting-toolbar .divider {
+  width: 1px;
+  background-color: #dadce0;
+  margin: 4px 6px; /* Vertical margin to align with buttons, horizontal margin for spacing */
+  align-self: stretch; /* Make it fill the height of the toolbar */
+}
+
+/* --- Styles for Attachments --- */
+/* Editor attachments */
+.editor-attachments {
+  margin-top: 16px;
+  border: 2px solid #000000; /* Changed from 1px solid #e0e0e0 to black */
+  border-radius: 4px;
+  background-color: #f8f9fa;
+}
+
+.editor-attachments h4 {
+  padding: 12px 16px;
+  margin: 0;
+  border-bottom: 1px solid #e0e0e0;
+  font-size: 14px;
+  font-weight: 500;
+  color: #5f6368;
+}
+
+.attachment-list {
+  padding: 8px 16px;
+}
+
+.file-attachment {
+  display: flex;
+  align-items: center;
+  padding: 12px 16px; /* Increased padding from 8px 0 */
+  border-bottom: 1px solid #f1f3f4;
+  font-size: 15px; /* Increased from default size */
+  color: #000000; /* Changed to black */
+}
+
+.file-attachment:last-child {
+  border-bottom: none;
+}
+
+.file-attachment .file-name {
+  flex-grow: 1;
+  font-size: 15px; /* Increased from 14px */
+  color: #000000; /* Changed to black from blue */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-right: 12px;
+  transition: color 0.2s;
+}
+
+.file-attachment .file-size {
+  font-size: 14px; /* Increased from 12px */
+  color: #000000; /* Changed to black from gray */
+  white-space: nowrap;
+  margin-right: 12px;
+}
+
+.file-icon {
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 12px;
+  color: #5f6368;
+}
+
+.attachment-preview {
+  width: 24px;
+  height: 24px;
+  object-fit: cover;
+  border-radius: 2px;
+}
+
+.attachment-file, .file-name {
+  flex-grow: 1;
+  font-size: 14px;
+  color: #1a73e8; /* Change to blue to indicate clickability */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-right: 12px;
+  transition: color 0.2s;
+}
+
+.attachment-file:hover {
+  color: #174ea6;
+  text-decoration: underline; /* Add underline to indicate it's clickable */
+}
+
+.file-size {
+  font-size: 12px;
+  color: #5f6368;
+  white-space: nowrap;
+  margin-right: 12px;
+}
+
+.remove-attachment-btn, .remove-file {
+  background: transparent;
+  border: none;
+  color: #5f6368;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s;
+}
+
+.remove-attachment-btn:hover, .remove-file:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+  color: #d93025;
+}
+
+/* For submission files section */
+.submission-files {
+  margin-top: 12px;
+  margin-bottom: 16px;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  background-color: #f8f9fa;
+  padding: 8px 16px;
+}
+
+/* Styles for attachments in cards */
+.assignment-card .assignment-attachments {
+  margin-top: 16px;
+  border-top: 1px solid #e0e0e0;
+  padding-top: 16px;
+}
+
+.assignment-card .assignment-attachments h4 {
+  margin-top: 0;
+  margin-bottom: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #5f6368;
+}
+
+/* Transition for attachment removal */
+.file-attachment.deleting {
+  opacity: 0.5;
+  background-color: #f8d7da;
+  position: relative;
+}
+
+/* Attachment loading state */
+.attachment-loading-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(255, 255, 255, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.attachment-spinner {
+  width: 20px;
+  height: 20px;
+  border: 2px solid rgba(0, 0, 0, 0.1);
+  border-top-color: #1a73e8;
+  border-radius: 50%;
+  animation: spinner 0.8s linear infinite;
+}
+
+@keyframes spinner {
+  to {transform: rotate(360deg);}
+}
+
+/* View Instructions Button */
+.view-instructions-section {
+  padding: 16px 20px;
+  display: flex;
+  justify-content: flex-start;
+}
+
+.view-instructions-btn {
+  background: none;
+  border: none;
+  color: #1a73e8;
+  font-size: 14px;
+  font-weight: 500;
+  padding: 0;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  text-decoration: underline;
+}
+
+.view-instructions-btn:hover {
+  color: #174ea6;
+}
+
+/* Instructions Modal Styling */
+.instructions-modal {
+  max-width: 700px;
+  width: 90%;
+  max-height: 90vh;
+}
+
+.instructions-content {
+  font-size: 14px;
+  line-height: 1.6;
+  color: #3c4043;
+  overflow-y: auto;
+  max-height: 60vh;
+  padding: 20px;
+}
+
+/* New instruction section styling */
+.instruction-section {
+  margin-bottom: 20px;
+}
+
+.instruction-section:last-child {
+  margin-bottom: 0;
+}
+
+.instruction-section h4 {
+  font-size: 16px;
+  font-weight: 500;
+  color: #202124;
+  margin-top: 0;
+  margin-bottom: 10px;
+  padding-bottom: 5px;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.instruction-section p {
+  margin-top: 0;
+  margin-bottom: 8px;
+}
+
+.instruction-section ul {
+  margin: 0;
+  padding-left: 20px;
+}
+
+.instruction-section li {
+  margin-bottom: 6px;
+}
+
+.instruction-section li:last-child {
+  margin-bottom: 0;
+}
+
+.close-btn {
+  background-color: #f1f3f4;
+  color: #3c4043;
+  border: 1px solid #dadce0;
+  padding: 8px 16px;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.close-btn:hover {
+  background-color: #e8eaed;
+}
+
+/* Assignment Details Modal and Tabs */
+.assignment-tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 32px;
+  flex-wrap: wrap;
+  border-bottom: 1px solid #e0e0e0;
+  padding-bottom: 16px;
+}
+
+.tab-button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 16px 24px;
+  background-color: #ffffff;
+  border: 1px solid #000000;
+  border-radius: 6px;
+  color: #000000;
+  font-weight: 500;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.tab-button:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+  transform: translateY(-2px);
+}
+
+.tab-button.active {
+  background-color: #000000;
+  color: #ffffff;
+  border-color: #000000;
+  transform: translateY(-2px);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.tab-content {
+  padding: 0;
+  overflow-y: auto;
+  flex-grow: 1;
+  height: calc(100% - 72px); /* Fixed height based on parent container minus tabs height */
+  width: 100%; /* Ensure tab content takes full width of the modal */
+}
+
+/* Instruction Tab */
+.instruction-tab {
+  padding: 20px;
+  width: 100%; /* Ensure content uses full width */
+}
+
+.assignment-details {
+  width: 100%;
+  margin: 0 auto;
+}
+
+/* Student Work Tab with complete borders */
+.student-work-tab {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+  border: 2px solid #000000; /* Add an overall border to the entire tab */
+  box-sizing: border-box; /* Ensure border is included in dimensions */
+}
+
+.student-work-interface {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+  box-sizing: border-box; /* Ensure border is included in dimensions */
+}
+
+.student-work-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  background-color: #f8f9fa;
+  border-bottom: 2px solid #000000; /* Change to border-bottom only */
+  box-sizing: border-box; /* Ensure border is included in dimensions */
+}
+
+.toolbar-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.return-btn, 
+.settings-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background-color: #000000; /* Black background */
+  border: 1px solid #000000; /* Black border */
+  border-radius: 4px;
+  padding: 8px 16px;
+  font-size: 14px;
+  color: #ffffff; /* White text */
+  cursor: pointer;
+  transition: background-color 0.2s;
+  font-weight: 500;
+  position: relative;
+}
+
+.return-btn:hover {
+  background-color: #333333; /* Darker gray on hover */
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+/* Remove yellow highlight from the return button */
+.return-btn::after {
+  display: none; /* Hide the yellow highlight */
+}
+
+/* Add highlight to currently active return button */
+.return-btn.active {
+  background-color: #333333; /* Consistent hover/active state */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.points-dropdown {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+  background-color: #f5f5f5;
+  margin-left: 10px;
+}
+
+.points-dropdown:hover {
+  background-color: #e8e8e8;
+}
+
+.points-dropdown form {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.points-dropdown input {
+  width: 60px;
+  padding: 4px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  text-align: center;
+}
+
+.points-dropdown button {
+  padding: 4px 8px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+.points-dropdown .save-points-btn {
+  background-color: #4CAF50;
+  color: white;
+}
+
+.points-dropdown .save-points-btn:hover {
+  background-color: #45a049;
+}
+
+.points-dropdown .cancel-points-btn {
+  background-color: #f44336;
+  color: white;
+}
+
+.points-dropdown .cancel-points-btn:hover {
+  background-color: #da190b;
+}
+
+.settings-btn {
+  background-color: #f1f3f4;
+  border: 1px solid #dadce0;
+  color: #3c4043;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.settings-btn:hover {
+  background-color: #e8eaed;
+}
+
+.student-work-content {
+  display: flex;
+  flex-grow: 1;
+  height: calc(100% - 60px);
+  box-sizing: border-box; /* Ensure border is included in dimensions */
+  min-height: 400px; /* Add minimum height to ensure visibility */
+}
+
+.student-list-panel {
+  width: 350px;
+  border-right: 2px solid #000000; /* Change to border-right only */
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow-y: auto;
+  box-sizing: border-box; /* Ensure border is included in dimensions */
+}
+
+.student-list-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  border-bottom: 1px solid #e0e0e0;
+  background-color: #f8f9fa;
+}
+
+.select-all-students {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: #3c4043;
+  cursor: pointer;
+}
+
+/* Interactive Custom Dropdown - matches the image */
+.sorting-dropdown {
+  position: relative;
+  display: inline-block;
+  min-width: 200px;
+}
+
+.sorting-dropdown .dropdown-trigger {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  padding: 12px 16px !important;
+  background-color: #ffffff !important;
+  border: 1px solid #d1d5db !important;
+  border-radius: 8px !important;
+  cursor: pointer !important;
+  font-size: 14px !important;
+  color: #374151 !important;
+  transition: all 0.2s ease !important;
+  outline: none !important;
+  user-select: none !important;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05) !important;
+}
+
+.sorting-dropdown .dropdown-trigger:hover {
+  border-color: #9ca3af !important;
+}
+
+.sorting-dropdown .dropdown-trigger.active {
+  border-color: #000000 !important;
+  border-bottom-left-radius: 0 !important;
+  border-bottom-right-radius: 0 !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
+}
+
+.sorting-dropdown .dropdown-trigger-content {
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+}
+
+.sorting-dropdown .dropdown-trigger-icon {
+  font-size: 16px !important;
+  min-width: 20px !important;
+}
+
+.sorting-dropdown .dropdown-trigger-text {
+  font-weight: 400 !important;
+}
+
+.sorting-dropdown .dropdown-arrow {
+  width: 0 !important;
+  height: 0 !important;
+  border-left: 4px solid transparent !important;
+  border-right: 4px solid transparent !important;
+  border-top: 4px solid #6b7280 !important;
+  transition: transform 0.2s ease !important;
+  margin-left: 8px !important;
+}
+
+.sorting-dropdown .dropdown-trigger.active .dropdown-arrow {
+  transform: rotate(180deg) !important;
+}
+
+.sorting-dropdown .dropdown-menu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  width: 100%;
+  background-color: #ffffff !important;
+  border: 1px solid #000000 !important;
+  border-top: none !important;
+  border-radius: 0 0 8px 8px !important;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06) !important;
+  z-index: 99999 !important;
+  max-height: 0 !important;
+  overflow: hidden !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
+  transform: translateY(-5px) !important;
+  transition: all 0.3s ease !important;
+  pointer-events: none !important;
+}
+
+.sorting-dropdown .dropdown-menu.open {
+  max-height: 400px !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  transform: translateY(0) !important;
+  pointer-events: auto !important;
+  display: block !important;
+}
+
+.sorting-dropdown .dropdown-option {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  font-size: 14px;
+  color: #374151;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+  border: none;
+  background: none;
+  width: 100%;
+  text-align: left;
+  outline: none;
+  white-space: nowrap;
+}
+
+.sorting-dropdown .dropdown-option:hover {
+  background-color: #f3f4f6;
+}
+
+.sorting-dropdown .dropdown-option.selected {
+  background-color: #000000 !important;
+  color: #ffffff !important;
+  border-radius: 0 !important;
+}
+
+.sorting-dropdown .dropdown-option.selected:hover {
+  background-color: #333333 !important;
+  border-radius: 0 !important;
+}
+
+.sorting-dropdown .dropdown-option-content {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.sorting-dropdown .dropdown-option-icon {
+  font-size: 16px;
+  min-width: 20px;
+}
+
+.sorting-dropdown .dropdown-option-text {
+  font-weight: 400;
+}
+
+.sorting-dropdown .dropdown-option-check {
+  font-size: 14px;
+  color: #ffffff;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.sorting-dropdown .dropdown-option.selected .dropdown-option-check {
+  opacity: 1;
+}
+
+.filter-options {
+  padding: 12px 16px;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.graded-filter {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: #3c4043;
+  cursor: pointer;
+}
+
+.student-list {
+  flex-grow: 1;
+  overflow-y: auto;
+}
+
+.student-entry {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 16px;
+  border-bottom: 1px solid #f1f3f4;
+  transition: background-color 0.2s ease;
+}
+
+.student-entry:hover {
+  background-color: #f1f3f4;
+}
+
+.student-entry.selected {
+  background-color: #e8f0fe;
+}
+
+.student-select {
+  margin: 0;
+}
+
+.student-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #e0e0e0;
+  flex-shrink: 0;
+}
+
+.student-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
+/* For initials fallback */
+.student-avatar-img {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #1a73e8;
+  color: white;
+  font-weight: 500;
+  font-size: 16px;
+  text-transform: uppercase;
+}
+
+.student-info {
+  flex-grow: 1;
+  max-width: calc(100% - 150px); /* Ensure name has enough space */
+  margin-right: 10px;
+}
+
+.student-name {
+  font-size: 14px;
+  font-weight: 500;
+  color: #202124;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+
+.student-score {
+  font-size: 12px;
+  color: #5f6368;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 150px;
+}
+
+/* Student grading components */
+.student-grading {
+  display: flex;
+  align-items: center;
+  margin-left: auto; /* Push to the right side */
+  gap: 8px;
+}
+
+.grade-divider {
+  width: 1px;
+  height: 40px;
+  background-color: #dadce0; /* Lighter color, similar to borders */
+  margin-right: 12px;
+}
+
+.grade-input-container {
+  display: flex;
+  align-items: center;
+  white-space: nowrap;
+}
+
+.grade-input {
+  width: 40px;
+  height: 28px;
+  border: 1px solid #dadce0;
+  border-radius: 4px;
+  padding: 0 6px;
+  font-size: 14px;
+  text-align: center;
+  color: #202124;
+}
+
+.grade-hamburger {
+  color: #5f6368;
+  cursor: pointer;
+  margin-left: 8px;
+  position: relative; /* Ensure this is relative for absolute child */
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: background-color 0.2s;
+}
+
+.grade-hamburger:hover {
+  color: #202124;
+  background-color: #f1f3f4;
+}
+
+/* Add styles for the grade hamburger menu */
+.grade-menu {
+  position: absolute;
+  top: 0; /* Align top edge with hamburger icon */
+  right: calc(100% + 5px); /* Position to the right of the hamburger icon with 5px gap */
+  transform: translateY(-25%); /* Adjust vertical position slightly if needed */
+  background-color: white;
+  border: 1px solid #dadce0;
+  border-radius: 4px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  padding: 8px 0;
+  z-index: 100; /* Ensure it's above other content */
+  min-width: 180px;
+  opacity: 1; /* Make sure it's visible */
+  pointer-events: auto; /* Make sure it's interactive */
+}
+
+/* Styles for menu buttons */
+.grade-menu button {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: none;
+  border: none;
+  padding: 10px 16px;
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+  font-size: 14px;
+  color: #3c4043;
+  transition: background-color 0.2s;
+  font-weight: normal;
+}
+
+.grade-menu button:hover {
+  background-color: #f1f3f4;
+}
+
+.keyboard-shortcut {
+  color: #5f6368;
+  font-size: 12px;
+  margin-left: 16px;
+}
+
+/* Remove the arrows if they exist */
+.grade-menu:before, .grade-menu:after {
+  display: none;
+}
+
+.grade-input:focus {
+  outline: none;
+  border-color: #1a73e8;
+}
+
+.grade-max {
+  margin-left: 2px;
+  font-size: 14px;
+  color: #5f6368;
+}
+
+/* Student List States */
+.loading-students,
+.student-error,
+.empty-students {
+  padding: 20px;
+  text-align: center;
+  color: #5f6368;
+  font-size: 14px;
+}
+
+.student-error {
+  color: #d93025;
+}
+
+.submission-panel {
+  flex-grow: 1;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow-y: auto;
+  box-sizing: border-box; /* Ensure border is included in dimensions */
+}
+
+.submission-header {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 20px;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.submission-header .title-section {
+  width: 100%;
+}
+
+.submission-header .title-section h4 {
+  font-size: 1.25rem;
+  font-weight: 500;
+  color: #202124;
+  margin: 0;
+  margin-bottom: 1.25rem;
+}
+
+.submission-header .stats-section {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.submission-header .submission-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: 19%;
+}
+
+.submission-header .submission-stats {
+  display: flex;
+  align-items: center;
+  justify-content: space-evenly;
+  gap: 32px;
+}
+
+.submission-header .stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.submission-header .stat-value {
+  font-size: 1.25rem;
+  font-weight: 500;
+  color: #202124;
+}
+
+.submission-header .stat-label {
+  font-size: 0.875rem;
+  color: #5f6368;
+}
+
+/* Remove the divider since we're using space-evenly */
+.submission-header .stat-item:not(:last-child):after {
+  display: none;
+}
+
+/* Accepting submission indicator */
+.submission-status {
+  display: flex;
+  align-items: center;
+  margin-top: 4px;
+}
+
+/* Status indicator - toggle slider style with red/green colors */
+.status-indicator {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 12px 6px 70px; /* Left padding for toggle switch */
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  background-color: transparent;
+  border: none;
+}
+
+/* Toggle slider background */
+.status-indicator::before {
+  content: "";
+  position: absolute;
+  left: 6px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 60px;
+  height: 28px;
+  background-color: #d93025; /* Red for not-accepting */
+  border-radius: 28px;
+  transition: background-color 0.4s ease;
+}
+
+/* Toggle slider circle */
+.status-indicator::after {
+  content: "";
+  position: absolute;
+  left: 10px; /* 6px + 4px offset */
+  top: 50%;
+  transform: translateY(-50%);
+  width: 20px;
+  height: 20px;
+  background-color: #ffffff;
+  border-radius: 50%;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  transition: all 0.4s ease;
+}
+
+/* Accepting state - green background and circle slides right */
+.status-indicator.accepting::before {
+  background-color: #0e7b1b; /* Green for accepting */
+}
+
+.status-indicator.accepting::after {
+  transform: translateY(-50%) translateX(32px);
+}
+
+/* Not accepting state - red background and circle on left */
+.status-indicator.not-accepting::before {
+  background-color: #d93025; /* Red for not-accepting */
+}
+
+.status-indicator.not-accepting::after {
+  transform: translateY(-50%) translateX(0);
+}
+
+/* Hide the original SVG icons */
+.status-indicator svg {
+  display: none;
+}
+
+.status-indicator.accepting svg {
+  color: #0e7b1b;
+  background-color: white;
+}
+
+.status-indicator.not-accepting svg {
+  color: #d93025;
+  background-color: white;
+}
+
+/* Info icon */
+.submission-status .info-icon {
+  margin-left: 10px;
+  background-color: #202124;
+  color: white;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.submission-filter {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.filter-dropdown {
+  position: relative;
+  display: inline-block;
+  min-width: 180px;
+}
+
+.filter-dropdown .dropdown-trigger {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  padding: 12px 16px !important;
+  background-color: #ffffff !important;
+  border: 1px solid #d1d5db !important;
+  border-radius: 8px !important;
+  cursor: pointer !important;
+  font-size: 14px !important;
+  color: #374151 !important;
+  transition: all 0.2s ease !important;
+  outline: none !important;
+  user-select: none !important;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05) !important;
+}
+
+.filter-dropdown .dropdown-trigger:hover {
+  border-color: #9ca3af !important;
+}
+
+.filter-dropdown .dropdown-trigger.active {
+  border-color: #000000 !important;
+  border-bottom-left-radius: 0 !important;
+  border-bottom-right-radius: 0 !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
+}
+
+.filter-dropdown .dropdown-trigger-content {
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+}
+
+.filter-dropdown .dropdown-trigger-text {
+  font-weight: 400 !important;
+}
+
+.filter-dropdown .dropdown-arrow {
+  width: 0 !important;
+  height: 0 !important;
+  border-left: 4px solid transparent !important;
+  border-right: 4px solid transparent !important;
+  border-top: 4px solid #6b7280 !important;
+  transition: transform 0.2s ease !important;
+  margin-left: 8px !important;
+}
+
+.filter-dropdown .dropdown-trigger.active .dropdown-arrow {
+  transform: rotate(180deg) !important;
+}
+
+.filter-options-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  width: 100%;
+  background-color: #ffffff !important;
+  border: 1px solid #000000 !important;
+  border-top: none !important;
+  border-radius: 0 0 8px 8px !important;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06) !important;
+  z-index: 2000 !important;
+  max-height: 0 !important;
+  overflow: hidden !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
+  transform: translateY(-5px) !important;
+  transition: all 0.3s ease !important;
+  pointer-events: none !important;
+}
+
+.filter-options-dropdown.open {
+  max-height: 400px !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  transform: translateY(0) !important;
+  pointer-events: auto !important;
+  display: block !important;
+}
+
+.filter-options-dropdown button {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  font-size: 14px;
+  color: #374151;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+  border: none;
+  background: none;
+  width: 100%;
+  text-align: left;
+  outline: none;
+  white-space: nowrap;
+}
+
+.filter-options-dropdown button:hover {
+  background-color: #f3f4f6;
+}
+
+.filter-options-dropdown button.active {
+  background-color: #000000 !important;
+  color: #ffffff !important;
+  border-radius: 0 !important;
+}
+
+.filter-options-dropdown button.active:hover {
+  background-color: #333333 !important;
+  border-radius: 0 !important;
+}
+
+.filter-options-dropdown .dropdown-option-content {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.filter-options-dropdown .dropdown-option-text {
+  font-weight: 400;
+}
+
+.filter-options-dropdown .dropdown-option-check {
+  font-size: 14px;
+  color: #ffffff;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.filter-options-dropdown button.active .dropdown-option-check {
+  opacity: 1;
+}
+
+.submissions-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); /* Increased from 150px */
+  gap: 20px; /* Increased from 16px */
+}
+
+.submission-file {
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  overflow: hidden;
+  background-color: #fff;
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+  cursor: pointer;
+}
+
+.submission-file:hover {
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+  transform: translateY(-2px);
+}
+
+.submission-file-header {
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  border-bottom: 1px solid #f1f3f4;
+}
+
+.submitter-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+
+.submitter-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.submitter-name {
+  font-size: 14px;
+  font-weight: 500;
+  color: #202124;
+  text-align: center;
+}
+
+.file-type {
+  padding: 12px;
+  text-align: center;
+  font-size: 14px;
+  color: #3c4043;
+  border-bottom: 1px solid #f1f3f4;
+}
+
+.grading-date {
+  padding: 12px;
+  text-align: center;
+  font-size: 12px;
+  color: #5f6368;
+}
+
+.grading-status-not-graded {
+  color: #ea4335; /* Red for not graded */
+}
+
+.grading-status-graded {
+  color: #34a853; /* Green for graded */
+}
+
+/* Rules for tabs on smaller screens */
+@media (max-width: 768px) {
+  .student-work-content {
+    flex-direction: column;
+  }
+  
+  .student-list-panel {
+    width: 100%;
+    height: auto;
+    max-height: 300px;
+    border-right: none;
+    border-bottom: 1px solid #e0e0e0;
+  }
+  
+  .submission-panel {
+    padding: 12px;
+  }
+  
+  .submissions-grid {
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  }
+}
+
+/* Enhanced Instruction Tab */
+.assignment-header-info {
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.assignment-meta-info {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  align-items: center;
+  justify-content: space-between;
+  color: #000000; /* Make all text in assignment-meta-info black */
+}
+
+.edit-assignment-button-container {
+  margin-left: auto;
+}
+
+.due-date-info, .points-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.due-date-info {
+  font-size: 13px; /* Make due-date-info smaller */
+}
+
+.points-info {
+  font-size: 17px; /* Make points-info bigger */
+  font-weight: 500; /* Add slightly bolder font weight to emphasize */
+}
+
+.meta-label {
+  font-weight: 500;
+  color: #000000; /* Change from #5f6368 to black */
+  font-size: 14px;
+}
+
+.meta-value {
+  color: #000000; /* Change from #202124 to black */
+  font-size: 14px;
+}
+
+.instruction-section {
+  margin-bottom: 30px;
+  padding-bottom: 10px;
+}
+
+.instruction-section h4 {
+  margin-top: 0;
+  margin-bottom: 16px;
+  font-size: 16px;
+  font-weight: 500;
+  color: #202124;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.instruction-section.your-submission {
+  background-color: #f8f9fa;
+  padding: 16px;
+  border-radius: 8px;
+  border: 1px solid #e0e0e0;
+}
+
+.no-submission p {
+  color: #5f6368;
+  margin-top: 0;
+}
+
+.past-due-note {
+  background-color: #fff3e0;
+  border-left: 3px solid #ff9800;
+  padding: 8px 12px;
+  margin-top: 10px !important;
+  font-size: 13px;
+  color: #e65100 !important;
+}
+
+.upload-submission {
+  margin-top: 16px;
+}
+
+.upload-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background-color: #f1f3f4;
+  color: #3c4043;
+  border: 1px solid #dadce0;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: background-color 0.2s, border-color 0.2s;
+}
+
+.upload-btn:hover {
+  background-color: #e8eaed;
+  border-color: #c6cace;
+}
+
+.selected-files {
+  margin-top: 16px;
+  margin-bottom: 16px;
+}
+
+.selected-file {
+  display: flex;
+  align-items: center;
+  padding: 8px 12px;
+  background-color: #fff;
+  border: 1px solid #dadce0;
+  border-radius: 4px;
+  margin-bottom: 8px;
+}
+
+.selected-file .file-name {
+  flex-grow: 1;
+  margin-right: 8px;
+  font-size: 14px;
+  color: #1a73e8; /* Changed to blue for better indication of clickability */
+  display: flex;
+  align-items: center;
+  transition: color 0.2s;
+}
+
+.selected-file .file-name:hover {
+  color: #174ea6;
+  text-decoration: underline; /* Add underline on hover to indicate it's clickable */
+}
+
+.selected-file .file-size {
+  margin-right: 12px;
+  font-size: 12px;
+  color: #5f6368;
+}
+
+.remove-file {
+  background: none;
+  border: none;
+  color: #5f6368;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s;
+}
+
+.remove-file:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+  color: #d93025;
+}
+
+.submit-assignment-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  background-color: #1a73e8;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: background-color 0.2s, box-shadow 0.2s;
+}
+
+.submit-assignment-btn:hover {
+  background-color: #185abc;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+/* Submitted Files */
+.submission-files-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.submitted-file-item {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 16px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background: #fff;
+}
+
+.submitted-file-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.submitted-file-icon {
+  font-size: 24px;
+  color: #2196f3;
+}
+
+.submitted-file-details {
+  flex: 1;
+}
+
+.submitted-file-name {
+  font-weight: 500;
+  color: #333;
+}
+
+.submission-date {
+  font-size: 14px;
+  color: #666;
+}
+
+.submission-grade {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.grade-value {
+  font-size: 16px;
+  font-weight: 500;
+  color: #188038;
+}
+
+.feedback {
+  font-size: 12px;
+  color: #5f6368;
+  max-width: 200px;
+  text-align: right;
+}
+
+.feedback-label {
+  font-weight: 500;
+}
+
+.submission-status {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.status-text {
+  padding: 4px 8px;
+  background-color: #f1f3f4;
+  border-radius: 4px;
+  font-size: 12px;
+  color: #5f6368;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .submitted-file-item {
+    flex-direction: column;
+    gap: 12px;
+  }
+  
+  .submission-grade {
+    align-items: flex-start;
+  }
+  
+  .feedback {
+    text-align: left;
+    max-width: 100%;
+  }
+}
+
+/* Attachment Download Link */
+.attachment-download-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: #1a73e8;
+  text-decoration: none;
+  transition: color 0.2s;
+  cursor: pointer;
+}
+
+.attachment-download-link:hover {
+  color: #174ea6;
+  text-decoration: underline;
+}
+
+.attachment-download-link svg {
+  font-size: 16px;
+}
+
+/* File Preview Modal Styles */
+.assignments-container .file-preview-modal {
+  max-width: 90%;
+  width: 900px;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+  overflow: hidden;
+  /* z-index is already set at the top of the file */
+}
+
+.assignments-container .file-preview-modal .modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 20px;
+  border-bottom: 1px solid #e5e7eb;
+  background-color: #f9fafb;
+}
+
+.assignments-container .file-preview-modal .modal-header h3 {
+  margin: 0;
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #1f2937;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 70%;
+}
+
+.assignments-container .file-preview-modal .modal-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.assignments-container .file-preview-modal .download-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  background-color: #000000; /* Changed from #3b82f6 to black */
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.assignments-container .file-preview-modal .download-btn:hover {
+  background-color: #333333; /* Changed from #2563eb to dark gray */
+}
+
+.assignments-container .file-preview-modal .close-modal {
+  background: none;
+  border: none;
+  color: #6b7280;
+  font-size: 1.2rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+  border-radius: 4px;
+  transition: background-color 0.2s;
+}
+
+.assignments-container .file-preview-modal .close-modal:hover {
+  background-color: #f3f4f6;
+  color: #1f2937;
+}
+
+/* File Preview Modal Enhancements */
+.assignments-container .file-preview-modal .modal-body {
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  max-height: calc(90vh - 60px);
+  overflow: auto;
+  background-color: #f5f5f5;
+}
+
+.file-preview-image {
+  max-width: 100%;
+  max-height: calc(90vh - 60px);
+  object-fit: contain;
+  display: block;
+  margin: 0 auto;
+}
+
+.file-preview-pdf {
+  width: 100%;
+  height: calc(90vh - 60px);
+  border: none;
+}
+
+.file-preview-unavailable {
+  padding: 40px;
+  text-align: center;
+  color: #666;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background-color: #f9f9f9;
+}
+
+.file-preview-icon {
+  margin-top: 20px;
+  color: #3498db;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.1);
+    opacity: 0.7;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* Attachment related styles */
+.attachments-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.file-attachment {
+  display: flex;
+  align-items: center;
+  padding: 8px 12px;
+  background-color: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 4px;
+  transition: background-color 0.2s;
+}
+
+.file-attachment:hover {
+  background-color: #f3f4f6;
+}
+
+.attachment-download-link {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #3b82f6;
+  text-decoration: none;
+  font-weight: 500;
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.attachment-download-link:hover {
+  text-decoration: underline;
+}
+
+.file-size {
+  color: #6b7280;
+  font-size: 0.85rem;
+  white-space: nowrap;
+}
+
+.no-submissions {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 20px;
+  color: #5f6368;
+  font-size: 14px;
+  background-color: #f8f9fa;
+  border: 1px dashed #dadce0;
+  border-radius: 8px;
+}
+
+/* Student category styling */
+.student-category {
+  margin-bottom: 16px;
+}
+
+.category-header {
+  display: flex;
+  align-items: center;
+  padding: 10px 16px; /* Increased padding */
+  background-color: #f8f9fa;
+  border-bottom: 1px solid #e0e0e0;
+  font-weight: 500;
+  color: #202124;
+}
+
+.category-header input[type="checkbox"] {
+  margin-right: 8px;
+}
+
+.category-name {
+  font-size: 14px;
+}
+
+.submission-actions {
+  display: flex;
+  gap: 8px;
+  margin: 8px 0;
+}
+
+.preview-btn,
+.unsubmit-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 4px;
+  border: 1px solid #ddd;
+  background: #fff;
+  color: #333;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.preview-btn:hover {
+  background: #f0f7ff;
+  border-color: #2196f3;
+  color: #2196f3;
+}
+
+.unsubmit-btn {
+  color: #dc3545;
+  border-color: #dc3545;
+}
+
+.unsubmit-btn:hover {
+  background: #dc3545;
+  color: #fff;
+}
+
+.submitted-file-item {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 16px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background: #fff;
+}
+
+.submitted-file-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.submitted-file-icon {
+  font-size: 24px;
+  color: #2196f3;
+}
+
+.submitted-file-details {
+  flex: 1;
+}
+
+.submitted-file-name {
+  font-weight: 500;
+  color: #333;
+}
+
+.submission-date {
+  font-size: 14px;
+  color: #666;
+}
+
+/* Grading modal styling */
+.assignments-container .grading-modal {
+  max-width: 90%;
+  width: 900px;
+  max-height: 90vh;
+  /* z-index is already set at the top of the file */
+}
+
+.assignments-container .grading-panel-body {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.grading-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #e0e0e0;
+  padding-bottom: 15px;
+}
+
+.grading-student-info {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.grading-student-info .student-avatar {
+  align-self: center;
+  width: 50px;
+  height: 50px;
+}
+
+.grading-student-info .student-name {
+  align-self: center;
+  font-weight: 500;
+  font-size: 16px;
+}
+
+/* Enhanced file preview in grading modal */
+.grading-file-preview {
+  margin-top: 20px;
+  border: 1px solid #000000; /* Changed from #e0e0e0 to black */
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.grading-file-preview h4 {
+  margin: 0;
+  padding: 12px 16px;
+  background-color: #f8f9fa;
+  border-bottom: 1px solid #e0e0e0;
+  font-size: 14px;
+  font-weight: 500;
+  color: #5f6368;
+}
+
+.grading-file-preview .submission-files-list {
+  padding: 12px 16px;
+  border: 2px solid #000000; /* Add solid black border to modal-body */
+}
+
+.grading-file-preview .file-attachment {
+  display: flex;
+  align-items: center;
+  padding: 8px 0;
+  border-bottom: 1px solid #f1f3f4;
+}
+
+.grading-file-preview .file-attachment:last-child {
+  border-bottom: none;
+}
+
+.grading-file-preview .attachment-download-link {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #1a73e8;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.grading-file-preview .attachment-download-link:hover {
+  color: #174ea6;
+  text-decoration: underline;
+}
+
+.grading-form {
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.grading-form label {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  font-weight: 500;
+}
+
+.grading-form input,
+.grading-form textarea {
+  padding: 10px;
+  border: 2px solid #000000; /* Add black border to inputs and textareas */
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.grading-form textarea {
+  min-height: 100px;
+  resize: vertical;
+}
+
+.grading-form .return-btn {
+  align-self: flex-start;
+  padding: 10px 20px;
+  background-color: #000000; /* Changed from #1a73e8 to black */
+  color: #ffffff; /* Ensure white text */
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  margin-top: 10px;
+}
+
+.grading-form .return-btn:hover {
+  background-color: #333333; /* Changed from #174ea6 to dark gray */
+}
+
+/* These styles are now handled by the z-index hierarchy at the top of the file */
+
+.due-date {
+  font-size: 0.9rem;
+  color: #555;
+}
+
+.due-date span {
+  display: inline;
+  font-weight: bold;
+}
+
+.no-due-date {
+  font-size: 0.9rem;
+  color: #777;
+  font-style: italic;
+}
+
+/* Style for the AM/PM indicators */
+.am-time {
+  background-color: #F2AC57;
+  color: white;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-weight: bold;
+}
+
+.pm-time {
+  background-color: #14A38B;
+  color: white;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-weight: bold;
+}
+
+.late-submission-indicator {
+  background-color: #ff5252;
+  color: white;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-weight: bold;
+  margin-bottom: 10px;
+  display: inline-block;
+}
+
+.late-submission-badge {
+  background-color: #ff5252;
+  color: white;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: bold;
+  margin-left: 8px;
+  display: inline-block;
+}
+
+/* Add highlight for late submission entries */
+.submission-item.late-submission,
+.submission-file.late-submission {
+  position: relative;
+  border-left: 4px solid #ff5252;
+}
+
+.submission-item.late-submission::before,
+.submission-file.late-submission::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(255, 82, 82, 0.05);
+  pointer-events: none;
+}
+
+/* Style for late submission in student list */
+.student-entry.late-submission {
+  background-color: rgba(255, 82, 82, 0.05);
+  border-left: 4px solid #ff5252;
+}
+
+/* Style for late submission in grading modal */
+.grading-modal .student-info-section.late-submission {
+  background-color: rgba(255, 82, 82, 0.05);
+  border-left: 4px solid #ff5252;
+  margin-left: -20px;
+  padding-left: 16px;
+}
+
+.submission-files-list.late-submission {
+  border: 1px solid rgba(255, 82, 82, 0.3);
+  border-left: 4px solid #ff5252;
+  background-color: rgba(255, 82, 82, 0.05);
+  padding: 15px;
+  margin: -15px;
+  border-radius: 4px;
+}
+
+.submission-files-list.late-submission .late-submission-indicator {
+  margin-bottom: 15px;
+}
+
+/* Improved styling for submission cards in the student work tab */
+.submission-card {
+  display: flex;
+  flex-direction: column;
+  padding: 15px;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  margin-bottom: 15px;
+  background-color: #fff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+/* Improved student submission details in the list */
+.student-submission-details {
+  display: flex;
+  align-items: center;
+  padding: 12px 16px;
+  border: 1px solid #000000; /* Changed from #e0e0e0 to black */
+  border-radius: 8px;
+  margin-bottom: 10px;
+  background-color: #fff;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  flex-wrap: wrap; /* Allow content to wrap when needed */
+}
+
+.student-submission-details.late-submission {
+  border-left: 4px solid #ff5252;
+  background-color: rgba(255, 82, 82, 0.05);
+}
+
+.student-avatar-container {
+  flex-shrink: 0;
+  margin-right: 15px;
+}
+
+.student-avatar-img {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #e0e0e0;
+  background-color: #f5f5f5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  color: #5f6368;
+  font-size: 16px;
+}
+
+.student-submission-info {
+  flex-grow: 1;
+  min-width: 0; /* Allow the container to shrink below its content size */
+  max-width: 100%; /* Ensure it doesn't exceed its parent container */
+}
+
+.student-name-text {
+  font-weight: 600;
+  font-size: 16px;
+  margin-bottom: 4px;
+  color: #202124;
+}
+
+.submission-timestamp {
+  display: flex;
+  align-items: center;
+  color: #5f6368;
+  font-size: 14px;
+  flex-wrap: wrap; /* Allow wrapping for long timestamps */
+  word-break: break-word; /* Break words if necessary */
+}
+
+/* Submission meta layout */
+.submission-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  width: 100%; /* Take full width to avoid overflows */
+}
+
+/* Separate submission details clearly */
+.submission-detail {
+  display: flex;
+  align-items: center;
+  margin-bottom: 4px;
+}
+
+.detail-label {
+  font-weight: 500;
+  margin-right: 6px;
+  color: #5f6368;
+}
+
+.detail-value {
+  color: #202124;
+  margin-right: 4px; /* Add spacing between elements */
+}
+
+/* Add specific spacing for the "at" text */
+.detail-value + .detail-value {
+  margin-left: 4px; /* Add space before the "at" text */
+}
+
+/* Add new styles for the submission card layout */
+.submission-card {
+  max-width: 100%; /* Ensure the card doesn't overflow its container */
+  overflow: hidden; /* Hide overflowing content */
+}
+
+/* Override time indicator styles to ensure they don't cause overflow */
+.time-indicator {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2px 6px; /* Reduce padding slightly */
+  border-radius: 4px;
+  font-weight: bold;
+  margin: 0 4px;
+  white-space: nowrap; /* Keep AM/PM on same line */
+}
+
+/* Restore the time indicators for AM/PM */
+.time-am {
+  background-color: #F2AC57;
+  color: white;
+}
+
+.time-pm {
+  background-color: #14A38B;
+  color: white;
+}
+
+/* Add additional styles for the specific cards in the image */
+.student-submission-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  width: 100%;
+}
+
+.student-submission-card {
+  flex: 1 1 300px; /* Allow cards to grow and shrink with a base width */
+  min-width: 0; /* Allow proper resizing */
+  max-width: 100%; /* Don't exceed parent width */
+  border-radius: 8px;
+  border: 1px solid #e0e0e0;
+  overflow: hidden; /* Hide overflows */
+  background-color: #fff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  padding: 0; /* Remove padding to leave that to inner elements */
+}
+
+.student-submission-header {
+  display: flex;
+  align-items: center;
+  padding: 12px;
+  border-bottom: 1px solid #f1f3f4;
+}
+
+.student-submission-body {
+  padding: 12px;
+}
+
+.submission-date-container {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  font-size: 13px;
+  color: #5f6368;
+}
+
+/* Style specifically for the timestamp and badges */
+.submission-timestamp {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Add specific styles for the LATE badge */
+.late-badge {
+  display: inline-flex;
+  align-items: center;
+  background-color: #ff5252;
+  color: white;
+  padding: 3px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: bold;
+  margin-left: 4px;
+}
+
+/* File Selection Modal Styles */
+.file-selection-modal {
+  max-width: 500px;
+  width: 100%;
+}
+
+.file-selection-modal .modal-body {
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.file-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.file-selection-item {
+  display: flex;
+  align-items: center;
+  padding: 12px;
+  border-radius: 8px;
+  background-color: #f8f9fa;
+  transition: background-color 0.2s ease;
+  cursor: pointer;
+}
+
+.file-selection-item:hover {
+  background-color: #e9ecef;
+}
+
+.file-selection-item .file-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  margin-right: 12px;
+  border-radius: 4px;
+  background-color: #e2e8f0;
+  color: #4a5568;
+}
+
+.file-selection-item .file-details {
+  flex: 1;
+}
+
+.file-selection-item .file-name {
+  font-weight: 500;
+  margin-bottom: 4px;
+  color: #2d3748;
+}
+
+.file-selection-item .file-size {
+  font-size: 0.85rem;
+  color: #718096;
+}
+
+/* Submission File Badges */
+.submission-files-preview {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 10px;
+}
+
+.submission-file-badge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 40px;
+  height: 24px;
+  padding: 0 8px;
+  border-radius: 4px;
+  background-color: #e2e8f0;
+  color: #4a5568;
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Grading File Items */
+.grading-file-item {
+  display: flex;
+  align-items: center;
+  padding: 12px;
+  margin-bottom: 8px;
+  border-radius: 8px;
+  background-color: #f8f9fa;
+  transition: background-color 0.2s ease;
+}
+
+.grading-file-item:hover {
+  background-color: #e9ecef;
+}
+
+.grading-file-item .file-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  margin-right: 12px;
+  border-radius: 4px;
+  background-color: #e2e8f0;
+  color: #4a5568;
+  font-size: 1.2rem;
+}
+
+.grading-file-item .attachment-download-link {
+  flex: 1;
+  font-weight: 500;
+  color: #2d3748;
+  text-decoration: none;
+}
+
+.grading-file-item .file-size {
+  color: #ffffff !important; /* Force white text to override any duplicate rules */
+  font-size: 0.85rem;
+  margin-left: 12px;
+  background-color: #000000 !important; /* Ensure black background */
+  width: 80px;
+  height: 36px;
+  margin-right: 12px;
+  border-radius: 4px;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.grading-file-item .attachment-download-link {
+  flex: 1;
+  font-weight: 500;
+  color: #2d3748;
+  text-decoration: none;
+}
+
+.grading-file-item .file-size {
+  color: #718096;
+  font-size: 0.85rem;
+  margin-left: 12px;
+}
+
+/* Force file preview modal to always appear in front */
+.assignments-container .file-preview-overlay,
+.assignments-container .modal-overlay.file-preview-overlay {
+  z-index: var(--z-file-modal) !important;
+}
+
+.assignments-container .file-preview-modal,
+.assignments-container .modal-content.file-preview-modal {
+  z-index: calc(var(--z-file-modal) + 1) !important;
+}
+
+/* Ensure consistent fixed sizes for both tabs */
+.instruction-tab, .student-work-tab {
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+}
+
+.assignment-details {
+  height: 100%;
+  width: 100%;
+  overflow-y: auto;
+  padding: 20px;
+}
+
+.student-work-interface {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.student-work-content {
+  height: calc(100% - 60px); /* Full height minus toolbar height */
+  display: flex;
+}
+
+/* Update instruction tab padding */
+.instruction-tab {
+  padding: 0 !important; /* Override existing padding */
+}
+
+/* Override any content-wrapper restrictions inside the assignment-details-modal */
+.assignments-container .assignment-details-modal .content-wrapper {
+  width: 100%;
+  max-width: 100%;
+  padding: var(--space-lg, 24px);
+  margin: 0;
+  box-sizing: border-box;
+}
+
+/* Assignment details section should take full width */
+.assignments-container .assignment-details-modal .assignment-details {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+/* Instruction section should take full width */
+.assignments-container .assignment-details-modal .instruction-section {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+/* All direct children of tab-content should take full width */
+.assignments-container .assignment-details-modal .tab-content > * {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+/* Link button style - placed next to attach-btn */
+.assignments-content .assignment-form-container .form-group .link-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background-color: #f1f3f4;
+  color: #3c4043;
+  border: 1px solid #dadce0;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: background-color 0.2s, border-color 0.2s;
+  margin-left: 8px; /* Space between buttons */
+  margin-bottom: 0; /* Override default label margin */
+}
+
+.assignments-content .assignment-form-container .form-group .link-btn:hover {
+  background-color: #e8eaed;
+  border-color: #c6cace;
+}
+
+/* Additional style for file/link button container */
+.assignments-content .assignment-form-container .form-group .attachment-buttons {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+/* Link attachment in the list */
+.assignments-content .assignment-form-container .file-attachment .link-icon {
+  color: #1a73e8;
+  margin-right: 8px;
+}
+
+/* Ensure collapsed cards have proper hover behavior */
+.assignment-card.collapsed .assignment-header:hover {
+  border-radius: 8px; /* Full border radius when collapsed since it's the only visible part */
+}
+
+/* Ensure expanded cards have proper hover behavior */
+.assignment-card.expanded .assignment-header:hover {
+  border-radius: 8px 8px 0 0; /* Only top corners rounded when expanded */
+}
+
+/* Attachment buttons container in assignment details modal */
+.assignment-details-modal .upload-submission .attachment-buttons {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+/* Link button in assignment details modal - style similar to upload-btn */
+.assignment-details-modal .upload-submission .link-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background-color: #f1f3f4;
+  color: #3c4043;
+  border: 1px solid #dadce0;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: background-color 0.2s, border-color 0.2s;
+}
+
+.assignment-details-modal .upload-submission .link-btn:hover {
+  background-color: #e8eaed;
+  border-color: #c6cace;
+}
+
+/* Link attachment styling in selected files */
+.assignment-details-modal .selected-file .file-name svg,
+.assignments-content .assignment-form-container .selected-file .file-name svg {
+  margin-right: 5px;
+  color: #1a73e8;
+}
+
+/* Link file styling */
+.assignment-details-modal .selected-file.link-file .file-name,
+.assignments-content .assignment-form-container .selected-file.link-file .file-name {
+  color: #1a73e8;
+  text-decoration: underline;
+}
+
+.assignment-details-modal .selected-file.link-file .file-name:hover,
+.assignments-content .assignment-form-container .selected-file.link-file .file-name:hover {
+  color: #174ea6;
+}
+
+/* Link URL Modal - Should appear above assignment details modal */
+.assignments-container .modal-overlay.link-url-overlay,
+.assignments-container.modal-overlay.link-url-overlay {
+  z-index: calc(var(--z-file-modal) + 999) !important; /* Very high z-index to appear above everything */
+}
+
+.assignments-container .modal-content.link-url-modal,
+.assignments-container.modal-content.link-url-modal {
+  z-index: calc(var(--z-file-modal) + 1000) !important; /* Even higher than the overlay */
+  max-width: 500px;
+  width: 90%;
+}
+
+/* Empty state styling for assignments list */
+.assignments-list .empty-state {
+  padding: var(--nova-spacing-xxl, 40px);
+  text-align: center;
+  background-color: #000000; /* Black background */
+  color: #FFFFFF; /* White text */
+  font-size: var(--nova-font-size-lg, 18px); /* Increased font size */
+  font-weight: 500; /* Added medium font weight for better visibility */
+  min-height: 200px; /* Added minimum height */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%; /* Full width like stream-items */
+  margin-bottom: var(--nova-spacing-xl, 24px); /* Match stream-item margin */
+  box-sizing: border-box; /* Ensure padding is included in width calculation */
+  max-width: 100%; /* Prevent overflow */
+  border-radius: 8px;
+  border: 1px solid #000000; /* Black border to match other elements */
+}
+
+.assignments-list .empty-state .empty-icon {
+  margin-bottom: 24px;
+  opacity: 0.8;
+}
+
+.assignments-list .empty-state .empty-icon svg {
+  fill: #ffffff;
+  width: 64px;
+  height: 64px;
+}
+
+.assignments-list .empty-state p {
+  font-size: 18px;
+  color: #ffffff;
+  margin: 0;
+  font-weight: 500;
+}
+
+/* ... existing code ... */
+
+/* Edit assignment button styling */
+.edit-assignment-button-container .edit-assignment-btn,
+.edit-assignment-btn {
+  background-color: #000000; /* Black background */
+  color: #FFFFFF; /* White text */
+  border: 1px solid #000000;
+  padding: 8px 16px;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.edit-assignment-button-container .edit-assignment-btn:hover,
+.edit-assignment-btn:hover {
+  background-color: #333333; /* Slightly lighter black on hover */
+}
+
+/* ... rest of existing CSS ... */
+
+/* Improved styling for attachments list */
+.attachments-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px; /* Increased from 8px */
+  margin-top: 16px; /* Increased from 10px */
+  padding: 16px; /* Added padding */
+  border-radius: 8px; /* Added rounded corners */
+  background-color: #f9fafb; /* Light background to distinguish */
+  border: 1px solid #e5e7eb; /* Light border */
+}
+
+/* Make attachment links black */
+.attachment-download-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: #000000 !important; /* Changed from blue to black, using !important to override */
+  text-decoration: none;
+  transition: color 0.2s;
+  cursor: pointer;
+  font-size: 15px; /* Increased font size */
+  font-weight: 500; /* Made it slightly bolder */
+}
+
+.attachment-download-link:hover {
+  color: #333333 !important; /* Darker gray on hover */
+  text-decoration: underline;
+}
+
+.attachment-download-link svg {
+  font-size: 18px; /* Increased from 16px */
+  color: #000000; /* Made icons black too */
+}
+
+/* Force black background and white text for edit assignment button */
+.edit-assignment-button-container .edit-assignment-btn,
+.edit-assignment-btn {
+  background-color: #000000 !important; /* Black background with !important to override inline styles */
+  color: #FFFFFF !important; /* White text with !important to override inline styles */
+  border: 1px solid #000000 !important;
+  padding: 8px 16px !important;
+  border-radius: 4px !important;
+  font-size: 14px !important;
+  font-weight: 500 !important;
+  cursor: pointer !important;
+  transition: background-color 0.2s ease !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  text-decoration: none !important;
+}
+
+.edit-assignment-button-container .edit-assignment-btn:hover,
+.edit-assignment-btn:hover {
+  background-color: #333333 !important; /* Slightly lighter black on hover */
+  border-color: #333333 !important;
+}
+
+/* Ensure the edit assignment button icon is white */
+.edit-assignment-btn svg,
+.edit-assignment-button-container .edit-assignment-btn svg {
+  fill: #FFFFFF !important;
+  color: #FFFFFF !important;
+  margin-right: 6px !important;
+}
+
+/* ... rest of existing CSS ... */
+
+/* Points input styling - specific to assignments */
+.assignments-container .points-input {
+  width: auto;
+  min-width: 180px;
+  max-width: 200px;
+  text-align: center;
+  height: 36px;
+  line-height: 36px;
+  padding: 0 12px;
+  vertical-align: middle;
+  display: inline-flex;
+  align-items: center;
+  box-sizing: content-box;
+  border: 1px solid #000000;
+  border-radius: 4px;
+  font-size: 14px;
+  color: #202124;
+  margin-bottom: 0; /* Explicitly remove margin-bottom */
+}
+
+.assignments-container .points-input:focus {
+  outline: none;
+  border-color: #000000;
+  box-shadow: 0 0 0 1px #000000;
+}
+
+/* Custom checkbox styling for student-list-panel - black theme */
+.student-list-panel input[type="checkbox"] {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  width: 16px;
+  height: 16px;
+  border: 2px solid #000000;
+  border-radius: 3px;
+  background-color: #ffffff;
+  cursor: pointer;
+  position: relative;
+  transition: all 0.2s ease;
+}
+
+.student-list-panel input[type="checkbox"]:checked {
+  background-color: #000000;
+  border-color: #000000;
+}
+
+.student-list-panel input[type="checkbox"]:checked::after {
+  content: '✓';
+  position: absolute;
+  top: -2px;
+  left: 1px;
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: bold;
+  line-height: 1;
+}
+
+.student-list-panel input[type="checkbox"]:hover {
+  border-color: #333333;
+}
+
+.student-list-panel input[type="checkbox"]:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.2);
+}
+
+.category-header input[type="checkbox"] {
+  margin-right: 8px;
+}
+
+/* Add styles for edit/delete buttons in options menu */
+.options-menu button.edit-btn {
+  color: #14A38B;
+}
+
+.options-menu button.edit-btn svg {
+  color: #14A38B;
+}
+
+.options-menu button.delete-btn {
+  color: #FF7171;
+}
+
+.options-menu button.delete-btn svg {
+  color: #FF7171;
+}
+
+.options-menu .edit-button {
+  /* Keep default color */
+  color: #14A38B; /* Added explicit text color to match the SVG */
+}
+
+.options-menu .edit-button svg {
+  color: #14A38B; /* Ensure svg icon matches the text color */
+}
+
+.options-menu .delete-button {
+  color: #FF7171; /* Changed from #d93025 (var(--nova-text-delete)) to #FF7171 */
+}
+
+.options-menu .delete-button svg {
+  color: #FF7171; /* Changed from #d93025 (var(--nova-text-delete)) to #FF7171 */
+}
+
+/* Specific input borders for assignment form elements */
+.assignments-content .assignment-form-container .form-group input.edit-title,
+.assignments-content .assignment-form-container .form-group input.edit-dueDate,
+.assignments-content .assignment-form-container .form-group input.edit-points,
+.assignments-content .assignment-form-container input.edit-title,
+.assignments-content .assignment-form-container input.edit-dueDate,
+.assignments-content .assignment-form-container input.edit-points {
+  border: 2px solid #000000 !important; /* Black solid border with !important to override existing styles */
+  border-radius: 4px !important;
+}
+
+/* Focus states for these specific inputs */
+.assignments-content .assignment-form-container .form-group input.edit-title:focus,
+.assignments-content .assignment-form-container .form-group input.edit-dueDate:focus,
+.assignments-content .assignment-form-container .form-group input.edit-points:focus,
+.assignments-content .assignment-form-container input.edit-title:focus,
+.assignments-content .assignment-form-container input.edit-dueDate:focus,
+.assignments-content .assignment-form-container input.edit-points:focus {
+  border-color: #000000 !important; /* Keep black border on focus */
+  outline: none;
+  box-shadow: 0 0 0 1px #000000 !important; /* Black focus ring */
+}
+
+/* More specific edit/delete button styles to override CombinedExam.css */
+.assignments-container .assignment-card .assignment-actions .options-menu button.edit-btn,
+.assignments-content .assignment-card .assignment-actions .options-menu button.edit-btn {
+  color: #14A38B !important;
+}
+
+.assignments-container .assignment-card .assignment-actions .options-menu button.edit-btn svg,
+.assignments-content .assignment-card .assignment-actions .options-menu button.edit-btn svg {
+  color: #14A38B !important;
+}
+
+.assignments-container .assignment-card .assignment-actions .options-menu button.delete-btn,
+.assignments-content .assignment-card .assignment-actions .options-menu button.delete-btn {
+  color: #FF7171 !important;
+}
+
+.assignments-container .assignment-card .assignment-actions .options-menu .edit-button,
+.assignments-content .assignment-card .assignment-actions .options-menu .edit-button {
+  color: #14A38B !important;
+}
+
+.assignments-container .assignment-card .assignment-actions .options-menu .edit-button svg,
+.assignments-content .assignment-card .assignment-actions .options-menu .edit-button svg {
+  color: #14A38B !important;
+}
+
+.assignments-container .assignment-card .assignment-actions .options-menu .delete-button,
+.assignments-content .assignment-card .assignment-actions .options-menu .delete-button {
+  color: #FF7171 !important;
+}
+
+.assignments-container .assignment-card .assignment-actions .options-menu .delete-button svg,
+.assignments-content .assignment-card .assignment-actions .options-menu .delete-button svg {
+  color: #FF7171 !important;
+}
+
+/* More specific form group border styles to override CombinedExam.css */
+.assignments-container .assignments-content .assignment-form-container .form-group,
+.assignments-content .assignment-form-container .assignment-form .form-group {
+  border: 2px solid #000000 !important;
+  border-radius: 4px !important;
+  padding: 16px !important;
+}
+
+/* More specific input border styles to override CombinedExam.css */
+.assignments-container .assignments-content .assignment-form-container .form-group input[type="text"],
+.assignments-container .assignments-content .assignment-form-container .form-group input[type="number"],
+.assignments-container .assignments-content .assignment-form-container .form-group input[type="datetime-local"],
+.assignments-container .assignments-content .assignment-form-container .form-group textarea,
+.assignments-content .assignment-form-container .assignment-form .form-group input[type="text"],
+.assignments-content .assignment-form-container .assignment-form .form-group input[type="number"],
+.assignments-content .assignment-form-container .assignment-form .form-group input[type="datetime-local"],
+.assignments-content .assignment-form-container .assignment-form .form-group textarea {
+  border: 2px solid #000000 !important;
+  border-radius: 4px !important;
+}
+
+/* More specific focus states to override CombinedExam.css */
+.assignments-container .assignments-content .assignment-form-container .form-group input[type="text"]:focus,
+.assignments-container .assignments-content .assignment-form-container .form-group input[type="number"]:focus,
+.assignments-container .assignments-content .assignment-form-container .form-group input[type="datetime-local"]:focus,
+.assignments-container .assignments-content .assignment-form-container .form-group textarea:focus,
+.assignments-content .assignment-form-container .assignment-form .form-group input[type="text"]:focus,
+.assignments-content .assignment-form-container .assignment-form .form-group input[type="number"]:focus,
+.assignments-content .assignment-form-container .assignment-form .form-group input[type="datetime-local"]:focus,
+.assignments-content .assignment-form-container .assignment-form .form-group textarea:focus {
+  border-color: #000000 !important;
+  outline: none !important;
+  box-shadow: 0 0 0 1px #000000 !important;
+}
+
+/* More specific named input styles to override CombinedExam.css */
+.assignments-container .assignments-content .assignment-form-container input.edit-title,
+.assignments-container .assignments-content .assignment-form-container input.edit-dueDate,
+.assignments-container .assignments-content .assignment-form-container input.edit-points,
+.assignments-content .assignment-form-container .assignment-form input.edit-title,
+.assignments-content .assignment-form-container .assignment-form input.edit-dueDate,
+.assignments-content .assignment-form-container .assignment-form input.edit-points {
+  border: 2px solid #000000 !important;
+  border-radius: 4px !important;
+}
+
+.assignments-container .assignments-content .assignment-form-container input.edit-title:focus,
+.assignments-container .assignments-content .assignment-form-container input.edit-dueDate:focus,
+.assignments-container .assignments-content .assignment-form-container input.edit-points:focus,
+.assignments-content .assignment-form-container .assignment-form input.edit-title:focus,
+.assignments-content .assignment-form-container .assignment-form input.edit-dueDate:focus,
+.assignments-content .assignment-form-container .assignment-form input.edit-points:focus {
+  border-color: #000000 !important;
+  outline: none !important;
+  box-shadow: 0 0 0 1px #000000 !important;
+}
+
+/* More specific editor-attachments border styles to override CombinedExam.css */
+.assignments-container .assignments-content .assignment-form-container .editor-attachments,
+.assignments-content .assignment-form-container .assignment-form .editor-attachments {
+  border: 2px solid #000000 !important;
+  border-radius: 4px !important;
+}
+
+/* Ultra-specific overrides to ensure CombinedExam.css doesn't interfere - MUST BE AT END */
+/* Override general .form-group input styles from CombinedExam.css */
+.assignments-container .assignments-content .assignment-form-container .assignment-form .form-group input,
+.assignments-container .assignments-content .assignment-form-container .assignment-form .form-group textarea,
+.assignments-container .assignments-content .assignment-form-container .form-group input,
+.assignments-container .assignments-content .assignment-form-container .form-group textarea,
+.assignments-content .assignment-form-container .assignment-form .form-group input,
+.assignments-content .assignment-form-container .assignment-form .form-group textarea,
+.assignments-content .assignment-form-container .form-group input,
+.assignments-content .assignment-form-container .form-group textarea {
+  border: 2px solid #000000 !important;
+  border-radius: 4px !important;
+}
+
+/* Override general .form-group input:focus styles from CombinedExam.css */
+.assignments-container .assignments-content .assignment-form-container .assignment-form .form-group input:focus,
+.assignments-container .assignments-content .assignment-form-container .assignment-form .form-group textarea:focus,
+.assignments-container .assignments-content .assignment-form-container .form-group input:focus,
+.assignments-container .assignments-content .assignment-form-container .form-group textarea:focus,
+.assignments-content .assignment-form-container .assignment-form .form-group input:focus,
+.assignments-content .assignment-form-container .assignment-form .form-group textarea:focus,
+.assignments-content .assignment-form-container .form-group input:focus,
+.assignments-content .assignment-form-container .form-group textarea:focus {
+  border-color: #000000 !important;
+  outline: none !important;
+  box-shadow: 0 0 0 1px #000000 !important;
+}
+
+/* Override datetime-local inputs specifically */
+.assignments-container .assignments-content .assignment-form-container .assignment-form .form-group input[type="datetime-local"],
+.assignments-container .assignments-content .assignment-form-container .form-group input[type="datetime-local"],
+.assignments-content .assignment-form-container .assignment-form .form-group input[type="datetime-local"],
+.assignments-content .assignment-form-container .form-group input[type="datetime-local"] {
+  border: 2px solid #000000 !important;
+  border-radius: 4px !important;
+}
+
+.assignments-container .assignments-content .assignment-form-container .assignment-form .form-group input[type="datetime-local"]:focus,
+.assignments-container .assignments-content .assignment-form-container .form-group input[type="datetime-local"]:focus,
+.assignments-content .assignment-form-container .assignment-form .form-group input[type="datetime-local"]:focus,
+.assignments-content .assignment-form-container .form-group input[type="datetime-local"]:focus {
+  border-color: #000000 !important;
+  outline: none !important;
+  box-shadow: 0 0 0 1px #000000 !important;
+}
+
+/* Final fallback - extremely specific selectors to catch any remaining overrides */
+body .assignments-container .assignments-content .assignment-form-container .form-group input,
+body .assignments-container .assignments-content .assignment-form-container .form-group textarea,
+body .assignments-content .assignment-form-container .form-group input,
+body .assignments-content .assignment-form-container .form-group textarea {
+  border: 2px solid #000000 !important;
+  border-radius: 4px !important;
+}
+
+body .assignments-container .assignments-content .assignment-form-container .form-group input:focus,
+body .assignments-container .assignments-content .assignment-form-container .form-group textarea:focus,
+body .assignments-content .assignment-form-container .form-group input:focus,
+body .assignments-content .assignment-form-container .form-group textarea:focus {
+  border-color: #000000 !important;
+  outline: none !important;
+  box-shadow: 0 0 0 1px #000000 !important;
+}
+
+body .assignments-content .assignment-form-container .form-group input:focus,
+body .assignments-content .assignment-form-container .form-group textarea:focus {
+  border-color: #000000 !important;
+  outline: none !important;
+  box-shadow: 0 0 0 1px #000000 !important;
+}
+
+/* Make all text in assignment form black except form-actions */
+.assignments-container .assignments-content .assignment-form-container .assignment-form,
+.assignments-content .assignment-form-container .assignment-form {
+  color: #000000 !important;
+}
+
+.assignments-container .assignments-content .assignment-form-container .assignment-form *:not(.form-actions):not(.form-actions *),
+.assignments-content .assignment-form-container .assignment-form *:not(.form-actions):not(.form-actions *) {
+  color: #000000 !important;
+}
+
+/* Specific text elements in assignment form */
+.assignments-container .assignments-content .assignment-form-container .assignment-form .form-group label,
+.assignments-container .assignments-content .assignment-form-container .assignment-form .form-group input,
+.assignments-container .assignments-content .assignment-form-container .assignment-form .form-group textarea,
+.assignments-container .assignments-content .assignment-form-container .assignment-form .form-group select,
+.assignments-container .assignments-content .assignment-form-container .assignment-form .form-group span,
+.assignments-container .assignments-content .assignment-form-container .assignment-form .form-group p,
+.assignments-container .assignments-content .assignment-form-container .assignment-form .form-group div,
+.assignments-container .assignments-content .assignment-form-container .assignment-form h1,
+.assignments-container .assignments-content .assignment-form-container .assignment-form h2,
+.assignments-container .assignments-content .assignment-form-container .assignment-form h3,
+.assignments-container .assignments-content .assignment-form-container .assignment-form h4,
+.assignments-container .assignments-content .assignment-form-container .assignment-form h5,
+.assignments-container .assignments-content .assignment-form-container .assignment-form h6,
+.assignments-content .assignment-form-container .assignment-form .form-group label,
+.assignments-content .assignment-form-container .assignment-form .form-group input,
+.assignments-content .assignment-form-container .assignment-form .form-group textarea,
+.assignments-content .assignment-form-container .assignment-form .form-group select,
+.assignments-content .assignment-form-container .assignment-form .form-group span,
+.assignments-content .assignment-form-container .assignment-form .form-group p,
+.assignments-content .assignment-form-container .assignment-form .form-group div,
+.assignments-content .assignment-form-container .assignment-form h1,
+.assignments-content .assignment-form-container .assignment-form h2,
+.assignments-content .assignment-form-container .assignment-form h3,
+.assignments-content .assignment-form-container .assignment-form h4,
+.assignments-content .assignment-form-container .assignment-form h5,
+.assignments-content .assignment-form-container .assignment-form h6 {
+  color: #000000 !important;
+}
+
+/* Form header elements */
+.assignments-container .assignments-content .assignment-form-container .form-header,
+.assignments-container .assignments-content .assignment-form-container .form-header *,
+.assignments-content .assignment-form-container .form-header,
+.assignments-content .assignment-form-container .form-header * {
+  color: #000000 !important;
+}
+
+/* Editor content */
+.assignments-container .assignments-content .assignment-form-container .form-group .editor-content,
+.assignments-content .assignment-form-container .form-group .editor-content {
+  color: #000000 !important;
+}
+
+/* Attachment elements */
+.assignments-container .assignments-content .assignment-form-container .attachments-list,
+.assignments-container .assignments-content .assignment-form-container .attachments-list *,
+.assignments-container .assignments-content .assignment-form-container .editor-attachments,
+.assignments-container .assignments-content .assignment-form-container .editor-attachments *,
+.assignments-content .assignment-form-container .attachments-list,
+.assignments-content .assignment-form-container .attachments-list *,
+.assignments-content .assignment-form-container .editor-attachments,
+.assignments-content .assignment-form-container .editor-attachments * {
+  color: #000000 !important;
+}
+
+/* Placeholder text */
+.assignments-container .assignments-content .assignment-form-container .assignment-form .form-group input::placeholder,
+.assignments-container .assignments-content .assignment-form-container .assignment-form .form-group textarea::placeholder,
+.assignments-content .assignment-form-container .assignment-form .form-group input::placeholder,
+.assignments-content .assignment-form-container .assignment-form .form-group textarea::placeholder {
+  color: #666666 !important;
+}
+
+/* Exclude form-actions from black text - preserve original colors */
+.assignments-container .assignments-content .assignment-form-container .assignment-form .form-actions,
+.assignments-container .assignments-content .assignment-form-container .assignment-form .form-actions *,
+.assignments-content .assignment-form-container .assignment-form .form-actions,
+.assignments-content .assignment-form-container .assignment-form .form-actions * {
+  color: inherit;
+}
+
+/* Remove black border from editor-attachments */
+.assignments-container .assignments-content .assignment-form-container .editor-attachments,
+.assignments-content .assignment-form-container .assignment-form .editor-attachments,
+.assignments-content .assignment-form-container .editor-attachments {
+  border: none !important;
+  border-radius: 0 !important;
+}
+
+/* Override any existing editor-attachments border styles */
+body .assignments-container .assignments-content .assignment-form-container .editor-attachments,
+body .assignments-content .assignment-form-container .editor-attachments {
+  border: none !important;
+  border-radius: 0 !important;
+}
+
+/* ========================================= */
+/* ENHANCED SPECIFICITY OVERRIDES FOR COMBINEDEXAM.CSS */
+/* ========================================= */
+
+/* These rules use maximum specificity to override CombinedExam.css without !important where possible */
+
+/* 1. Override CombinedExam.css .form-group selector (line 723) */
+html body .assignments-container .assignments-content .assignment-form-container .assignment-form .form-group,
+html body .assignments-container .assignments-content .assignment-form-container .form-group,
+html body .assignments-content .assignment-form-container .assignment-form .form-group,
+html body .assignments-content .assignment-form-container .form-group {
+  margin-bottom: 20px;
+  border: 2px solid #000000;
+  border-radius: 4px;
+  padding: 16px;
+  background: transparent;
+  box-shadow: none;
+}
+
+/* 2. Override CombinedExam.css .form-group label selector */
+html body .assignments-container .assignments-content .assignment-form-container .assignment-form .form-group label,
+html body .assignments-container .assignments-content .assignment-form-container .form-group label,
+html body .assignments-content .assignment-form-container .assignment-form .form-group label,
+html body .assignments-content .assignment-form-container .form-group label {
+  display: block;
+  font-size: 14px;
+  font-weight: 500;
+  color: #000000;
+  margin-bottom: 8px;
+}
+
+/* 3. Override CombinedExam.css .form-group input, .form-group textarea selectors (lines 734-743) */
+html body .assignments-container .assignments-content .assignment-form-container .assignment-form .form-group input[type="text"],
+html body .assignments-container .assignments-content .assignment-form-container .assignment-form .form-group input[type="number"],
+html body .assignments-container .assignments-content .assignment-form-container .assignment-form .form-group input[type="datetime-local"],
+html body .assignments-container .assignments-content .assignment-form-container .assignment-form .form-group input[type="email"],
+html body .assignments-container .assignments-content .assignment-form-container .assignment-form .form-group input[type="password"],
+html body .assignments-container .assignments-content .assignment-form-container .assignment-form .form-group textarea,
+html body .assignments-container .assignments-content .assignment-form-container .assignment-form .form-group select,
+html body .assignments-container .assignments-content .assignment-form-container .form-group input[type="text"],
+html body .assignments-container .assignments-content .assignment-form-container .form-group input[type="number"],
+html body .assignments-container .assignments-content .assignment-form-container .form-group input[type="datetime-local"],
+html body .assignments-container .assignments-content .assignment-form-container .form-group input[type="email"],
+html body .assignments-container .assignments-content .assignment-form-container .form-group input[type="password"],
+html body .assignments-container .assignments-content .assignment-form-container .form-group textarea,
+html body .assignments-container .assignments-content .assignment-form-container .form-group select,
+html body .assignments-content .assignment-form-container .assignment-form .form-group input[type="text"],
+html body .assignments-content .assignment-form-container .assignment-form .form-group input[type="number"],
+html body .assignments-content .assignment-form-container .assignment-form .form-group input[type="datetime-local"],
+html body .assignments-content .assignment-form-container .assignment-form .form-group input[type="email"],
+html body .assignments-content .assignment-form-container .assignment-form .form-group input[type="password"],
+html body .assignments-content .assignment-form-container .assignment-form .form-group textarea,
+html body .assignments-content .assignment-form-container .assignment-form .form-group select,
+html body .assignments-content .assignment-form-container .form-group input[type="text"],
+html body .assignments-content .assignment-form-container .form-group input[type="number"],
+html body .assignments-content .assignment-form-container .form-group input[type="datetime-local"],
+html body .assignments-content .assignment-form-container .form-group input[type="email"],
+html body .assignments-content .assignment-form-container .form-group input[type="password"],
+html body .assignments-content .assignment-form-container .form-group textarea,
+html body .assignments-content .assignment-form-container .form-group select {
+  width: 100%;
+  padding: 10px 12px;
+  border: 2px solid #000000;
+  border-radius: 4px;
+  font-size: 14px;
+  color: #000000;
+  background-color: #ffffff;
+  box-sizing: border-box;
+  transition: border-color 0.2s;
+  font-family: inherit;
+  outline: none;
+}
+
+/* 4. Override CombinedExam.css .form-group input:focus, .form-group textarea:focus selectors (lines 744-750) */
+html body .assignments-container .assignments-content .assignment-form-container .assignment-form .form-group input[type="text"]:focus,
+html body .assignments-container .assignments-content .assignment-form-container .assignment-form .form-group input[type="number"]:focus,
+html body .assignments-container .assignments-content .assignment-form-container .assignment-form .form-group input[type="datetime-local"]:focus,
+html body .assignments-container .assignments-content .assignment-form-container .assignment-form .form-group input[type="email"]:focus,
+html body .assignments-container .assignments-content .assignment-form-container .assignment-form .form-group input[type="password"]:focus,
+html body .assignments-container .assignments-content .assignment-form-container .assignment-form .form-group textarea:focus,
+html body .assignments-container .assignments-content .assignment-form-container .assignment-form .form-group select:focus,
+html body .assignments-container .assignments-content .assignment-form-container .form-group input[type="text"]:focus,
+html body .assignments-container .assignments-content .assignment-form-container .form-group input[type="number"]:focus,
+html body .assignments-container .assignments-content .assignment-form-container .form-group input[type="datetime-local"]:focus,
+html body .assignments-container .assignments-content .assignment-form-container .form-group input[type="email"]:focus,
+html body .assignments-container .assignments-content .assignment-form-container .form-group input[type="password"]:focus,
+html body .assignments-container .assignments-content .assignment-form-container .form-group textarea:focus,
+html body .assignments-container .assignments-content .assignment-form-container .form-group select:focus,
+html body .assignments-content .assignment-form-container .assignment-form .form-group input[type="text"]:focus,
+html body .assignments-content .assignment-form-container .assignment-form .form-group input[type="number"]:focus,
+html body .assignments-content .assignment-form-container .assignment-form .form-group input[type="datetime-local"]:focus,
+html body .assignments-content .assignment-form-container .assignment-form .form-group input[type="email"]:focus,
+html body .assignments-content .assignment-form-container .assignment-form .form-group input[type="password"]:focus,
+html body .assignments-content .assignment-form-container .assignment-form .form-group textarea:focus,
+html body .assignments-content .assignment-form-container .assignment-form .form-group select:focus,
+html body .assignments-content .assignment-form-container .form-group input[type="text"]:focus,
+html body .assignments-content .assignment-form-container .form-group input[type="number"]:focus,
+html body .assignments-content .assignment-form-container .form-group input[type="datetime-local"]:focus,
+html body .assignments-content .assignment-form-container .form-group input[type="email"]:focus,
+html body .assignments-content .assignment-form-container .form-group input[type="password"]:focus,
+html body .assignments-content .assignment-form-container .form-group textarea:focus,
+html body .assignments-content .assignment-form-container .form-group select:focus {
+  border-color: #000000;
+  outline: none;
+  box-shadow: 0 0 0 1px #000000;
+}
+
+/* 5. Override CombinedExam.css .form-group textarea selector (line 751) */
+html body .assignments-container .assignments-content .assignment-form-container .assignment-form .form-group textarea,
+html body .assignments-container .assignments-content .assignment-form-container .form-group textarea,
+html body .assignments-content .assignment-form-container .assignment-form .form-group textarea,
+html body .assignments-content .assignment-form-container .form-group textarea {
+  min-height: 120px;
+  resize: vertical;
+  font-family: inherit;
+}
+
+/* 6. Specific overrides for named inputs */
+html body .assignments-container .assignments-content .assignment-form-container input.edit-title,
+html body .assignments-container .assignments-content .assignment-form-container input.edit-dueDate,
+html body .assignments-container .assignments-content .assignment-form-container input.edit-points,
+html body .assignments-content .assignment-form-container input.edit-title,
+html body .assignments-content .assignment-form-container input.edit-dueDate,
+html body .assignments-content .assignment-form-container input.edit-points {
+  border: 2px solid #000000;
+  border-radius: 4px;
+  color: #000000;
+  background-color: #ffffff;
+}
+
+html body .assignments-container .assignments-content .assignment-form-container input.edit-title:focus,
+html body .assignments-container .assignments-content .assignment-form-container input.edit-dueDate:focus,
+html body .assignments-container .assignments-content .assignment-form-container input.edit-points:focus,
+html body .assignments-content .assignment-form-container input.edit-title:focus,
+html body .assignments-content .assignment-form-container input.edit-dueDate:focus,
+html body .assignments-content .assignment-form-container input.edit-points:focus {
+  border-color: #000000;
+  outline: none;
+  box-shadow: 0 0 0 1px #000000;
+}
+
+/* 7. Override editor-content styling */
+html body .assignments-container .assignments-content .assignment-form-container .form-group .editor-content,
+html body .assignments-content .assignment-form-container .form-group .editor-content {
+  width: 100%;
+  min-height: 120px;
+  padding: 10px 12px;
+  border: 1px solid #dadce0;
+  border-radius: 0 0 4px 4px;
+  border-top-color: transparent;
+  margin-top: -1px;
+  font-size: 14px;
+  color: #000000;
+  box-sizing: border-box;
+  resize: vertical;
+  overflow: auto;
+  background-color: white;
+  line-height: 1.5;
+  font-family: inherit;
+}
+
+html body .assignments-container .assignments-content .assignment-form-container .form-group .editor-content:focus,
+html body .assignments-content .assignment-form-container .form-group .editor-content:focus {
+  border-color: #1a73e8;
+  border-top-color: #1a73e8;
+  outline: none;
+  box-shadow: 0 0 0 1px #1a73e8;
+  position: relative;
+  z-index: 1;
+}
+
+/* 8. Ensure all text elements in assignment forms are black */
+html body .assignments-container .assignments-content .assignment-form-container .assignment-form,
+html body .assignments-content .assignment-form-container .assignment-form {
+  color: #000000;
+}
+
+html body .assignments-container .assignments-content .assignment-form-container .assignment-form * :not(.form-actions):not(.form-actions *),
+html body .assignments-content .assignment-form-container .assignment-form * :not(.form-actions):not(.form-actions *) {
+  color: #000000;
+}
+
+/* 9. Override any remaining general input styles from CombinedExam.css */
+html body .assignments-container input[type="text"],
+html body .assignments-container input[type="number"], 
+html body .assignments-container input[type="datetime-local"],
+html body .assignments-container input[type="email"],
+html body .assignments-container input[type="password"],
+html body .assignments-container textarea,
+html body .assignments-container select {
+  border: 2px solid #000000;
+  color: #000000;
+  background-color: #ffffff;
+}
+
+html body .assignments-container input[type="text"]:focus,
+html body .assignments-container input[type="number"]:focus,
+html body .assignments-container input[type="datetime-local"]:focus,
+html body .assignments-container input[type="email"]:focus,
+html body .assignments-container input[type="password"]:focus,
+html body .assignments-container textarea:focus,
+html body .assignments-container select:focus {
+  border-color: #000000;
+  outline: none;
+  box-shadow: 0 0 0 1px #000000;
+}
+
+/* 10. Final catch-all to ensure assignments-specific styling takes precedence */
+html body .assignments-container .assignments-content .assignment-form-container *[class*="form-group"] input,
+html body .assignments-container .assignments-content .assignment-form-container *[class*="form-group"] textarea,
+html body .assignments-container .assignments-content .assignment-form-container *[class*="form-group"] select {
+  border: 2px solid #000000;
+  color: #000000;
+  background-color: #ffffff;
+}
+
+html body .assignments-container .assignments-content .assignment-form-container *[class*="form-group"] input:focus,
+html body .assignments-container .assignments-content .assignment-form-container *[class*="form-group"] textarea:focus,
+html body .assignments-container .assignments-content .assignment-form-container *[class*="form-group"] select:focus {
+  border-color: #000000;
+  outline: none;
+  box-shadow: 0 0 0 1px #000000;
+}
+
+/* ========================================= */
+/* END ENHANCED SPECIFICITY OVERRIDES */
+/* ========================================= */
+
+.assignments-container .assignment-card .assignment-actions .options-menu button.delete-btn svg,
+.assignments-content .assignment-card .assignment-actions .options-menu button.delete-btn svg {
+  color: #FF7171 !important;
+}
+
+.assignments-container .assignment-card .assignment-actions .options-menu .edit-button,
+.assignments-content .assignment-card .assignment-actions .options-menu .edit-button {
+  color: #14A38B !important;
+}
+
+.assignments-container .assignment-card .assignment-actions .options-menu .edit-button svg,
+.assignments-content .assignment-card .assignment-actions .options-menu .edit-button svg {
+  color: #14A38B !important;
+}
+
+.assignments-container .assignment-card .assignment-actions .options-menu .delete-button,
+.assignments-content .assignment-card .assignment-actions .options-menu .delete-button {
+  color: #FF7171 !important;
+}
+
+/* ========================================= */
+/* END ENHANCED SPECIFICITY OVERRIDES */
+/* ========================================= */
+
+/* TESTING: Ensure form-group borders are clearly visible */
+/* This section can be used to test if borders are working */
+html body div.assignments-container div.assignments-content div.assignment-form-container div.form-group {
+  border: 3px solid #FF0000 !important; /* Temporary red border for testing - change to black when working */
+  background-color: rgba(255, 0, 0, 0.1) !important; /* Light red background for testing */
+  margin-bottom: 20px !important;
+  padding: 16px !important;
+  border-radius: 4px !important;
+}
+
+/* TESTING: Ensure inputs also have visible borders */
+html body div.assignments-container div.assignments-content div.assignment-form-container div.form-group input,
+html body div.assignments-container div.assignments-content div.assignment-form-container div.form-group textarea,
+html body div.assignments-container div.assignments-content div.assignment-form-container div.form-group select {
+  border: 3px solid #0000FF !important; /* Temporary blue border for testing - change to black when working */
+  background-color: rgba(0, 0, 255, 0.1) !important; /* Light blue background for testing */
+  border-radius: 4px !important;
+  color: #000000 !important;
+  padding: 10px 12px !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+/* TESTING: Focus states */
+html body div.assignments-container div.assignments-content div.assignment-form-container div.form-group input:focus,
+html body div.assignments-container div.assignments-content div.assignment-form-container div.form-group textarea:focus,
+html body div.assignments-container div.assignments-content div.assignment-form-container div.form-group select:focus {
+  border: 3px solid #00FF00 !important; /* Temporary green border for focus testing */
+  background-color: rgba(0, 255, 0, 0.1) !important; /* Light green background for testing */
+  outline: none !important;
+  box-shadow: 0 0 0 2px #00FF00 !important;
+}
+
+/* ULTIMATE OVERRIDE: Maximum specificity possible to beat CombinedExam.css */
+html body div.assignments-container.assignments-container div.assignments-content.assignments-content div.assignment-form-container.assignment-form-container form.assignment-form div.form-group.form-group {
+  border: 2px solid #000000 !important; /* Your intended black border */
+  background-color: transparent !important;
+  margin-bottom: 20px !important;
+  padding: 16px !important;
+  border-radius: 4px !important;
+}
+
+html body div.assignments-container.assignments-container div.assignments-content.assignments-content div.assignment-form-container.assignment-form-container form.assignment-form div.form-group.form-group input,
+html body div.assignments-container.assignments-container div.assignments-content.assignments-content div.assignment-form-container.assignment-form-container form.assignment-form div.form-group.form-group textarea,
+html body div.assignments-container.assignments-container div.assignments-content.assignments-content div.assignment-form-container.assignment-form-container form.assignment-form div.form-group.form-group select {
+  border: 2px solid #000000 !important; /* Your intended black border */
+  background-color: #ffffff !important;
+  color: #000000 !important;
+  border-radius: 4px !important;
+  padding: 10px 12px !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+  font-size: 14px !important;
+  transition: border-color 0.2s !important;
+}
+
+/* Additional margin-top for form-actions when following editor-attachments specifically */
+.assignments-content .assignment-form-container .editor-attachments + .form-actions,
+.assignments-container .modal-content .assignment-form .editor-attachments + .form-actions {
+  margin-top: 48px; /* Even more space when directly following editor-attachments */
+}
+
+/* Fix for long assignment titles in student work tab */
+.student-work-interface {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.student-work-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  background-color: #f8f9fa;
+  border-bottom: 2px solid #000000;
+  box-sizing: border-box;
+  min-height: 70px; /* Ensure minimum height for toolbar */
+  flex-shrink: 0; /* Prevent toolbar from shrinking */
+}
+
+.student-work-content {
+  display: flex;
+  flex-grow: 1;
+  height: calc(100% - 70px); /* Adjust based on toolbar height */
+  min-height: 400px;
+  overflow: hidden; /* Prevent content overflow */
+}
+
+.student-list-panel {
+  width: 350px;
+  min-width: 350px; /* Prevent panel from shrinking */
+  border-right: 2px solid #000000;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow-y: auto;
+  box-sizing: border-box;
+  flex-shrink: 0; /* Prevent panel from shrinking */
+}
+
+.submission-panel {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+/* Ensure assignment title doesn't overflow */
+.modal-header h3 {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: calc(100% - 40px); /* Leave space for close button */
+  margin-right: 16px;
+}
+
+/* Media query for smaller screens */
+@media (max-width: 768px) {
+  .student-list-panel {
+    width: 100%;
+    min-width: 100%;
+    height: auto;
+    max-height: 300px;
+    border-right: none;
+    border-bottom: 2px solid #000000;
+  }
+
+  .student-work-content {
+    flex-direction: column;
+  }
+
+  .submission-panel {
+    width: 100%;
+    height: calc(100% - 300px);
+  }
+}
+
+.attachment-buttons {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 16px;
+  margin-bottom: 16px;
+  width: 100%;
+}
+
+.attach-btn, .link-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background-color: #f1f3f4;
+  color: #3c4043;
+  border: 1px solid #dadce0;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: background-color 0.2s, border-color 0.2s;
+  min-width: 120px;
+  justify-content: center;
+}
+
+.attach-btn:hover, .link-btn:hover {
+  background-color: #e8eaed;
+  border-color: #c6cace;
+}
+
+.attach-btn input[type="file"] {
+  display: none;
+}
+
+/* Container for the attachment section */
+.form-group .attachment-section {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+  padding: 16px 0;
+}
+
+.form-group + .pointscon{
+  margin-top: 0px !important;
+}
+
+/* Attachment buttons styling */
+.assignments-container .assignment-form-container .form-group .attachment-buttons {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 16px;
+  margin-bottom: 16px;
+  width: 100%;
+}
+
+.assignments-container .assignment-form-container .form-group .attach-btn,
+.assignments-container .assignment-form-container .form-group .link-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background-color: #f1f3f4;
+  color: #3c4043;
+  border: 1px solid #dadce0;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: background-color 0.2s, border-color 0.2s;
+  min-width: 120px;
+  justify-content: center;
+}
+
+.assignments-container .assignment-form-container .form-group .attach-btn:hover,
+.assignments-container .assignment-form-container .form-group .link-btn:hover {
+  background-color: #e8eaed;
+  border-color: #c6cace;
+}
+
+.assignments-container .assignment-form-container .form-group .attach-btn input[type="file"] {
+  display: none;
+}
+
+/* Override any existing margin or padding that might affect alignment */
+.assignments-container .assignment-form-container .form-group .attachment-buttons > * {
+  margin: 0;
+}

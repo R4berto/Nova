@@ -1,0 +1,486 @@
+:root {
+    /* Define explicit colors instead of referencing undefined variables */
+    --primary-color: #4fd1dc;
+    --primary-hover: #2bbbc7;
+    --text-color: #1a2b4c;
+    --text-secondary: #6c757d;
+    --background: #f8f9fa;
+    --border-color: #e9ecef;
+    --error-color: #ff5252;
+    --success-color: #2ed47a;
+    --radius-md: 12px;
+    --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.1);
+    --shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.15);
+    --navy: #1a2b4c;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    line-height: 1.5;
+    color: var(--text-color);
+    background: var(--background);
+    min-height: 100vh;
+}
+
+.container {
+    display: flex;
+    min-height: 100vh;
+    min-width: 100vw;
+    background-color: var(--background);
+}
+
+.info-section {
+    flex: 1;
+    padding: 48px;
+    background: linear-gradient(180deg, var(--navy) 0%, #343c5a 100%);
+    color: white;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    position: relative;
+}
+
+.info-section h1 {
+    font-size: 48px;
+    font-weight: 700;
+    margin-bottom: 24px;
+    line-height: 1.2;
+    color: white;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.subtitle {
+    font-size: 20px;
+    opacity: 0.9;
+    margin-bottom: 48px;
+    color: white;
+}
+
+.features {
+    display: grid;
+    gap: 32px;
+}
+
+.feature {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+}
+
+.feature-icon {
+    font-size: 24px;
+    background: rgba(255, 255, 255, 0.2);
+    padding: 12px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.feature h3 {
+    font-size: 18px;
+    margin-bottom: 8px;
+    color: white;
+}
+
+.feature p {
+    opacity: 1;
+    line-height: 1.5;
+    color: rgba(255, 255, 255, 0.9);
+    margin-bottom: 0;
+}
+
+.form-section {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 48px;
+    background-color: #f0f4ff;
+}
+
+.form-container {
+    width: 100%;
+    max-width: 500px;
+    padding: 32px;
+    background: white;
+    border-radius: var(--radius-md);
+    box-shadow: none;
+}
+
+.form-container h2 {
+    font-size: 24px;
+    color: var(--text-color);
+    margin-bottom: 32px;
+    text-align: center;
+    font-weight: 600;
+}
+
+.form-group {
+    margin-bottom: 24px;
+}
+
+.form-group label {
+    display: block;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-color);
+    margin-bottom: 8px;
+}
+
+.form-group input,
+.form-group select {
+    width: 100%;
+    padding: 12px 16px;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    font-size: 16px;
+    transition: all 0.2s ease;
+    background-color: white;
+    color: var(--text-color);
+}
+
+.form-group input:focus,
+.form-group select:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(79, 209, 220, 0.1);
+}
+
+.form-group select {
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%234e5d78' d='M6 8.825L1.175 4 2.238 2.938 6 6.7l3.763-3.763L10.825 4z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 16px center;
+    padding-right: 40px;
+}
+
+.submit-button {
+    width: 100%;
+    padding: 12px;
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: var(--radius-md);
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    margin-top: 8px;
+    box-shadow: none;
+}
+
+.submit-button:hover {
+    background-color: var(--primary-hover);
+    transform: translateY(-2px);
+    box-shadow: none;
+}
+
+.submit-button:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.reg-footer {
+    margin-top: 24px;
+    text-align: center;
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+
+.link {
+    color: var(--primary-color);
+    text-decoration: none;
+    font-weight: 600;
+    transition: color 0.2s ease;
+}
+
+.link:hover {
+    color: var(--primary-hover);
+    text-decoration: underline;
+}
+
+@media (max-width: 768px) {
+    .container {
+        flex-direction: column;
+    }
+
+    .info-section {
+        padding: 32px;
+    }
+
+    .info-section h1 {
+        font-size: 36px;
+    }
+
+    .form-section {
+        padding: 32px;
+    }
+
+    .form-container {
+        padding: 24px;
+    }
+    
+    .logo-wrapper {
+        top: 20px;
+        left: 32px;
+    }
+    
+    .nova-logo {
+        width: 50px;
+        height: 50px;
+    }
+}
+
+@media (max-width: 480px) {
+    .logo-wrapper {
+        top: 15px;
+        left: 20px;
+    }
+    
+    .nova-logo {
+        width: 40px;
+        height: 40px;
+    }
+}
+
+.password-requirements {
+  font-size: 0.85rem;
+  color: #666;
+  margin-top: 5px;
+}
+
+.password-requirements ul {
+  margin-top: 5px;
+  margin-bottom: 0;
+  padding-left: 20px;
+}
+
+.password-requirements li {
+  margin-bottom: 3px;
+}
+
+/* Carousel Styles */
+.carousel-container {
+    width: 100%;
+    position: relative;
+    overflow: hidden;
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
+.carousel-slides {
+    display: flex;
+    width: 100%;
+    transition: transform 0.4s ease;
+}
+
+.carousel-slide {
+    min-width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    animation: fadeIn 0.5s ease-out;
+}
+
+.image-wrapper {
+    width: 100%;
+    max-width: 240px;
+    height: 180px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 20px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 20px;
+    padding: 20px;
+}
+
+.image-wrapper img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.text-wrapper {
+    text-align: center;
+    max-width: 400px;
+}
+
+.text-wrapper h3 {
+    font-size: 24px;
+    font-weight: 600;
+    margin-bottom: 10px;
+    color: white;
+}
+
+.text-wrapper p {
+    font-size: 16px;
+    line-height: 1.6;
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.carousel-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 30px;
+    width: 100%;
+    max-width: 400px;
+    padding: 0 10px;
+}
+
+.carousel-btn {
+    background: rgba(255, 255, 255, 0.2);
+    border: none;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.carousel-btn:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: scale(1.05);
+}
+
+.carousel-dots {
+    display: flex;
+    gap: 8px;
+}
+
+.carousel-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.3);
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.carousel-dot.active {
+    background: white;
+    transform: scale(1.2);
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Media Queries for Carousel */
+@media (max-width: 768px) {
+    .carousel-container {
+        margin-top: 10px;
+    }
+    
+    .image-wrapper {
+        height: 150px;
+        padding: 15px;
+    }
+    
+    .text-wrapper h3 {
+        font-size: 20px;
+    }
+    
+    .text-wrapper p {
+        font-size: 14px;
+    }
+}
+
+@media (max-width: 480px) {
+    .carousel-container {
+        margin-top: 5px;
+    }
+    
+    .image-wrapper {
+        height: 120px;
+        padding: 10px;
+    }
+    
+    .carousel-btn {
+        width: 36px;
+        height: 36px;
+    }
+}
+
+/* Logo styling */
+.logo-wrapper {
+    position: absolute;
+    top: 30px;
+    left: 48px;
+    display: flex;
+    align-items: center;
+    z-index: 10;
+}
+
+.nova-logo {
+    width: 60px;
+    height: 60px;
+    border-radius: 12px;
+    object-fit: contain;
+}
+
+/* Carousel styling */
+.carousel-dots-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 30px;
+    width: 100%;
+}
+
+.carousel-dots {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+}
+
+.form-group.error input,
+.form-group.error select {
+  border-color: var(--error-color);
+  background-color: rgba(255, 82, 82, 0.05);
+}
+
+.error-message {
+  color: var(--error-color);
+  font-size: 12px;
+  margin-top: 5px;
+  font-weight: 500;
+}
+
+.form-group.error label {
+  color: var(--error-color);
+}
+
+/* Animation for input clearing */
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+  20%, 40%, 60%, 80% { transform: translateX(5px); }
+}
+
+.form-group.error input,
+.form-group.error select {
+  animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both;
+} 

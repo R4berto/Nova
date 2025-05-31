@@ -1,0 +1,1 @@
+ALTER TABLE assignment ALTER COLUMN description DROP NOT NULL;

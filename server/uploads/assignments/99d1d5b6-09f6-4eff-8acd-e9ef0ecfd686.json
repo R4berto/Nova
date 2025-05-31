@@ -1,0 +1,27 @@
+{
+  "version": "1.0",
+  "exportDate": "2025-05-25T14:42:06.112Z",
+  "exam": {
+    "title": "test",
+    "description": "sample test for recheck archived",
+    "due_date": "2025-05-26T08:45:00.000Z",
+    "questions": [
+      {
+        "type": "mcq",
+        "question_text": "In typography, serif fonts are typically characterized by",
+        "options": [
+          "Blocky shapes",
+          "No decorative edges",
+          "Rounded ends",
+          "Small lines or strokes attached to letters"
+        ],
+        "correct_answer": [
+          "{\"Small lines or strokes attached to letters\"",
+          "\"Rounded ends\"}"
+        ],
+        "points": 1,
+        "allow_multiple_answers": true
+      }
+    ]
+  }
+}

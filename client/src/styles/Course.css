@@ -1,0 +1,47 @@
+.course-page {
+    min-height: 100vh;
+    background-color: #f8f9fa;
+}
+
+.course-header {
+    background-color: #1a73e8;
+    color: white;
+    padding: 24px;
+    margin-bottom: 24px;
+}
+
+.course-header h1 {
+    margin: 0;
+    font-size: 24px;
+    font-weight: 500;
+}
+
+.course-info {
+    margin-top: 8px;
+    display: flex;
+    gap: 16px;
+    font-size: 14px;
+    opacity: 0.9;
+}
+
+.course-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 16px;
+}
+
+/* Responsive styles */
+@media (max-width: 600px) {
+    .course-header {
+        padding: 16px;
+    }
+
+    .course-header h1 {
+        font-size: 20px;
+    }
+
+    .course-info {
+        flex-direction: column;
+        gap: 4px;
+    }
+} 

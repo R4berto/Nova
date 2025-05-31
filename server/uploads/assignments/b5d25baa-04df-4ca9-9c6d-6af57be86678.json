@@ -1,0 +1,23 @@
+{
+  "version": "1.0",
+  "exportDate": "2025-05-25T15:06:07.178Z",
+  "exam": {
+    "title": "damn",
+    "description": "JAHAHAHAHHA",
+    "due_date": "2025-05-31T04:06:00.000Z",
+    "questions": [
+      {
+        "type": "identification",
+        "question_text": "HAAHAHHA",
+        "options": null,
+        "correct_answer": [
+          "",
+          "lang naman",
+          "huhuhu"
+        ],
+        "points": 1,
+        "allow_multiple_answers": true
+      }
+    ]
+  }
+}

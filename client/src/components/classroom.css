@@ -1,0 +1,2504 @@
+/* Base Layout */
+.dashboard-container {
+  display: flex;
+  min-height: 100vh;
+  background-color: var(--bg-light, #f8f9fa); /* Fallback color if variable isn't defined */
+}
+
+/* Check if variables are loaded - for debugging */
+:root {
+  --check-variables: 1;
+  --sidebar-width: 280px;
+  --sidebar-collapsed-width: 64px;
+  --border-color: #e5e7eb;
+  --text-color: #374151;
+  --text-secondary: #6b7280;
+  --background: #f9fafb;
+  --card-bg: #ffffff;
+  --accent-color: #3b82f6;
+  --hover-color: #f3f4f6;
+  --sidebar-bg: #ffffff;
+  --sidebar-text: #374151;
+  --sidebar-hover: #f3f4f6;
+  --sidebar-active-bg: #e5e7eb;
+
+  /* Nova specific variables */
+  --nova-bg-primary: #ffffff;
+  --nova-bg-secondary: #f8fafc;
+  --nova-bg-tertiary: #f1f5f9;
+  --nova-text-primary: #0f172a;
+  --nova-text-secondary: #475569;
+  --nova-text-tertiary: #64748b;
+  --nova-border-color: #e2e8f0;
+  --nova-border-strong: #000000;
+  --nova-color-white: #ffffff;
+  --nova-color-black: #000000;
+  --nova-border-radius: 12px;
+  --nova-border-radius-sm: 6px;
+  --nova-spacing-xs: 4px;
+  --nova-spacing-sm: 8px;
+  --nova-spacing-md: 16px;
+  --nova-spacing-lg: 24px;
+  --nova-spacing-xl: 32px;
+  --space-lg: 24px;
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+}
+
+/* If you open browser console and run: getComputedStyle(document.documentElement).getPropertyValue('--check-variables') 
+ It should return "1" if CSS variables are being loaded properly */
+
+/* Sidebar Styles scoped to Classroom Page */
+.classroom-page .sidebar {
+min-width: var(--sidebar-width);
+width: var(--sidebar-width);
+background-color: var(--sidebar-bg);
+height: 100vh;
+position: fixed;
+left: 0;
+top: 0;
+padding: 24px;
+display: flex;
+flex-direction: column;
+align-items: stretch;
+z-index: 1000;
+border-right: 1px solid var(--border-color);
+transition: all 0.3s ease;
+overflow-y: auto;
+overflow-x: hidden;
+}
+
+.classroom-page .logo-container {
+display: flex;
+justify-content: flex-start;
+align-items: center;
+gap: 0.75rem;
+margin-bottom: 36px;
+padding: 0 0.5rem;
+width: auto;
+}
+
+.classroom-page .logo {
+width: 40px;
+height: 40px;
+border-radius: 12px;
+position: relative;
+overflow: hidden;
+object-fit: cover;
+}
+
+.classroom-page .logo-container h2 {
+display: block;
+color: var(--text-color);
+font-size: 1.5rem;
+font-weight: 600;
+margin: 0;
+}
+
+.classroom-page .sidebar-header {
+display: block;
+margin-bottom: 16px;
+color: var(--text-secondary);
+font-size: 0.875rem;
+font-weight: 500;
+text-transform: uppercase;
+letter-spacing: 1px;
+padding-left: 8px;
+}
+
+.classroom-page .sidebar-nav {
+flex: 1;
+display: flex;
+flex-direction: column;
+align-items: stretch;
+gap: 8px;
+width: auto;
+margin-top: 40px;
+}
+
+.classroom-page .nav-item {
+display: flex;
+justify-content: flex-start;
+align-items: center;
+padding: 14px 16px;
+color: #000000;
+text-decoration: none;
+border-radius: 8px;
+margin-bottom: 8px;
+transition: all 0.3s ease;
+position: relative;
+font-weight: 500;
+}
+
+.classroom-page .nav-item > span:not(.submenu-toggle) {
+display: inline-block;
+}
+
+.classroom-page .nav-item:hover {
+background-color: var(--sidebar-hover);
+color: #000000;
+}
+
+.classroom-page .nav-item.active {
+background-color: var(--sidebar-active-bg);
+color: #000000;
+box-shadow: none;
+}
+
+.classroom-page .nav-item.active::before {
+display: none;
+}
+
+.classroom-page .nav-icon {
+font-size: 1.25rem;
+opacity: 0.9;
+color: #000000;
+margin: 0;
+margin-right: 10px;
+}
+
+.classroom-page .nav-item:hover .nav-icon,
+.classroom-page .nav-item.active .nav-icon {
+color: #000000;
+}
+
+.classroom-page .nav-item.has-submenu {
+padding: 0;
+display: flex;
+flex-direction: column;
+align-items: flex-start;
+margin-bottom: 8px;
+}
+
+.classroom-page .nav-item.has-submenu > span {
+display: flex;
+align-items: center;
+gap: 12px;
+padding: 14px 16px;
+width: 100%;
+cursor: pointer;
+border-radius: 8px;
+transition: background-color 0.2s ease;
+}
+
+.classroom-page .nav-item.has-submenu > span:hover {
+background-color: var(--sidebar-hover);
+}
+
+.classroom-page .nav-item.has-submenu > span > span {
+display: inline-block;
+}
+
+.classroom-page .submenu-toggle {
+position: static;
+bottom: auto;
+right: auto;
+font-size: 0.75rem;
+color: #000000;
+transition: transform 0.3s ease;
+background-color: transparent;
+border-radius: 0;
+padding: 0;
+line-height: inherit;
+margin-left: auto;
+display: inline-flex;
+align-items: center;
+justify-content: center;
+}
+
+.classroom-page .submenu {
+display: none;
+padding-left: calc(16px + 1.25rem + 12px);
+margin-top: 4px;
+margin-bottom: 8px;
+}
+
+.classroom-page .nav-item.has-submenu.active .submenu {
+display: block;
+}
+
+.classroom-page .submenu-item {
+display: flex;
+align-items: center;
+gap: 10px;
+padding: 10px 0;
+color: #000000;
+text-decoration: none;
+border-radius: 8px;
+transition: all 0.2s ease;
+font-size: 0.9rem;
+position: relative;
+}
+
+.classroom-page .submenu-item:hover {
+color: #000000;
+background-color: var(--sidebar-hover);
+}
+
+.classroom-page .submenu-item.active {
+color: #000000;
+font-weight: 500;
+background-color: var(--sidebar-active-bg);
+}
+
+.classroom-page .submenu-item.active:hover {
+color: #000000;
+background-color: var(--sidebar-hover);
+}
+
+.classroom-page .submenu-item .nav-icon {
+font-size: 1.25rem;
+color: #000000;
+opacity: 0.9;
+margin-right: 10px;
+}
+
+.classroom-page .logout-button {
+display: flex;
+justify-content: flex-start;
+align-items: center;
+gap: 12px;
+padding: 14px 16px;
+color: #ffffff;
+background: #000000;
+border: none;
+border-radius: 8px;
+cursor: pointer;
+transition: background-color 0.2s ease, transform 0.2s ease;
+font-weight: 500;
+margin-top: auto;
+margin-bottom: 20px;
+width: auto;
+}
+
+.classroom-page .logout-button > span {
+display: inline-block;
+color: #ffffff;
+}
+
+.classroom-page .logout-button .nav-icon {
+color: #ffffff !important;
+fill: #ffffff !important;
+}
+
+.classroom-page .logout-button:hover {
+background-color: #333333;
+transform: translateY(-2px);
+}
+
+.classroom-page .logout-button:active {
+transform: translateY(0);
+}
+
+.classroom-page .sidebar.collapsed .logout-button {
+display: flex;
+justify-content: center;
+padding: 14px 0;
+margin-top: auto;
+margin-bottom: 20px;
+width: 40px;
+height: 40px;
+border-radius: 50%;
+margin-left: auto;
+margin-right: auto;
+background-color: #000000;
+}
+
+.classroom-page .sidebar.collapsed .logout-button .nav-icon {
+color: #ffffff !important;
+fill: #ffffff !important;
+margin-right: 0;
+}
+
+.classroom-page .sidebar .logout-button.collapsed {
+justify-content: center;
+padding: 14px 0;
+background-color: #000000;
+}
+
+.classroom-page .sidebar .logout-button.collapsed .nav-icon {
+color: #ffffff !important;
+fill: #ffffff !important;
+}
+
+.classroom-page .main-content {
+flex: 1;
+margin-left: var(--sidebar-width);
+min-height: 100vh;
+width: calc(100% - var(--sidebar-width));
+background-color: var(--background);
+position: relative;
+transition: margin-left 0.3s ease, width 0.3s ease;
+}
+
+.classroom-page .main-content.sidebar-collapsed {
+margin-left: var(--sidebar-collapsed-width);
+width: calc(100% - var(--sidebar-collapsed-width));
+}
+
+.classroom-page .sidebar.collapsed {
+min-width: var(--sidebar-collapsed-width);
+width: var(--sidebar-collapsed-width);
+padding: 24px 12px;
+overflow: visible;
+z-index: 1001;
+}
+
+.classroom-page .sidebar.collapsed .logo-container {
+display: none;
+}
+
+.classroom-page .sidebar.collapsed .sidebar-nav {
+margin-top: 80px;
+}
+
+.classroom-page .collapse-toggle {
+position: absolute;
+top: 20px;
+right: -16px;
+width: 32px;
+height: 32px;
+background-color: #000000;
+border: 2px solid #ffffff;
+border-radius: 50%;
+display: flex;
+align-items: center;
+justify-content: center;
+cursor: pointer;
+z-index: 1005;
+transition: all 0.3s ease;
+box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+}
+
+.classroom-page .collapse-toggle svg {
+width: 24px;
+height: 24px;
+color: #ffffff !important;
+fill: #ffffff !important;
+}
+
+.classroom-page .collapse-toggle svg path {
+fill: #ffffff !important;
+stroke: #ffffff !important;
+}
+
+.classroom-page .collapse-toggle:hover {
+transform: scale(1.1);
+background-color: #333333;
+}
+
+.classroom-page .sidebar.collapsed .collapse-toggle {
+right: -16px;
+}
+
+.classroom-page .sidebar.collapsed .nav-icon {
+margin-right: 0;
+font-size: 2rem;
+color: #000000;
+}
+
+.classroom-page .sidebar.collapsed .has-submenu .nav-icon {
+font-size: 2.2rem;
+}
+
+.classroom-page .sidebar.collapsed .nav-item:hover .nav-icon {
+transform: scale(1.1);
+color: var(--primary-color);
+}
+
+.classroom-page .sidebar.collapsed .nav-item:hover::after {
+content: attr(title);
+position: absolute;
+left: calc(100% + 10px);
+top: 50%;
+transform: translateY(-50%);
+background-color: var(--dark-color);
+color: var(--white);
+padding: 6px 12px;
+border-radius: 4px;
+white-space: nowrap;
+font-size: 0.875rem;
+font-weight: 400;
+z-index: 1000;
+box-shadow: var(--shadow-md);
+pointer-events: none;
+opacity: 0.9;
+}
+
+.classroom-page .sidebar.collapsed .submenu-trigger {
+display: flex;
+justify-content: center;
+padding: 14px 0;
+width: 100%;
+text-decoration: none;
+cursor: pointer;
+}
+
+.classroom-page .sidebar.collapsed .nav-item.has-submenu .submenu-trigger {
+padding: 16px 0;
+color: #000000;
+}
+
+.classroom-page .sidebar.collapsed .nav-item.has-submenu .submenu-trigger:hover {
+background-color: var(--sidebar-hover);
+}
+
+.classroom-page .sidebar.collapsed .submenu-toggle {
+display: none;
+}
+
+.classroom-page .sidebar.collapsed .collapsed-submenu {
+position: absolute;
+left: 100%;
+top: 0;
+background-color: var(--white);
+border: 1px solid var(--border-color);
+border-radius: 8px;
+padding: 10px;
+min-width: 200px;
+max-width: 240px;
+box-shadow: var(--shadow-md);
+z-index: 1000;
+margin-left: 5px;
+}
+
+.classroom-page .sidebar.collapsed .submenu {
+display: none;
+padding-left: 0;
+}
+
+.classroom-page .sidebar.collapsed .submenu.open {
+display: block;
+}
+
+.classroom-page .sidebar.collapsed .submenu-item {
+padding: 10px 12px;
+border-radius: 4px;
+}
+
+.classroom-page .sidebar.collapsed .has-submenu:hover::after {
+display: none;
+}
+
+.classroom-page .sidebar,
+.classroom-page .main-content,
+.classroom-page .logo-container,
+.classroom-page .nav-item,
+.classroom-page .submenu,
+.classroom-page .logout-button {
+transition: all 0.3s ease;
+}
+
+.classroom-page .nav-item:hover,
+.classroom-page .submenu-item:hover {
+background-color: var(--sidebar-hover);
+}
+
+.classroom-page .submenu-toggle {
+transition: transform 0.3s ease;
+margin-left: auto;
+display: inline-flex;
+align-items: center;
+justify-content: center;
+}
+
+.classroom-page .submenu-toggle.open {
+transform: rotate(180deg);
+}
+
+.classroom-page .nav-item.has-submenu > .submenu-trigger {
+display: flex;
+align-items: center;
+width: 100%;
+cursor: pointer;
+padding: 14px 16px;
+}
+
+/* Add styles for active submenu trigger */
+.classroom-page .nav-item.has-submenu > .submenu-trigger.active {
+background-color: var(--sidebar-active-bg);
+color: #000000;
+}
+
+.classroom-page .nav-item.has-submenu > .submenu-trigger .submenu-toggle {
+margin-left: auto;
+}
+
+.classroom-page .sidebar-header h3 {
+margin: 0;
+font-size: 0.75rem;
+color: var(--text-secondary);
+font-weight: 600;
+text-transform: uppercase;
+letter-spacing: 1px;
+}
+
+.classroom-page .sidebar.collapsed .nav-item {
+justify-content: center;
+padding: 16px 0;
+position: relative;
+margin-bottom: 24px;
+}
+
+.classroom-page .logout-button .nav-icon path {
+fill: #ffffff !important;
+stroke: #ffffff !important;
+}
+
+.classroom-page .sidebar.collapsed .logout-button .nav-icon path {
+fill: #ffffff !important;
+stroke: #ffffff !important;
+}
+
+.classroom-page .sidebar .logout-button.collapsed .nav-icon path {
+fill: #ffffff !important;
+stroke: #ffffff !important;
+}
+
+.classroom-page .submenu-toggle-button {
+background: none;
+border: none;
+padding: 0;
+margin-left: auto;
+cursor: pointer;
+display: flex;
+align-items: center;
+justify-content: center;
+}
+
+.classroom-page .nav-item.has-submenu .submenu-trigger {
+display: flex;
+align-items: center;
+width: 100%;
+padding: 14px 16px;
+color: #000000;
+text-decoration: none;
+cursor: pointer;
+}
+
+.classroom-page .nav-item.has-submenu > .submenu-trigger:hover {
+background-color: var(--sidebar-hover);
+}
+
+/* Main Content Styles */
+.main-content {
+  flex: 1;
+  margin-left: var(--sidebar-width);
+  padding: 24px;
+  width: calc(100% - var(--sidebar-width));
+  padding-bottom: 0; /* Remove bottom padding from main content */
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  transition: margin-left 0.3s ease, width 0.3s ease;
+}
+
+/* Adjust main content when sidebar is collapsed */
+.main-content.sidebar-collapsed {
+  margin-left: var(--sidebar-collapsed-width);
+  width: calc(100% - var(--sidebar-collapsed-width));
+}
+
+.classroom-page .content-wrapper {
+  width: 100%;
+  max-width: 100%; /* Remove any max-width restrictions */
+  padding-top: var(--space-lg);
+  padding-right: var(--space-lg);
+  padding-left: var(--space-lg);
+  padding-bottom: 0;
+  margin: 0; /* Remove auto margins */
+  box-sizing: border-box;
+  margin-bottom: 0; /* Explicitly remove bottom margin */
+  position: relative;
+  flex: 1; /* Take up remaining space like settings.css */
+  overflow-y: auto; /* Allow scrolling if content overflows */
+}
+
+/* Top Bar Styles */
+.classroom-page .top-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: var(--white);
+  border: 1px solid var(--nova-border-strong); /* Black border */
+  border-radius: 16px;
+  padding: 16px 24px;
+  margin-bottom: 24px;
+  box-shadow: var(--shadow-sm);
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.search-bar {
+  position: relative;
+  width: 300px;
+}
+
+.search-icon {
+  position: absolute;
+  left: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--gray-400);
+  font-size: 14px;
+}
+
+.search-input {
+  width: 100%;
+  padding: 12px 16px 12px 42px;
+  border: 1px solid var(--gray-200);
+  border-radius: 24px;
+  font-size: 0.875rem;
+  background-color: var(--white);
+  transition: all 0.2s ease;
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: var(--accent-teal);
+  box-shadow: 0 0 0 3px rgba(79, 192, 208, 0.1);
+}
+
+.search-input:hover {
+  border-color: var(--accent-teal);
+}
+
+.top-bar-right {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.notification-icon {
+  position: relative;
+  color: var(--gray-600);
+  cursor: pointer;
+  font-size: 1.2rem;
+  transition: color 0.2s ease;
+}
+
+.notification-icon:hover {
+  color: var(--accent-teal);
+}
+
+.notification-badge {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  background-color: var(--alert-red);
+  color: white;
+  border-radius: 50%;
+  padding: 2px 6px;
+  font-size: 0.7rem;
+  min-width: 18px;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.user-profile {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.user-info {
+  text-align: right;
+}
+
+.user-name {
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: var(--gray-800);
+}
+
+.user-role {
+  color: var(--gray-600);
+  font-size: 0.8rem;
+}
+
+.avatar {
+  width: 40px;
+  height: 40px;
+  background-color: var(--navy);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: 600;
+  font-size: 1rem;
+}
+
+/* Course List Styles */
+.course-list-container {
+  background-color: var(--nova-bg-primary); /* White background */
+  border-radius: var(--nova-border-radius); /* Consistent rounding */
+  padding: var(--nova-spacing-xl); /* Standard padding */
+  box-shadow: none; /* Remove shadow */
+  border: 1px solid var(--nova-border-strong); /* Black border */
+}
+
+.course-list-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--nova-spacing-xl); /* Increased spacing */
+  padding-bottom: var(--nova-spacing-lg); /* Space above controls */
+  border-bottom: 1px solid var(--nova-border-color); /* Separator */
+}
+
+.course-list-header h2 {
+  font-size: 1.5rem; /* Larger heading */
+  font-weight: 600;
+  color: var(--nova-text-primary);
+  margin: 0;
+}
+
+.add-course-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--nova-spacing-sm);
+  padding: var(--nova-spacing-sm) var(--nova-spacing-lg);
+  background-color: var(--nova-border-strong); /* Black background */
+  color: var(--nova-bg-primary); /* White text */
+  border: 1px solid var(--nova-border-strong); /* Black border */
+  border-radius: var(--nova-border-radius-sm);
+  cursor: pointer;
+  font-weight: 500;
+  transition: background-color 0.2s, color 0.2s;
+}
+
+.add-course-btn:hover {
+  background-color: #333; /* Darker gray hover */
+  border-color: #333;
+}
+
+.course-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--nova-spacing-xl);
+}
+
+.course-tabs {
+  display: flex;
+  gap: var(--nova-spacing-sm);
+}
+
+.tab-btn {
+  padding: var(--nova-spacing-sm) var(--nova-spacing-lg);
+  border: 1px solid var(--nova-border-color); 
+  background: var(--nova-bg-primary); 
+  color: var(--nova-text-primary); 
+  cursor: pointer;
+  font-size: var(--nova-font-size-base, 14px);
+  font-weight: 500;
+  transition: color 0.2s, background-color 0.2s, border-color 0.2s;
+  border-radius: var(--nova-border-radius-sm);
+  outline: none; 
+}
+
+.tab-btn:hover {
+  color: var(--nova-bg-primary);
+  background-color: var(--nova-border-strong); 
+  border-color: var(--nova-border-strong); 
+}
+
+.tab-btn.active {
+  color: var(--nova-bg-primary);
+  background-color: var(--nova-border-strong); 
+  border-color: var(--nova-border-strong); 
+  font-weight: 500;
+}
+
+.tab-btn:focus-visible {
+  outline: 2px solid var(--nova-primary, #1a73e8); 
+  outline-offset: 2px;
+}
+
+.classroom-page .view-controls {
+  display: flex;
+  gap: var(--nova-spacing-sm);
+}
+
+.classroom-page .view-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--nova-spacing-sm); /* Square padding */
+  border: 1px solid var(--nova-border-color);
+  background: var(--nova-color-white); /* White background */
+  color: var(--nova-color-black); /* Black icon */
+  cursor: pointer;
+  border-radius: var(--nova-border-radius-sm);
+  transition: background-color 0.2s, color 0.2s, border-color 0.2s;
+}
+
+.classroom-page .view-btn:hover {
+  border-color: var(--nova-color-black); /* Black border on hover */
+  background-color: var(--nova-color-white); /* Keep white background */
+  color: var(--nova-color-black); /* Keep black icon */
+}
+
+.classroom-page .view-btn.active {
+  background-color: var(--nova-color-black); /* Black background */
+  border-color: var(--nova-color-black); /* Black border */
+  color: var(--nova-color-white); /* White icon */
+}
+
+.classroom-page .view-btn:focus-visible {
+  outline: 2px solid var(--nova-primary, #1a73e8); 
+  outline-offset: 1px;
+}
+
+.filter-button, .sort-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: auto;
+  padding: 0 16px;
+  height: 48px;
+  background-color: var(--white);
+  border: 1px solid var(--gray-200);
+  border-radius: 12px;
+  cursor: pointer;
+  color: var(--gray-600);
+  transition: all 0.2s ease;
+  gap: 8px;
+}
+
+.filter-button:hover, .sort-button:hover {
+  background-color: var(--gray-200);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-sm);
+}
+
+.filter-button span, .sort-button span {
+  font-size: 0.95rem;
+  font-weight: 500;
+}
+
+/* Course Grid Layout */
+.course-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); /* Adjust minmax as needed */
+  gap: var(--nova-spacing-xl);
+}
+
+/* Course Card Styles Scoped to Classroom */
+.classroom-page .course-card {
+  position: relative;
+  background-color: var(--nova-bg-primary);
+  border-radius: var(--nova-border-radius); /* Match container */
+  border: 1px solid var(--nova-border-strong); /* Black border */
+  box-shadow: none; /* Remove shadow */
+  overflow: hidden;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  transition: none; /* Remove hover transform/shadow */
+  padding: 0; /* Remove old padding */
+}
+
+.classroom-page .course-card:hover {
+  transform: none; /* No lift on hover */
+  box-shadow: none;
+  border-color: var(--nova-border-strong);
+}
+
+.classroom-page .course-card::before {
+  display: none; 
+}
+
+.classroom-page .course-card-content {
+  padding: var(--nova-spacing-lg); /* Consistent padding */
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1; 
+  height: auto; /* Let content determine height */
+  gap: var(--nova-spacing-md); /* Add gap between elements */
+}
+
+.course-title {
+  margin: 0;
+}
+
+/* Scoped Course Name Link */
+.classroom-page .course-name-link {
+  color: var(--nova-text-primary);
+  text-decoration: none;
+  transition: color 0.2s ease;
+  font-weight: 600;
+  font-size: 1.1rem; /* Slightly larger title */
+}
+
+.classroom-page .course-name-link:hover {
+  color: var(--nova-primary);
+}
+
+.course-description {
+  color: var(--nova-text-secondary);
+  font-size: 0.9rem;
+  line-height: 1.5;
+  margin: 0; /* Remove default margin */
+  /* Reset text clamping if not desired */
+  overflow: visible; 
+  display: block; 
+  -webkit-line-clamp: unset; 
+  -webkit-box-orient: unset;
+}
+
+.course-meta {
+  display: flex;
+  flex-wrap: wrap; /* Allow wrapping */
+  gap: var(--nova-spacing-sm); 
+  margin-top: auto; /* Push to bottom */
+}
+
+.course-meta span {
+  display: inline-flex;
+  align-items: center;
+  padding: var(--nova-spacing-xs) var(--nova-spacing-sm);
+  background-color: var(--nova-bg-tertiary); 
+  border-radius: var(--nova-border-radius-sm);
+  font-size: 0.8rem; 
+  color: var(--nova-text-secondary); 
+  white-space: nowrap;
+}
+
+/* Scoped Course Action Button Styles */
+.classroom-page .course-actions {
+  display: flex;
+  gap: var(--nova-spacing-sm); /* Consistent gap */
+  margin-top: var(--nova-spacing-lg); /* Space above actions */
+  padding-top: var(--nova-spacing-lg); /* Space */
+  border-top: 1px solid var(--nova-border-color); /* Separator */
+  flex-wrap: wrap;
+  justify-content: center; /* Center buttons */
+}
+
+.classroom-page .action-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--nova-spacing-sm); /* Square padding */
+  border: 1px solid var(--nova-border-color);
+  background: var(--nova-bg-primary); /* White background */
+  color: var(--nova-border-strong); /* Black icon color */
+  cursor: pointer;
+  border-radius: var(--nova-border-radius-sm);
+  transition: background-color 0.2s, color 0.2s, border-color 0.2s;
+  min-width: 40px; /* Set fixed minimum width */
+  height: 40px; /* Set fixed height for square buttons */
+  position: relative; /* Keep for tooltip */
+}
+
+.classroom-page .action-btn span {
+  position: absolute;
+  background: rgba(0, 0, 0, 0.9); /* Darker background for better contrast */
+  color: white;
+  padding: 6px 12px; /* Slightly larger padding */
+  border-radius: 4px;
+  font-size: 0.75rem;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%) translateY(-4px);
+  transition: all 0.2s ease;
+  z-index: 1010;
+  margin-bottom: 4px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3); /* Add shadow for better visibility */
+  border: 1px solid rgba(255, 255, 255, 0.1); /* Subtle border */
+}
+
+/* Base hover state */
+.classroom-page .action-btn:hover {
+  background-color: var(--nova-bg-tertiary); /* Light gray background */
+  border-color: var(--nova-border-strong); /* Black border */
+  color: var(--nova-border-strong); /* Keep icon black */
+}
+
+/* Tooltip visibility on hover */
+.classroom-page .action-btn:hover span {
+  opacity: 1;
+  transform: translateX(-50%) translateY(-8px);
+}
+
+.classroom-page .action-btn svg {
+  width: 16px;
+  height: 16px;
+  /* Ensure SVG inherits the button color */
+  fill: currentColor;
+  /* Add explicit min-dimensions */
+  min-width: 16px;
+  min-height: 16px;
+}
+
+/* --- Specificity Overrides for action buttons WITHIN .classroom-page --- */
+/* Ensure these buttons always have black icons and white/gray backgrounds, overriding global .delete-btn etc. */
+
+.classroom-page .action-btn.edit-btn,
+.classroom-page .action-btn.delete-btn,
+.classroom-page .action-btn.inactivate-btn,
+.classroom-page .action-btn.reactivate-btn,
+.classroom-page .action-btn.archive-btn {
+background-color: var(--nova-bg-primary); /* Ensure white background */
+color: var(--nova-border-strong); /* Ensure black icon */
+border-color: var(--nova-border-color); /* Ensure standard border */
+}
+
+.classroom-page .action-btn.edit-btn:hover,
+.classroom-page .action-btn.delete-btn:hover,
+.classroom-page .action-btn.inactivate-btn:hover,
+.classroom-page .action-btn.reactivate-btn:hover,
+.classroom-page .action-btn.archive-btn:hover {
+background-color: var(--nova-bg-tertiary); /* Ensure light gray hover background */
+color: var(--nova-border-strong); /* Ensure black icon on hover */
+border-color: var(--nova-border-strong); /* Ensure black border on hover */
+}
+/* --- End Specificity Overrides --- */
+
+/* Course List Table Styles */
+.classroom-page .course-list-table {
+  width: 100%;
+  border-collapse: separate; /* Use separate for border-radius */
+  border-spacing: 0;
+  background: var(--nova-bg-primary);
+  border-radius: var(--nova-border-radius); /* Match container radius */
+  border: 1px solid var(--nova-border-strong); /* Black border */
+  overflow: hidden; /* Needed for border-radius on table */
+  box-shadow: none; /* Remove shadow */
+}
+
+.classroom-page .course-list-header-row {
+  display: grid;
+  grid-template-columns: 1.5fr 2fr 1fr 1.2fr 1.2fr 1.2fr 1.2fr;
+  padding: var(--nova-spacing-md) var(--nova-spacing-lg);
+  background-color: var(--nova-bg-secondary);
+  border-bottom: 1px solid var(--nova-border-strong);
+  font-weight: 600;
+  color: var(--nova-text-primary);
+  text-align: left;
+  position: static; /* Changed from relative to prevent stacking context issues */
+  z-index: auto; /* Auto instead of explicit z-index */
+}
+
+/* Adjust column templates if user is not professor */
+.classroom-page .course-list-table:not(:has(.enrollment-column)) .course-list-header-row,
+.classroom-page .course-list-table:not(:has(.enrollment-column)) .course-row {
+  grid-template-columns: 1.5fr 2fr 1fr 1.2fr 1.2fr;
+}
+.classroom-page .course-list-table:not(:has(.actions-column)) .course-list-header-row,
+.classroom-page .course-list-table:not(:has(.actions-column)) .course-row {
+  grid-template-columns: 2fr 2fr 1fr 1.2fr 1.2fr; /* Student view */
+}
+
+.classroom-page .course-list-body {
+  position: relative;
+  z-index: 1;
+}
+
+.classroom-page .course-list-body .course-row {
+  display: grid;
+  grid-template-columns: 1.5fr 2fr 1fr 1.2fr 1.2fr 1.2fr 1.2fr; /* Match header */
+  padding: 0; /* Remove row padding, use cell padding */
+  border-bottom: 1px solid var(--nova-border-color); /* Lighter internal border */
+  align-items: center;
+  transition: background-color 0.15s ease;
+  position: relative;
+  z-index: 2; /* Higher than list body but lower than tooltips */
+}
+
+.classroom-page .course-list-body .course-row:last-child {
+  border-bottom: none;
+}
+
+.classroom-page .course-list-body .course-row:hover {
+  background-color: var(--nova-bg-tertiary);
+  z-index: 3;
+}
+
+/* Style table cells */
+.classroom-page .course-column,
+.classroom-page .description-column,
+.classroom-page .section-column,
+.classroom-page .semester-column,
+.classroom-page .year-column,
+.classroom-page .enrollment-column,
+.classroom-page .actions-column {
+  padding: var(--nova-spacing-md) var(--nova-spacing-lg);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  text-align: left;
+  font-size: 0.9rem;
+  color: var(--nova-text-primary);
+}
+
+.classroom-page .description-column {
+white-space: normal; /* Allow description to wrap */
+line-height: 1.4;
+color: var(--nova-text-secondary);
+}
+
+/* Link style within table */
+.classroom-page .course-column .course-name-link {
+  font-weight: 500;
+  /* Inherits color from cell */
+}
+
+/* Actions column in table */
+.classroom-page .actions-column .action-buttons {
+  display: flex;
+  gap: var(--nova-spacing-sm);
+  justify-content: flex-start; /* Align left */
+  position: relative;
+}
+
+/* Use same .action-btn styles as card view */
+.classroom-page .actions-column .action-btn {
+  /* Styles are inherited from the rules defined earlier */
+  padding: var(--nova-spacing-xs); /* Slightly smaller padding */
+}
+.classroom-page .actions-column .action-btn span { /* Tooltip */
+   /* Tooltip styles inherited */
+}
+
+/* Tooltip visibility on hover for table actions */
+.classroom-page .actions-column .action-btn:hover span {
+  opacity: 1;
+  transform: translateX(-50%) translateY(-8px);
+}
+
+/* Remove old specific table action button styles */
+/* 
+.action-btn svg { ... }
+.edit-btn { ... }
+...etc 
+*/
+
+/* Responsive adjustments for table */
+@media (max-width: 1024px) {
+  /* Adjust grid template columns if needed */
+}
+
+@media (max-width: 768px) {
+  .classroom-page .course-list-header-row {
+      display: none; /* Hide header on small screens */
+  }
+  .classroom-page .course-list-body .course-row {
+      grid-template-columns: 1fr auto; /* Simple layout */
+      padding: var(--nova-spacing-md);
+      gap: var(--nova-spacing-md);
+  }
+  /* Hide less important columns */
+  .classroom-page .description-column,
+  .classroom-page .section-column,
+  .classroom-page .semester-column,
+  .classroom-page .year-column,
+  .classroom-page .enrollment-column {
+      display: none;
+  }
+  .classroom-page .course-column {
+      white-space: normal;
+      padding: 0;
+  }
+  .classroom-page .actions-column {
+     padding: 0;
+     justify-self: end;
+  }
+}
+
+/* Modal Styles */
+.classroom-page .modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.6); /* Darker overlay */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1050; /* Ensure above most things */
+  animation: fadeIn 0.2s ease forwards;
+}
+
+.classroom-page .modal-content {
+  background-color: var(--nova-bg-primary);
+  border-radius: var(--nova-border-radius); /* Consistent radius */
+  padding: 0; /* Remove padding, apply to sections */
+  width: 90%; /* Use percentage width */
+  max-width: 600px; /* Max width */
+  max-height: 90vh;
+  overflow: hidden; /* Hide overflow, rely on internal */
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--nova-border-strong); /* Black border */
+  box-shadow: none; /* Remove shadow */
+  animation: scaleIn 0.2s ease forwards;
+}
+
+.classroom-page .modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--nova-spacing-lg) var(--nova-spacing-xl);
+  border-bottom: 1px solid var(--nova-border-strong); /* Black border */
+  flex-shrink: 0;
+}
+
+.classroom-page .modal-header h2 {
+  margin: 0;
+  color: var(--nova-text-primary);
+  font-size: 1.25rem; /* Slightly smaller */
+  font-weight: 600;
+}
+
+.classroom-page .close-modal {
+  background: none;
+  border: none;
+  color: var(--nova-text-secondary);
+  cursor: pointer;
+  padding: var(--nova-spacing-xs);
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s, color 0.2s;
+  width: 32px;
+  height: 32px;
+}
+
+.classroom-page .close-modal:hover {
+  background-color: var(--nova-bg-hover);
+  color: var(--nova-text-primary);
+}
+
+.classroom-page .modal-form {
+  padding: var(--nova-spacing-xl); /* Add padding here */
+  overflow-y: auto; /* Allow vertical scroll */
+  flex-grow: 1;
+}
+
+.classroom-page .form-group {
+  margin-bottom: var(--nova-spacing-lg);
+}
+
+.classroom-page .form-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); /* Responsive columns */
+  gap: var(--nova-spacing-lg);
+}
+
+.classroom-page .form-group label {
+  display: block;
+  margin-bottom: var(--nova-spacing-sm);
+  font-weight: 500;
+  color: var(--nova-text-primary);
+  font-size: 0.9rem;
+}
+
+.classroom-page .form-group input[type="text"],
+.classroom-page .form-group input[type="password"],
+.classroom-page .form-group input[type="email"],
+.classroom-page .form-group input[type="number"],
+.classroom-page .form-group textarea,
+.classroom-page .form-group select {
+  width: 100%;
+  padding: var(--nova-spacing-sm) var(--nova-spacing-md);
+  border: 1px solid var(--nova-border-color);
+  border-radius: var(--nova-border-radius-sm);
+  font-size: 0.95rem;
+  color: var(--nova-text-primary);
+  background-color: var(--nova-bg-primary);
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.classroom-page .form-group input[type="text"]:focus,
+.classroom-page .form-group input[type="password"]:focus,
+.classroom-page .form-group input[type="email"]:focus,
+.classroom-page .form-group input[type="number"]:focus,
+.classroom-page .form-group textarea:focus,
+.classroom-page .form-group select:focus {
+  outline: none;
+  border-color: var(--nova-primary);
+  box-shadow: 0 0 0 2px rgba(26, 115, 232, 0.2);
+}
+
+.classroom-page .form-group textarea {
+  min-height: 100px;
+  resize: vertical;
+}
+
+.classroom-page .modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--nova-spacing-md);
+  margin-top: var(--nova-spacing-xl);
+  padding: var(--nova-spacing-lg) var(--nova-spacing-xl);
+  border-top: 1px solid var(--nova-border-strong); /* Black border */
+  background-color: var(--nova-bg-secondary); /* Slight contrast */
+  flex-shrink: 0;
+}
+
+/* Style modal buttons */
+.classroom-page .submit-btn,
+.classroom-page .cancel-btn,
+.classroom-page .delete-btn, 
+.classroom-page .warning-btn,
+.classroom-page .success-btn {
+  padding: var(--nova-spacing-sm) var(--nova-spacing-lg);
+  border: 1px solid var(--nova-border-strong); /* Default black border */
+  border-radius: var(--nova-border-radius-sm);
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s, color 0.2s, border-color 0.2s;
+  font-size: 0.9rem;
+}
+
+.classroom-page .submit-btn {
+  background-color: var(--nova-border-strong); /* Black background */
+  color: var(--nova-bg-primary); /* White text */
+}
+.classroom-page .submit-btn:hover {
+  background-color: #333;
+  border-color: #333;
+}
+
+.classroom-page .cancel-btn {
+  background-color: var(--nova-bg-primary); /* White background */
+  color: var(--nova-text-primary); /* Black text */
+  border-color: var(--nova-border-color); /* Lighter border */
+}
+.classroom-page .cancel-btn:hover {
+  background-color: var(--nova-bg-tertiary);
+  border-color: var(--nova-border-strong);
+}
+
+/* Specific colors for confirmation modals */
+.classroom-page .delete-btn,
+.classroom-page .warning-btn { /* Assuming warning is for archive/inactivate */
+  background-color: #d93025; /* Red background */
+  color: var(--nova-bg-primary); /* White text */
+  border-color: #d93025; /* Red border */
+}
+.classroom-page .delete-btn:hover,
+.classroom-page .warning-btn:hover {
+  background-color: #c5221f; /* Darker red */
+  border-color: #c5221f;
+}
+
+.classroom-page .success-btn { /* Assuming success is for reactivate */
+  background-color: #1e8e3e; /* Green background */
+  color: var(--nova-bg-primary); /* White text */
+  border-color: #1e8e3e; /* Green border */
+}
+.classroom-page .success-btn:hover {
+  background-color: #187a33; /* Darker green */
+  border-color: #187a33;
+}
+
+
+/* Confirmation Modal Specific Styles */
+.classroom-page .confirmation-modal {
+/* Inherits .modal-content styles */
+}
+
+.classroom-page .confirmation-modal .warning-icon {
+/* Style icon */
+}
+
+.classroom-page .confirmation-modal .warning-text {
+color: #d93025; /* Use variable if available */
+font-weight: 600;
+margin-bottom: 1rem;
+}
+
+.classroom-page .confirmation-modal ul {
+margin: 1rem 0;
+padding-left: 1.5rem;
+list-style-type: disc;
+}
+
+.classroom-page .confirmation-modal li {
+margin-bottom: 0.5rem;
+color: var(--nova-text-secondary);
+}
+
+.classroom-page .confirmation-modal strong {
+color: var(--nova-text-primary);
+font-weight: 600;
+}
+
+/* Remove old button color styles */
+/* 
+.confirmation-modal .delete-btn { ... }
+.confirmation-modal .warning-btn { ... }
+.confirmation-modal .success-btn { ... }
+*/
+
+/* Status Messages */
+.loading-message,
+.error-message,
+.no-courses-message {
+  text-align: center;
+  padding: 48px 24px;
+}
+
+.loading-message {
+  color: var(--gray-600);
+}
+
+.error-message {
+  color: var(--alert-red);
+}
+
+.no-courses-message {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: var(--gray-600);
+  padding: 64px 24px;
+}
+
+.no-courses-message h3 {
+  margin: 16px 0 8px;
+  color: var(--navy);
+}
+
+.no-courses-message p {
+  margin-bottom: 24px;
+  max-width: 400px;
+}
+
+.mb-4 {
+  margin-bottom: 16px;
+}
+
+.mt-4 {
+  margin-top: 16px;
+}
+
+.mr-2 {
+  margin-right: 8px;
+}
+
+/* Sidebar Overlay for Mobile */
+.sidebar-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 999;
+  display: none;
+}
+
+.sidebar-overlay.open {
+  display: block;
+}
+
+/* Mobile Toggle Button */
+.sidebar-toggle {
+  position: fixed;
+  top: 16px;
+  left: 16px;
+  z-index: 1001;
+  width: 44px;
+  height: 44px;
+  border-radius: 8px;
+  background-color: var(--navy);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  cursor: pointer;
+  box-shadow: var(--shadow-md);
+}
+
+/* Responsive Styles */
+@media (max-width: 1200px) {
+  .course-grid {
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  }
+}
+
+@media (max-width: 992px) {
+  .course-list-header-row {
+      grid-template-columns: 1.5fr 2fr 1fr 1fr 1fr;
+  }
+  
+  .course-row {
+      grid-template-columns: 1.5fr 2fr 1fr 1fr 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .sidebar {
+      transform: translateX(-100%);
+      width: 240px;
+  }
+  
+  .sidebar.open {
+      transform: translateX(0);
+  }
+  
+  .main-content {
+      margin-left: 0;
+      width: 100%;
+      padding: 16px;
+      padding-top: 80px;
+  }
+  
+  .course-controls {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 16px;
+  }
+  
+  .course-tabs {
+      width: 100%;
+  }
+  
+  .tab-btn {
+      flex: 1;
+  }
+  
+  .view-controls {
+      justify-content: space-between;
+  }
+  
+  .course-grid {
+      grid-template-columns: 1fr;
+  }
+  
+  .course-list-header-row {
+      display: none;
+  }
+  
+  .course-row {
+      grid-template-columns: 1fr;
+      grid-gap: 8px;
+  }
+  
+  .actions-column {
+      justify-content: flex-start;
+  }
+  
+  .action-buttons {
+      justify-content: flex-start;
+  }
+  
+  .top-bar {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 16px;
+  }
+  
+  .search-container {
+      width: 100%;
+  }
+  
+  .search-bar {
+      width: 100%;
+  }
+  
+  .top-bar-right {
+      justify-content: space-between;
+  }
+  
+  .modal-content {
+      width: 90%;
+  }
+  
+  .form-row {
+      grid-template-columns: 1fr;
+  }
+}
+
+/* Animation Keyframes */
+@keyframes fadeIn {
+from { opacity: 0; }
+to { opacity: 1; }
+}
+
+@keyframes scaleIn {
+from { transform: scale(0.95); opacity: 0; }
+to { transform: scale(1); opacity: 1; }
+}
+
+@keyframes slideUp {
+from { transform: translateY(10px); opacity: 0; }
+to { transform: translateY(0); opacity: 1; }
+}
+
+/* Animation Classes */
+.fade-in {
+animation: fadeIn 0.3s ease forwards;
+}
+
+.scale-in {
+animation: scaleIn 0.3s ease forwards;
+}
+
+.slide-up {
+animation: slideUp 0.3s ease forwards;
+}
+
+/* Sidebar Submenu */
+.classroom-page .has-submenu {
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 0;
+  margin-bottom: 8px;
+}
+
+.classroom-page .has-submenu > span {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  padding: 14px 16px;
+  cursor: pointer;
+  border-radius: 8px;
+  transition: background-color 0.2s ease;
+}
+
+.classroom-page .has-submenu.active .submenu-toggle {
+  transform: rotate(180deg);
+}
+
+.classroom-page .submenu {
+  width: 100%;
+  padding-left: calc(16px + 1.25rem + 12px);
+  margin-top: 4px;
+  overflow: hidden;
+  max-height: 0;
+  transition: max-height 0.3s ease;
+  display: none;
+}
+
+.classroom-page .has-submenu.active .submenu {
+  max-height: 500px;
+  display: block;
+}
+
+.classroom-page .submenu-item {
+  display: flex;
+  align-items: center;
+  padding: 10px 0;
+  color: #000000;
+  text-decoration: none;
+  border-radius: 8px;
+  margin-bottom: 4px;
+  transition: all 0.2s ease;
+  font-size: 0.9rem;
+  position: relative;
+  gap: 10px;
+}
+
+.classroom-page .submenu-item::before {
+  display: none;
+}
+
+.classroom-page .submenu-item:hover {
+  color: #000000;
+  background-color: var(--sidebar-hover);
+}
+
+.classroom-page .submenu-item.active {
+  color: #000000;
+  background-color: var(--sidebar-active-bg);
+  font-weight: 500;
+}
+
+.classroom-page .submenu-item.active:hover {
+  background-color: var(--sidebar-hover);
+}
+
+/* Add explicit styling for icons within submenu items */
+.classroom-page .submenu-item .nav-icon {
+  font-size: 1.25rem;
+  color: #000000;
+  opacity: 0.9;
+  margin-right: 10px;
+}
+
+/* Announcement Styles */
+.announcement-container {
+background-color: var(--surface-bg);
+border-radius: var(--border-radius-lg);
+box-shadow: var(--shadow-md);
+padding: 1.5rem;
+margin-bottom: 2rem;
+width: 100%;
+}
+
+.announcement-header {
+display: flex;
+justify-content: space-between;
+align-items: center;
+margin-bottom: 1.5rem;
+flex-wrap: wrap;
+gap: 1rem;
+}
+
+.announcement-header .header-left h1 {
+font-size: 1.8rem;
+font-weight: 600;
+color: var(--text-primary);
+margin: 0;
+}
+
+.announcement-header .header-right {
+display: flex;
+gap: 0.75rem;
+align-items: center;
+flex-wrap: wrap;
+}
+
+.search-input {
+background-color: var(--surface-bg-alt);
+border: 1px solid var(--border-color);
+border-radius: var(--border-radius);
+padding: 0.5rem 1rem;
+font-size: 0.95rem;
+min-width: 240px;
+transition: var(--transition);
+}
+
+.search-input:focus {
+outline: none;
+border-color: var(--primary);
+box-shadow: 0 0 0 2px rgba(var(--primary-rgb), 0.2);
+}
+
+.add-announcement-btn {
+display: flex;
+align-items: center;
+gap: 0.5rem;
+background-color: var(--primary);
+color: white;
+border: none;
+border-radius: var(--border-radius);
+padding: 0.5rem 1rem;
+font-size: 0.95rem;
+font-weight: 500;
+cursor: pointer;
+transition: var(--transition);
+}
+
+.add-announcement-btn:hover {
+background-color: var(--primary-dark);
+}
+
+.announcement-content {
+background-color: white;
+border-radius: var(--border-radius);
+border: 2px solid var(--border-color);
+min-height: 300px;
+padding: 1.5rem;
+}
+
+.announcement-content .empty-state {
+display: flex;
+flex-direction: column;
+align-items: center;
+justify-content: center;
+padding: 3rem 1rem;
+text-align: center;
+}
+
+.megaphone-icon {
+background-color: var(--accent-light);
+width: 80px;
+height: 80px;
+border-radius: 50%;
+display: flex;
+align-items: center;
+justify-content: center;
+margin-bottom: 1.5rem;
+}
+
+.megaphone-image {
+width: 40px;
+height: 40px;
+filter: invert(45%) sepia(90%) saturate(1000%) hue-rotate(175deg) brightness(100%) contrast(100%);
+}
+
+.empty-state h2 {
+font-size: 1.5rem;
+color: var(--text-primary);
+margin-bottom: 0.5rem;
+}
+
+.empty-state p {
+color: var(--text-secondary);
+font-size: 1rem;
+}
+
+/* Announcement Modal */
+.modal-overlay {
+position: fixed;
+top: 0;
+left: 0;
+right: 0;
+bottom: 0;
+background-color: rgba(0, 0, 0, 0.6);
+z-index: 1000;
+display: flex;
+justify-content: center;
+align-items: center;
+padding: 0;
+}
+
+.announcement-modal {
+background-color: white;
+border-radius: var(--border-radius-lg);
+width: 100%;
+max-width: 900px;
+max-height: calc(100vh - 2rem);
+overflow-y: auto;
+animation: fadeIn 0.2s ease-out;
+}
+
+.modal-content {
+padding: 1.5rem;
+}
+
+.form-group {
+margin-bottom: 1.5rem;
+}
+
+.form-group label {
+display: block;
+margin-bottom: 0.5rem;
+font-weight: 500;
+color: var(--text-primary);
+}
+
+.title-input {
+width: 100%;
+padding: 0.75rem;
+font-size: 1rem;
+border: 1px solid var(--border-color);
+border-radius: var(--border-radius);
+background-color: var(--surface-bg-alt);
+}
+
+.title-input:focus {
+outline: none;
+border-color: var(--primary);
+box-shadow: 0 0 0 2px rgba(var(--primary-rgb), 0.2);
+}
+
+.editor-section {
+border: 1px solid var(--border-color);
+border-radius: var(--border-radius);
+overflow: hidden;
+margin-bottom: 1.5rem;
+}
+
+.editor-menu {
+border-bottom: 1px solid var(--border-color);
+}
+
+.menu-bar {
+display: flex;
+background-color: var(--surface-bg-alt);
+border-bottom: 1px solid var(--border-color);
+}
+
+.menu-bar span {
+padding: 0.5rem 1rem;
+font-size: 0.9rem;
+color: var(--text-secondary);
+cursor: pointer;
+}
+
+.menu-bar span:hover {
+background-color: rgba(0, 0, 0, 0.05);
+}
+
+.toolbar {
+display: flex;
+flex-wrap: wrap;
+gap: 0.25rem;
+padding: 0.5rem;
+background-color: var(--surface-bg-alt);
+}
+
+.format-btn, .font-select, .style-select {
+background-color: white;
+border: 1px solid var(--border-color);
+border-radius: var(--border-radius-sm);
+padding: 0.25rem 0.5rem;
+font-size: 0.9rem;
+cursor: pointer;
+}
+
+.format-btn:hover, .font-select:hover, .style-select:hover {
+background-color: var(--surface-bg-alt);
+}
+
+.color-picker {
+padding: 0;
+width: 2rem;
+height: 1.5rem;
+}
+
+.editor-content {
+padding: 1rem;
+background-color: white;
+font-size: 1rem;
+color: var(--text-primary);
+line-height: 1.5;
+}
+
+.editor-content:focus {
+outline: none;
+}
+
+.editor-footer {
+display: flex;
+justify-content: space-between;
+align-items: center;
+padding: 0.5rem 1rem;
+background-color: var(--surface-bg-alt);
+border-top: 1px solid var(--border-color);
+}
+
+.attach-btn {
+display: flex;
+align-items: center;
+gap: 0.5rem;
+cursor: pointer;
+color: var(--text-secondary);
+font-size: 0.9rem;
+}
+
+.attach-btn:hover {
+color: var(--primary);
+}
+
+.footer-right {
+font-size: 0.85rem;
+color: var(--text-tertiary);
+}
+
+.modal-footer {
+display: flex;
+justify-content: space-between;
+align-items: center;
+padding: 1rem 1.5rem;
+background-color: var(--surface-bg-alt);
+border-top: 1px solid var(--border-color);
+}
+
+.modal-options {
+display: flex;
+flex-wrap: wrap;
+gap: 1.5rem;
+}
+
+.option-item {
+display: flex;
+align-items: center;
+gap: 0.5rem;
+}
+
+.option-item label {
+font-size: 0.9rem;
+color: var(--text-secondary);
+}
+
+.action-btns {
+display: flex;
+gap: 0.75rem;
+}
+
+.cancel-btn {
+background-color: var(--surface-bg-alt);
+border: 1px solid var(--border-color);
+color: var(--text-secondary);
+padding: 0.5rem 1rem;
+border-radius: var(--border-radius);
+font-size: 0.95rem;
+cursor: pointer;
+transition: var(--transition);
+}
+
+.cancel-btn:hover {
+background-color: var(--surface-bg);
+}
+
+.post-btn {
+background-color: var(--primary);
+color: white;
+border: none;
+padding: 0.5rem 1.5rem;
+border-radius: var(--border-radius);
+font-size: 0.95rem;
+font-weight: 500;
+cursor: pointer;
+transition: var(--transition);
+display: flex;
+align-items: center;
+gap: 0.5rem;
+}
+
+.post-btn:hover {
+background-color: var(--primary-dark);
+}
+
+.post-select {
+background-color: var(--surface-bg-alt);
+border: 1px solid var(--border-color);
+border-radius: var(--border-radius);
+padding: 0.5rem;
+font-size: 0.95rem;
+width: 100%;
+}
+
+.post-select:focus {
+outline: none;
+border-color: var(--primary);
+}
+
+.scheduling-options {
+display: grid;
+grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+gap: 1.5rem;
+margin-top: 1rem;
+}
+
+.date-time-group {
+position: relative;
+}
+
+.date-time-inputs {
+display: grid;
+grid-template-columns: 1fr 1fr;
+gap: 0.75rem;
+}
+
+.reset-date {
+position: absolute;
+right: 0;
+top: 0;
+background: none;
+border: none;
+color: var(--accent);
+font-size: 0.85rem;
+cursor: pointer;
+display: flex;
+align-items: center;
+gap: 0.25rem;
+}
+
+.reset-date:hover {
+color: var(--accent-dark);
+}
+
+.date-input, .time-input {
+padding: 0.5rem;
+border: 1px solid var(--border-color);
+border-radius: var(--border-radius);
+font-size: 0.95rem;
+}
+
+.date-input:focus, .time-input:focus {
+outline: none;
+border-color: var(--primary);
+}
+
+@media (max-width: 768px) {
+.announcement-header {
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.announcement-header .header-right {
+  width: 100%;
+}
+
+.search-input {
+  flex: 1;
+  min-width: auto;
+}
+
+.scheduling-options {
+  grid-template-columns: 1fr;
+}
+
+.modal-options, .modal-footer {
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.action-btns {
+  width: 100%;
+}
+
+.cancel-btn, .post-btn {
+  flex: 1;
+  text-align: center;
+  justify-content: center;
+}
+}
+
+.enrollment-code-container {
+  background-color: #f1f3f4; /* Changed from var(--nova-bg-tertiary) to match course meta */
+  border-radius: var(--nova-border-radius-sm);
+  padding: var(--nova-spacing-sm) var(--nova-spacing-md);
+  margin: 0; /* Remove margin */
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.875rem;
+  gap: var(--nova-spacing-sm);
+}
+
+.enrollment-code-label {
+  color: var(--nova-text-secondary);
+  font-weight: 500;
+}
+
+.enrollment-code {
+  font-family: monospace;
+  font-weight: 600;
+  color: var(--nova-text-primary);
+  background-color: var(--nova-bg-primary); 
+  padding: var(--nova-spacing-xs) var(--nova-spacing-sm);
+  border-radius: var(--nova-border-radius-sm);
+  border: 1px solid var(--nova-border-color);
+}
+
+.description-column {
+color: #6B7280;
+line-height: 1.5;
+display: -webkit-box;
+-webkit-line-clamp: 2; 
+-webkit-box-orient: vertical;
+overflow: hidden;
+padding: 8px;
+}
+
+.course-section {
+font-size: 0.9rem;
+color: var(--text-secondary);
+margin: -10px 0 10px;
+display: flex;
+align-items: center;
+}
+
+.course-section span {
+background-color: var(--bg-light);
+padding: 3px 8px;
+border-radius: 4px;
+font-weight: 500;
+}
+
+.optional-field {
+  color: var(--gray-500);
+  font-size: 0.9rem;
+  font-weight: normal;
+  font-style: italic;
+  margin-left: 6px;
+}
+
+.section-column {
+font-size: 0.9rem;
+border-right: 1px solid var(--border-color);
+padding: 10px;
+display: flex;
+align-items: center;
+justify-content: flex-start;
+}
+
+.course-list-header-row .section-column {
+font-weight: 600;
+background-color: var(--bg-light);
+}
+
+.active-action-buttons {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+
+.active-action-buttons button {
+  flex: 1;
+  height: 48px;
+  border-radius: 4px;
+  border: none;
+  background-color: #f3f4f6;
+  color: #4b5563;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 20px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.confirmation-modal {
+max-width: 500px !important;
+}
+
+.confirmation-modal .modal-body {
+padding: 1.5rem;
+}
+
+.confirmation-modal .warning-icon {
+font-size: 2rem;
+color: #dc3545;
+margin-bottom: 1rem;
+text-align: center;
+}
+
+.confirmation-modal .warning-text {
+color: #dc3545;
+font-weight: 600;
+margin-bottom: 1rem;
+}
+
+.confirmation-modal ul {
+margin: 1rem 0;
+padding-left: 1.5rem;
+}
+
+.confirmation-modal li {
+margin-bottom: 0.5rem;
+color: #666;
+}
+
+.confirmation-modal strong {
+color: #333;
+font-weight: 600;
+}
+
+.modal-actions {
+display: flex;
+justify-content: flex-end;
+gap: 1rem;
+padding: 1rem;
+border-top: 1px solid #eee;
+}
+
+.modal-actions button {
+padding: 0.5rem 1rem;
+border-radius: 4px;
+border: none;
+cursor: pointer;
+font-weight: 500;
+transition: all 0.2s;
+}
+
+.cancel-btn {
+background-color: #f8f9fa;
+color: #333;
+}
+
+.cancel-btn:hover {
+background-color: #e9ecef;
+}
+
+.delete-btn {
+background-color: #dc3545;
+color: white;
+}
+
+.delete-btn:hover {
+background-color: #c82333;
+}
+
+.warning-btn {
+background-color: #ffc107;
+color: #333;
+}
+
+.warning-btn:hover {
+background-color: #e0a800;
+}
+
+.success-btn {
+background-color: #28a745;
+color: white;
+}
+
+.success-btn:hover {
+background-color: #218838;
+}
+
+/* Scoped Modal Button Styles */
+.classroom-page .modal-actions .cancel-btn {
+background-color: #f8f9fa;
+color: #333;
+}
+
+.classroom-page .modal-actions .cancel-btn:hover {
+background-color: #e9ecef;
+}
+
+.classroom-page .modal-actions .delete-btn {
+background-color: #dc3545;
+color: white;
+}
+
+.classroom-page .modal-actions .delete-btn:hover {
+background-color: #c82333;
+}
+
+.classroom-page .modal-actions .warning-btn {
+background-color: #ffc107;
+color: #333;
+}
+
+.classroom-page .modal-actions .warning-btn:hover {
+background-color: #e0a800;
+}
+
+.classroom-page .modal-actions .success-btn {
+background-color: #28a745;
+color: white;
+}
+
+.classroom-page .modal-actions .success-btn:hover {
+background-color: #218838;
+}
+
+/* Complete overhaul of action button tooltips in table view */
+.classroom-page .course-list-table .action-btn span {
+  /* Change tooltip positioning completely */
+  position: absolute;
+  top: -40px; /* Position well above the button */
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #000000;
+  color: #ffffff;
+  padding: 6px 12px;
+  border-radius: 4px;
+  font-size: 12px;
+  white-space: nowrap;
+  opacity: 0;
+  visibility: hidden;
+  z-index: 2000; /* Extremely high z-index */
+  box-shadow: 0 3px 8px rgba(0,0,0,0.3);
+  pointer-events: none;
+}
+
+/* Show tooltip on hover */
+.classroom-page .course-list-table .action-btn:hover span {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* Add arrow to tooltip */
+.classroom-page .course-list-table .action-btn span::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  margin-left: -5px;
+  border-width: 5px;
+  border-style: solid;
+  border-color: #000000 transparent transparent transparent;
+}
+
+/* Position each action button as relative to allow proper tooltip positioning */
+.classroom-page .course-list-table .action-btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Ensure actions column doesn't have overflow issues */
+.classroom-page .actions-column {
+  overflow: visible !important;
+}
+
+/* Force row to have high z-index when hovered */
+.classroom-page .course-list-body .course-row:hover {
+  position: relative;
+  z-index: 1500; /* Very high to ensure it's above other elements */
+}
+
+/* Make sure table doesn't clip overflow */
+.classroom-page .course-list-table {
+  overflow: visible;
+}
+
+/* Ensure table cell doesn't clip tooltips */
+.classroom-page .course-list-table .actions-column {
+  overflow: visible !important;
+  position: relative;
+}
+
+/* Make the tooltip direction explicit for table actions */
+.classroom-page .course-list-table .action-btn span {
+  bottom: auto; /* Override the bottom positioning from general tooltips */
+}
+
+/* Add styles for collapsed active submenu trigger */
+.classroom-page .sidebar.collapsed .nav-item.has-submenu .submenu-trigger.active {
+background-color: var(--sidebar-active-bg);
+color: #000000;
+}
+
+.classroom-page .sidebar.collapsed .nav-item.has-submenu .submenu-trigger:hover {
+background-color: var(--sidebar-hover);
+}
+
+/* Enhanced styles for navigation items in collapsed state */
+.classroom-page .sidebar.collapsed .nav-item {
+  justify-content: center;
+  padding: 16px 0;
+  position: relative;
+  margin-bottom: 24px;
+}
+
+.classroom-page .sidebar.collapsed .nav-item:hover {
+  background-color: var(--sidebar-hover);
+}
+
+.classroom-page .sidebar.collapsed .nav-item.active {
+  background-color: var(--sidebar-active-bg);
+}
+
+.classroom-page .sidebar.collapsed .nav-icon {
+  margin-right: 0;
+  font-size: 2rem;
+  color: #000000;
+}
+
+.classroom-page .sidebar.collapsed .nav-item:hover .nav-icon {
+  transform: scale(1.1);
+  color: var(--primary-color);
+}
+
+/* Tooltip for collapsed nav items */
+.classroom-page .sidebar.collapsed .nav-item:hover::after {
+  content: attr(title);
+  position: absolute;
+  left: calc(100% + 10px);
+  top: 50%;
+  transform: translateY(-50%);
+  background-color: var(--dark-color);
+  color: var(--white);
+  padding: 6px 12px;
+  border-radius: 4px;
+  white-space: nowrap;
+  font-size: 0.875rem;
+  font-weight: 400;
+  z-index: 1000;
+  box-shadow: var(--shadow-md);
+  pointer-events: none;
+  opacity: 0.9;
+}

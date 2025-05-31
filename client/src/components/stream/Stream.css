@@ -1,0 +1,2056 @@
+B2B8BE/* Stream.css - Modernized */
+:root {
+  --nova-primary: #1a73e8;
+  --nova-primary-dark: #1557b0;
+  --nova-text-primary: #202124;
+  --nova-text-secondary: #5f6368;
+  --nova-text-light: #9aa0a6;
+  --nova-text-on-primary: #ffffff;
+  --nova-text-error: #d32f2f;
+  --nova-text-delete: #d93025;
+
+  --nova-bg-primary: #ffffff;
+  --nova-bg-secondary: #f8f9fa;
+  --nova-bg-tertiary: #f1f3f4;
+  --nova-bg-error: #fef1f1;
+  --nova-bg-hover: rgba(0, 0, 0, 0.04);
+
+  --nova-border-color: #e0e0e0;
+  --nova-border-color-light: #ededed;
+  --nova-border-strong: #000000; /* Black border as per image */
+  --nova-border-error: #e53935;
+
+  --nova-font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  --nova-font-size-base: 14px;
+  --nova-font-size-sm: 12px;
+  --nova-font-size-lg: 16px;
+  --nova-font-size-xl: 24px;
+
+  --nova-border-radius: 12px; /* Increased radius to match image */
+  --nova-border-radius-sm: 8px;
+  --nova-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --nova-shadow-md: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06);
+
+  --nova-spacing-xs: 4px;
+  --nova-spacing-sm: 8px;
+  --nova-spacing-md: 12px;
+  --nova-spacing-lg: 16px;
+  --nova-spacing-xl: 24px;
+  --nova-spacing-xxl: 32px;
+}
+
+/* Remove body styles if they are handled globally or by dashboard.css */
+/* body {
+  font-family: var(--nova-font-family);
+  font-size: var(--nova-font-size-base);
+  color: var(--nova-text-primary);
+  background-color: var(--nova-bg-secondary);
+  line-height: 1.5;
+} */
+
+/* Fix for the white space issue by ensuring the content fills available height */
+.dashboard-page .stream-container .course-main-area,
+.dashboard-page .stream-content .course-main-area, 
+.dashboard-page .course-main-area,
+.stream-container .course-main-area,
+.stream-content .course-main-area,
+.announcements-section .course-main-area {
+  min-height: calc(100vh - 180px); /* Adjust based on header/footer height */
+  max-height: calc(100vh - 180px); /* Add max-height to enable scrolling */
+  display: flex;
+  flex-direction: column;
+  padding-bottom: 0; /* Remove any bottom padding */
+  background-color: var(--nova-bg-primary);
+  border: 2px solid #000000; /* Changed from 1px to 3px and using explicit black color */
+  border-radius: var(--nova-border-radius);
+  padding: var(--nova-spacing-xl);
+  margin-top: var(--nova-spacing-xl); /* Add space below top bar */
+  overflow-y: auto; /* Enable vertical scrolling */
+  scrollbar-width: thin; /* Firefox */
+  scrollbar-color: transparent transparent; /* Firefox */
+}
+
+/* Hide scrollbar when not in use for Chrome/Safari/Edge */
+.dashboard-page .stream-container .course-main-area::-webkit-scrollbar,
+.dashboard-page .stream-content .course-main-area::-webkit-scrollbar, 
+.dashboard-page .course-main-area::-webkit-scrollbar,
+.stream-container .course-main-area::-webkit-scrollbar,
+.stream-content .course-main-area::-webkit-scrollbar,
+.announcements-section .course-main-area::-webkit-scrollbar {
+  width: 8px;
+  background-color: transparent;
+}
+
+/* Show scrollbar on hover/active for Chrome/Safari/Edge */
+.dashboard-page .stream-container .course-main-area:hover::-webkit-scrollbar-thumb,
+.dashboard-page .stream-content .course-main-area:hover::-webkit-scrollbar-thumb, 
+.dashboard-page .course-main-area:hover::-webkit-scrollbar-thumb,
+.stream-container .course-main-area:hover::-webkit-scrollbar-thumb,
+.stream-content .course-main-area:hover::-webkit-scrollbar-thumb,
+.announcements-section .course-main-area:hover::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
+}
+
+/* Firefox - show scrollbar on hover */
+.dashboard-page .stream-container .course-main-area:hover,
+.dashboard-page .stream-content .course-main-area:hover, 
+.dashboard-page .course-main-area:hover,
+.stream-container .course-main-area:hover,
+.stream-content .course-main-area:hover,
+.announcements-section .course-main-area:hover {
+  scrollbar-color: rgba(0, 0, 0, 0.2) transparent; /* Firefox */
+}
+
+.stream-container {
+  /* This container might be redundant if Stream.js adopts dashboard layout */
+  /* Keeping it for now, but padding might need adjustment */
+  padding: var(--nova-spacing-xl);
+  max-width: 800px; /* Match stream component width */
+  margin: 0 auto;
+  flex-grow: 1; /* Take up available space */
+  display: flex;
+  flex-direction: column;
+}
+
+/* Remove Top Bar styles specific to Stream.css */
+/* .top-bar { ... } */
+/* .top-bar-right { ... } */
+/* .user-profile { ... } */
+/* .user-info { ... } */
+/* .user-name { ... } */
+/* .user-role { ... } */
+/* .avatar { ... } */
+/* .avatar img { ... } */
+
+/* Navigation Tabs */
+.course-main-area .course-nav {
+  display: flex;
+  gap: var(--nova-spacing-sm);
+  /* border-bottom: 1px solid var(--nova-border-strong); */ /* REMOVE border from nav container */
+  margin-bottom: var(--nova-spacing-xl); /* Add margin below tabs */
+}
+
+/* Prefix with .course-main-area to scope these styles */
+.course-main-area .nav-tab {
+  padding: var(--nova-spacing-sm) var(--nova-spacing-lg); /* Adjust padding for size */
+  border: 1px solid var(--nova-border-color); /* Light gray border */
+  /* border-bottom: none; */ /* Removed */
+  background: var(--nova-bg-primary); /* White background */
+  color: #000000; /* Explicitly Black text */
+  cursor: pointer;
+  font-size: var(--nova-font-size-base);
+  font-weight: 500;
+  transition: color 0.2s, background-color 0.2s, border-color 0.2s; /* Add border-color transition */
+  /* margin-bottom: -1px; */ /* Removed */
+  border-radius: var(--nova-border-radius-sm); /* Rounded corners */
+  outline: none; /* Remove browser default focus outline */
+}
+
+/* Optional: Define focus style explicitly if needed, but keep it non-blue */
+.course-main-area .nav-tab:focus-visible {
+  box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.5); /* Example: subtle black focus ring */
+}
+
+.course-main-area .nav-tab:hover {
+  /* Hover: Black background, white text, black border */
+  color: #ffffff;
+  background-color: #000000;
+  border-color: #000000;
+}
+
+.course-main-area .nav-tab.active {
+  /* Active: Black background, white text, black border */
+  color: #ffffff; /* Explicit white text */
+  background-color: #000000; /* Explicit black background */
+  border-color: #000000; /* Explicit black border */
+  font-weight: 500; /* Keep normal weight */
+}
+
+/* Main Content Layout */
+.course-main-area .stream-content {
+  display: grid;
+  grid-template-columns: 300px 1fr;
+  gap: var(--nova-spacing-xl);
+  /* margin-top: var(--nova-spacing-xl); */ /* REMOVE margin-top */
+  overflow-y: auto; /* Enable vertical scrolling */
+  max-height: 100%; /* Ensure it takes available height */
+  scrollbar-width: thin; /* Firefox */
+  scrollbar-color: transparent transparent; /* Firefox */
+}
+
+/* Hide scrollbar when not in use for Chrome/Safari/Edge */
+.stream-content::-webkit-scrollbar {
+  width: 8px;
+  background-color: transparent;
+}
+
+/* Show scrollbar on hover/active for Chrome/Safari/Edge */
+.stream-content:hover::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
+}
+
+/* Firefox - show scrollbar on hover */
+.stream-content:hover {
+  scrollbar-color: rgba(0, 0, 0, 0.2) transparent; /* Firefox */
+}
+
+/* Shared Container Styles - Black Border */
+.card-container {
+  background: var(--nova-bg-primary);
+  border-radius: var(--nova-border-radius);
+  padding: var(--nova-spacing-xl);
+  border: 1px solid var(--nova-border-strong); /* BLACK BORDER */
+  box-shadow: none; /* NO SHADOW */
+}
+
+/* Course Info Panel */
+.course-info-panel {
+  composes: card-container;
+  height: fit-content;
+}
+
+.course-code {
+  margin: 0 0 var(--nova-spacing-sm) 0;
+  font-size: var(--nova-font-size-xl);
+  color: var(--nova-text-primary);
+  font-weight: 600;
+}
+
+.course-section {
+  margin: 0 0 var(--nova-spacing-lg) 0;
+  font-size: var(--nova-font-size-lg);
+  color: var(--nova-text-secondary);
+}
+
+.course-description {
+  margin: 0 0 var(--nova-spacing-lg) 0;
+  color: var(--nova-text-secondary);
+  font-size: var(--nova-font-size-base);
+  line-height: 1.6;
+}
+
+.semester-info {
+  display: flex;
+  flex-direction: column;
+  gap: var(--nova-spacing-xs);
+  margin: var(--nova-spacing-lg) 0;
+  color: var(--nova-text-secondary);
+  font-size: var(--nova-font-size-sm);
+}
+
+/* Enrollment Code Box */
+.enrollment-code-box {
+  margin-top: var(--nova-spacing-xl);
+  padding: var(--nova-spacing-lg);
+  background: var(--nova-bg-primary); /* White bg */
+  border-radius: var(--nova-border-radius);
+  border: 1px solid var(--nova-border-strong); /* Black border */
+}
+
+.enrollment-code-box h3 {
+  margin: 0 0 var(--nova-spacing-sm) 0;
+  font-size: var(--nova-font-size-sm);
+  font-weight: 500;
+  color: var(--nova-text-secondary);
+  text-transform: uppercase;
+}
+
+.enrollment-code-box .code {
+  font-family: monospace;
+  font-size: var(--nova-font-size-lg);
+  color: var(--nova-text-primary);
+  font-weight: 600;
+}
+
+/* Announcements Section */
+.announcements-section {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--nova-spacing-xl);
+  min-width: 0; /* Prevent overflow in grid context */
+  overflow-y: auto; /* Enable vertical scrolling */
+  max-height: 100%; /* Take up available height */
+  scrollbar-width: thin; /* Firefox */
+  scrollbar-color: transparent transparent; /* Firefox */
+  position: relative; /* Ensure proper positioning context */
+}
+
+/* Hide scrollbar when not in use for Chrome/Safari/Edge */
+.announcements-section::-webkit-scrollbar {
+  width: 8px;
+  background-color: transparent;
+}
+
+/* Show scrollbar on hover/active for Chrome/Safari/Edge */
+.announcements-section:hover::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
+}
+
+/* Firefox - show scrollbar on hover */
+.announcements-section:hover {
+  scrollbar-color: rgba(0, 0, 0, 0.2) transparent; /* Firefox */
+}
+
+/* Ensure content is visible when rich editor is active */
+.announcements-section .rich-editor-container {
+  position: sticky;
+  top: 0;
+  margin-bottom: 20px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* Adjust scroll when editor is open */
+.announcements-section .rich-editor-container + .stream-items {
+  padding-top: 20px;
+}
+
+/* Error message */
+.error-message {
+  background-color: var(--nova-bg-error);
+  border: 1px solid var(--nova-border-error); /* Use error border color */
+  padding: var(--nova-spacing-md) var(--nova-spacing-lg);
+  margin-bottom: var(--nova-spacing-lg);
+  border-radius: var(--nova-border-radius-sm);
+  color: var(--nova-text-error);
+  font-size: var(--nova-font-size-base);
+  border-left: 3px solid var(--nova-border-error); /* Add left accent border */
+}
+
+/* Empty state */
+.announcements-section .empty-state,
+.stream-content .empty-state,
+.stream-items .empty-state {
+  composes: card-container; /* Inherits black border */
+  padding: var(--nova-spacing-xxl);
+  text-align: center;
+  background-color: #000000; /* Black background */
+  color: #FFFFFF; /* White text */
+  font-size: var(--nova-font-size-lg); /* Increased font size */
+  font-weight: 500; /* Added medium font weight for better visibility */
+  min-height: 200px; /* Added minimum height */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%; /* Full width like stream-items */
+  margin-bottom: var(--nova-spacing-xl); /* Match stream-item margin */
+  box-sizing: border-box; /* Ensure padding is included in width calculation */
+  max-width: 100%; /* Prevent overflow */
+}
+
+/* Loading */
+.loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 300px;
+  font-size: var(--nova-font-size-lg);
+  color: var(--nova-text-secondary);
+}
+
+/* Announcement Composer Trigger Button - Black BG, White Text */
+.announcement-header-section {
+  /* Wrapper - no style needed */
+  position: relative;
+  z-index: 5;
+  margin-bottom: 20px;
+}
+
+.add-announcement-btn {
+  /* Specific style for this button based on image */
+  composes: btn; /* Get base padding, flex, etc. */
+  background-color: #000000 !important; /* Black background - ensure override */
+  color: #ffffff; /* White text */
+  border-color: #000000 !important; /* Black border - ensure override */
+  font-weight: 500;
+  position: relative;
+  z-index: 5;
+}
+
+.add-announcement-btn:hover {
+  background-color: #333333; /* Darker gray hover */
+  border-color: #333333;
+  color: #ffffff;
+}
+
+/* Base Button Styles (Keep general styles, but primary is now different) */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--nova-spacing-sm);
+  padding: var(--nova-spacing-sm) var(--nova-spacing-lg);
+  font-size: var(--nova-font-size-base);
+  font-weight: 500;
+  border-radius: var(--nova-border-radius-sm);
+  cursor: pointer;
+  transition: background-color 0.2s, border-color 0.2s, color 0.2s;
+  border: 1px solid var(--nova-border-strong); /* Black border for buttons too? */
+  background: var(--nova-bg-primary);
+  color: var(--nova-text-primary);
+}
+
+.btn:hover {
+  background-color: var(--nova-bg-tertiary);
+  border-color: var(--nova-border-strong);
+}
+
+.btn-primary {
+  composes: btn;
+  background-color: var(--nova-primary);
+  color: var(--nova-text-on-primary);
+  border-color: var(--nova-primary);
+}
+
+.btn-primary:hover {
+  background-color: var(--nova-primary-dark);
+  border-color: var(--nova-primary-dark);
+}
+
+.btn-primary:disabled {
+  background-color: #a1c2fa;
+  border-color: #a1c2fa;
+  cursor: not-allowed;
+  color: var(--nova-text-on-primary);
+}
+
+.btn-secondary {
+  composes: btn;
+  /* Already has black border from .btn */
+}
+
+.btn-secondary:hover {
+  background-color: var(--nova-bg-tertiary);
+}
+
+.btn-icon {
+  background: none;
+  border: none; /* No border for icon buttons */
+  color: var(--nova-text-secondary);
+  cursor: pointer;
+  padding: var(--nova-spacing-xs);
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s, color 0.2s;
+  width: 32px;
+  height: 32px;
+}
+
+.btn-icon:hover {
+  background-color: var(--nova-bg-hover);
+  color: var(--nova-text-primary);
+}
+
+/* Rich Text Editor */
+.rich-editor-container {
+  composes: card-container; /* Inherits black border */
+  padding: 0;
+  overflow: visible; /* Changed from hidden to visible */
+  /* margin-bottom: var(--nova-spacing-xl); */ /* Handled by section gap */
+  position: relative; /* Ensure proper positioning */
+  z-index: 10; /* Give higher z-index to appear above other content */
+  background-color: var(--nova-bg-primary); /* Ensure background is solid */
+}
+
+.editor-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--nova-spacing-md) var(--nova-spacing-lg);
+  border-bottom: 1px solid var(--nova-border-color-light); /* Use light border internally */
+}
+
+.editor-header h3 {
+  margin: 0;
+  font-size: var(--nova-font-size-lg);
+  font-weight: 600;
+  color: var(--nova-text-primary);
+}
+
+.close-editor {
+  composes: btn-icon;
+}
+
+.editor-form {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  z-index: 11; /* Higher than rich-editor-container */
+  background-color: var(--nova-bg-primary);
+}
+
+.title-input-container {
+  padding: var(--nova-spacing-lg) var(--nova-spacing-lg) var(--nova-spacing-sm);
+}
+
+.title-input-container label {
+  display: block;
+  margin-bottom: var(--nova-spacing-sm);
+  font-size: var(--nova-font-size-sm);
+  color: var(--nova-text-secondary);
+  font-weight: 500;
+}
+
+.title-input {
+  width: 100%;
+  padding: var(--nova-spacing-sm) var(--nova-spacing-md);
+  border: 1px solid var(--nova-border-color); /* Internal border */
+  border-radius: var(--nova-border-radius-sm);
+  font-size: var(--nova-font-size-base);
+  background-color: var(--nova-bg-primary);
+}
+
+.title-input:focus {
+  outline: none;
+  border-color: var(--nova-primary);
+  box-shadow: 0 0 0 2px rgba(26, 115, 232, 0.2);
+}
+
+.editor-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--nova-spacing-xs);
+  padding: var(--nova-spacing-sm) var(--nova-spacing-lg);
+  border-bottom: 1px solid var(--nova-border-color-light); /* Light internal border */
+  background-color: var(--nova-bg-secondary);
+}
+
+.editor-toolbar button {
+  composes: btn-icon;
+}
+
+.editor-toolbar .divider {
+  width: 1px;
+  height: 24px;
+  background-color: var(--nova-border-color);
+  margin: auto var(--nova-spacing-xs);
+}
+
+.format-select {
+  height: 32px;
+  padding: 0 var(--nova-spacing-sm);
+  border: 1px solid var(--nova-border-color);
+  border-radius: var(--nova-border-radius-sm);
+  background-color: var(--nova-bg-primary);
+  color: var(--nova-text-secondary);
+  font-size: var(--nova-font-size-sm);
+  margin: auto 0;
+}
+
+/* Make editor content text black AND auto height */
+.course-main-area .editor-content,
+.dashboard-page .stream-edit-modal .editor-content { /* Highly specific selector for editor within the modal on this page */
+  /* min-height: 150px; */ /* REMOVED */
+  /* max-height: 400px; */ /* REMOVED */
+  /* overflow-y: auto; */ /* REMOVED */
+  height: auto !important; /* Explicitly allow height to adjust AND override conflicts */
+  min-height: 150px; /* Ensure editor has enough height to be visible */
+  padding: var(--nova-spacing-lg);
+  font-size: var(--nova-font-size-base);
+  line-height: 1.6;
+  color: var(--nova-text-primary); /* Explicitly set text color to primary (black) */
+  border: none;
+  outline: none;
+  background-color: white; /* Ensure editor has white background */
+  position: relative; /* Ensure proper stacking */
+  z-index: 12; /* Higher than parent containers */
+}
+
+/* Limit padding on deeply nested blockquotes to prevent excessive indent */
+.course-main-area .editor-content blockquote blockquote blockquote blockquote,
+.dashboard-page .stream-edit-modal .editor-content blockquote blockquote blockquote blockquote {
+  padding-left: var(--nova-spacing-sm); /* Apply only a small padding */
+  margin-left: 0; /* Prevent additional margin */
+}
+
+/* Keep placeholder color light */
+.course-main-area .editor-content:empty:before {
+  content: attr(data-placeholder);
+  color: var(--nova-text-light);
+  pointer-events: none;
+}
+
+.editor-content img {
+  max-width: 100%;
+  height: auto;
+  border-radius: var(--nova-border-radius-sm);
+}
+
+.editor-content a {
+  color: var(--nova-primary);
+  text-decoration: none;
+}
+
+.editor-content a:hover {
+  text-decoration: underline;
+}
+
+/* Editor Footer with Left Actions Container */
+.editor-footer {
+  display: flex;
+  justify-content: flex-start; /* Align to left side */
+  align-items: center;
+  padding: var(--nova-spacing-sm) var(--nova-spacing-lg);
+  border-top: 1px solid var(--nova-border-color-light);
+  background-color: var(--nova-bg-secondary);
+}
+
+.editor-actions-left {
+  display: flex;
+  align-items: center;
+  gap: var(--nova-spacing-md);
+  margin-right: auto; /* Push to left */
+}
+
+/* Complete button styles without inheritance */
+.attach-btn,
+.link-btn {
+  /* Reset all styles */
+  all: initial;
+  
+  /* Box model */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 36px;
+  padding: 8px 16px;
+  box-sizing: border-box;
+  
+  /* Typography */
+  font-family: var(--nova-font-family);
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1;
+  text-align: center;
+  white-space: nowrap;
+  
+  /* Visual styling */
+  color: #000000; /* Changed to black */
+  background-color: transparent;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  
+  /* Spacing for icon and text */
+  gap: 8px;
+  
+  /* Transitions */
+  transition: background-color 0.2s, color 0.2s;
+}
+
+.attach-btn:hover,
+.link-btn:hover {
+  background-color: rgba(0, 0, 0, 0.1); /* Light black (gray) background */
+  color: #333333; /* Dark gray for hover */
+}
+
+.attach-btn:focus,
+.link-btn:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(26, 115, 232, 0.2); /* Light blue focus ring */
+}
+
+.attach-btn svg,
+.link-btn svg {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  margin: 0;
+  padding: 0;
+}
+
+.attach-btn input[type="file"] {
+  display: none;
+}
+
+/* Reset any conflicting styles from the editor actions */
+.course-main-area .editor-footer .attach-btn,
+.course-main-area .editor-footer .link-btn,
+.stream-edit-modal .editor-footer .attach-btn,
+.stream-edit-modal .editor-footer .link-btn {
+  /* Override any inherited styles with the same properties as above */
+  all: initial;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 36px;
+  padding: 8px 16px;
+  box-sizing: border-box;
+  font-family: var(--nova-font-family);
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1;
+  color: #000000; /* Changed to black */
+  background-color: transparent;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  gap: 8px;
+  white-space: nowrap;
+  transition: background-color 0.2s, color 0.2s;
+}
+
+.word-counter {
+  font-size: var(--nova-font-size-sm);
+  color: var(--nova-text-secondary);
+}
+
+/* Editor Attachments */
+.editor-attachments {
+  padding: var(--nova-spacing-md) var(--nova-spacing-lg);
+  border-top: 1px solid var(--nova-border-color-light);
+}
+
+.editor-attachments h4 {
+  margin-top: 0;
+  margin-bottom: var(--nova-spacing-sm);
+  color: var(--nova-text-secondary);
+  font-size: var(--nova-font-size-sm);
+  font-weight: 500;
+  text-transform: uppercase;
+}
+
+/* Actions at the bottom of the editor */
+.editor-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--nova-spacing-md);
+  padding: var(--nova-spacing-lg);
+  border-top: 1px solid var(--nova-border-color-light);
+}
+
+.stream-container .cancel-btn,
+.course-main-area .cancel-btn,
+.stream-edit-modal .cancel-btn,
+.link-confirmation-modal .cancel-btn,
+.link-url-modal .cancel-btn,
+.file-preview-modal .cancel-btn,
+.attachment-removal-modal .cancel-btn {
+  composes: btn-secondary;
+}
+
+/* Add black hover effect for cancel button */
+.stream-container .cancel-btn:hover,
+.course-main-area .cancel-btn:hover,
+.stream-edit-modal .cancel-btn:hover,
+.link-confirmation-modal .cancel-btn:hover,
+.link-url-modal .cancel-btn:hover,
+.file-preview-modal .cancel-btn:hover,
+.attachment-removal-modal .cancel-btn:hover {
+  background-color: #000000; /* Black background */
+  color: #ffffff; /* White text */
+  border-color: #000000; /* Black border */
+}
+
+.post-btn {
+  composes: btn-primary;
+}
+
+/* Stream Items (Announcements/Materials) */
+.stream-items {
+  display: flex;
+  flex-direction: column;
+  gap: var(--nova-spacing-xl);
+}
+
+.stream-item {
+  background-color: var(--nova-bg-primary);
+  border-radius: var(--nova-border-radius);
+  border: 1px solid var(--nova-border-strong);
+  padding: var(--nova-spacing-lg);
+  margin-bottom: var(--nova-spacing-xl);
+  position: relative;
+}
+
+/* Header for Announcements and Materials */
+.announcement-header, .material-header-combined {
+  display: flex;
+  align-items: flex-start; /* Align items to the top */
+  gap: var(--nova-spacing-md);
+  margin-bottom: var(--nova-spacing-md);
+  padding-bottom: var(--nova-spacing-md);
+  border-bottom: 1px solid var(--nova-border-color-light);
+}
+
+.profile-picture {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  overflow: hidden;
+  flex-shrink: 0; /* Prevent shrinking */
+}
+
+.profile-picture img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.profile-picture-placeholder {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: var(--nova-bg-tertiary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 500;
+  color: var(--nova-text-secondary);
+  flex-shrink: 0;
+}
+
+/* Container for Name and Timestamp */
+.announcement-meta, .material-meta {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+}
+
+.author-name {
+  font-weight: 600; /* Make name bolder */
+  color: var(--nova-text-primary);
+  font-size: var(--nova-font-size-base);
+  margin-bottom: 2px; /* Small gap between name and date */
+}
+
+.timestamp {
+  font-size: var(--nova-font-size-sm);
+  color: var(--nova-text-secondary);
+}
+
+.timestamp .edited {
+  font-style: italic;
+  margin-left: var(--nova-spacing-xs);
+}
+
+/* Keep existing content styles and ensure height adjusts */
+.stream-item .announcement-content, 
+.stream-item .material-content {
+  padding-top: var(--nova-spacing-sm);
+  color: var(--nova-text-primary);
+  line-height: 1.6;
+  font-size: var(--nova-font-size-base);
+  height: auto; /* Ensure height is determined by content */
+  min-height: unset; /* Remove any minimum height restriction */
+  max-height: unset; /* Remove any maximum height restriction */
+  overflow: visible; /* Ensure content isn't clipped */
+  word-wrap: break-word; /* Allow long words/URLs to break */
+  overflow-wrap: break-word; /* Modern equivalent for word-wrap */
+}
+
+/* Specificity overrides if necessary (example) */
+.course-main-area .stream-item .announcement-content {
+  height: auto !important;
+  min-height: unset !important;
+}
+
+/* Actions (Ellipsis Menu) */
+.announcement-actions {
+  position: absolute;
+  top: var(--nova-spacing-lg);
+  right: var(--nova-spacing-lg);
+}
+
+/* Material Card Specific Styles */
+.material-card {
+  /* Already composed card-container, has black border */
+  border-left: 3px solid var(--nova-primary); /* Keep accent border */
+  padding-left: calc(var(--nova-spacing-xl) - 3px);
+}
+
+.material-header-combined {
+  justify-content: space-between;
+}
+
+.material-type {
+  text-transform: uppercase;
+  font-size: var(--nova-font-size-sm);
+  font-weight: 600;
+  color: var(--nova-primary);
+  margin-bottom: 2px;
+}
+
+.material-meta {
+  text-align: right;
+}
+
+.material-content h3 {
+  margin: 0 0 var(--nova-spacing-sm) 0;
+  font-size: var(--nova-font-size-lg);
+  font-weight: 600;
+  color: var(--nova-text-primary);
+}
+
+.material-content p {
+  margin: 0 0 var(--nova-spacing-lg) 0;
+  color: var(--nova-text-secondary);
+}
+
+.due-date, .points {
+  font-size: var(--nova-font-size-sm);
+  color: var(--nova-text-secondary);
+  margin-top: var(--nova-spacing-sm);
+}
+
+/* Attachments Display */
+.announcement-attachments {
+  padding: var(--nova-spacing-lg);
+  border-top: none; /* Removed border between content and attachments */
+}
+
+.announcement-attachments h4 {
+  margin-bottom: var(--nova-spacing-sm);
+  color: var(--nova-text-secondary);
+  font-size: var(--nova-font-size-sm);
+  font-weight: 500;
+  text-transform: uppercase;
+}
+
+.attachment-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--nova-spacing-sm);
+}
+
+.file-attachment {
+  position: relative;
+  display: flex;
+  align-items: center;
+  background-color: var(--nova-bg-tertiary);
+  padding: var(--nova-spacing-sm) var(--nova-spacing-md);
+  border-radius: var(--nova-border-radius-sm);
+  border: 1px solid var(--nova-border-color);
+  overflow: hidden;
+  transition: background-color 0.2s;
+  cursor: pointer;
+}
+
+.file-attachment:hover {
+  background-color: #e8f0fe; /* Light blue on hover */
+}
+
+/* Completely hide delete buttons in announcements but show them in the edit modal */
+.announcement-attachments .remove-attachment-btn {
+  display: none !important; /* Use !important to ensure it's never shown */
+}
+
+/* Base styling for attachment delete buttons shown in the edit modal */
+.remove-attachment-btn {
+  /* Inherit base button styles for consistency */
+  composes: btn from "../dashboard.css"; /* Assuming dashboard.css has base .btn */
+  
+  /* Override specifics for delete appearance */
+  background-color: var(--nova-bg-primary); /* White background */
+  color: var(--nova-text-delete); /* Red text/icon */
+  border: none; /* Remove the border */
+  padding: var(--nova-spacing-xs) var(--nova-spacing-sm); /* Slightly smaller padding */
+  min-width: auto; /* Allow button to shrink */
+  width: auto; /* Reset fixed width */
+  height: auto; /* Reset fixed height */
+  border-radius: var(--nova-border-radius-sm); /* Standard border radius */
+  margin-left: var(--nova-spacing-sm); 
+  opacity: 1;
+  transition: background-color 0.2s, color 0.2s, border-color 0.2s;
+  outline: none !important; /* Remove outline */
+
+  /* Remove circular styling */
+  /* width: 24px; */
+  /* height: 24px; */
+  /* border-radius: 50%; */
+  /* background-color: rgba(240, 240, 240, 0.8); */ /* Replaced with white */
+}
+
+.remove-attachment-btn:hover {
+  background-color: var(--nova-bg-error); /* Light red background */
+  color: var(--nova-text-on-primary); /* White text/icon */
+  border-color: none; /* Ensure no border on hover either */
+  outline: none !important; /* Remove outline */
+}
+
+/* Ensure the trash icon is styled correctly */
+.remove-attachment-btn svg {
+  display: block;
+  width: 1em; /* Match font size */
+  height: 1em; /* Match font size */
+  margin: 0; /* Reset margin */
+  padding: 0; /* Reset padding */
+  color: inherit; /* Inherit red color */
+  fill: inherit; /* Inherit red fill */
+}
+
+/* Hide the button in the read-only announcement view */
+.announcement-attachments .remove-attachment-btn {
+  display: none !important; 
+}
+
+/* Ensure it remains visible in the editor attachments section */
+.editor-attachments .remove-attachment-btn {
+  display: inline-flex !important; /* Ensure it's visible here */
+  opacity: 1;
+}
+
+/* Attachment deleting state */
+.file-attachment.deleting {
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+.attachment-loading-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(255, 255, 255, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 5;
+}
+
+.attachment-spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(0, 0, 0, 0.1);
+  border-top-color: #3498db;
+  border-radius: 50%;
+  animation: attachment-spin 1s linear infinite;
+}
+
+@keyframes attachment-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.file-icon {
+  margin-right: var(--nova-spacing-sm);
+  color: var(--nova-text-secondary);
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.attachment-preview {
+  width: 20px;
+  height: 20px;
+  object-fit: cover;
+  border-radius: 2px;
+}
+
+.attachment-file {
+  color: var(--nova-primary);
+  text-decoration: none;
+  font-weight: 500;
+  font-size: var(--nova-font-size-base);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex: 1;
+  cursor: pointer;
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.file-size {
+  color: var(--nova-text-secondary);
+  font-size: var(--nova-font-size-sm);
+  margin-left: var(--nova-spacing-sm);
+  white-space: nowrap;
+}
+
+/* Add style for the delete button in the announcement view - always visible and black */
+.announcement-attachments .remove-attachment-btn {
+  background-color: rgba(240, 240, 240, 0.8);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 1; /* Always visible */
+  transition: all 0.2s ease;
+  color: #000000; /* Black icon */
+}
+
+.announcement-attachments .remove-attachment-btn:hover {
+  background-color: rgba(0, 0, 0, 0.08); /* Light black background on hover */
+  color: #000000; /* Keep black color on hover */
+}
+
+/* Announcement Actions (Edit/Delete) */
+.announcement-actions {
+  position: absolute;
+  top: var(--nova-spacing-lg);
+  right: var(--nova-spacing-lg);
+}
+
+.options-toggle {
+  composes: btn-icon;
+}
+
+.options-menu {
+  position: absolute;
+  top: calc(100% + var(--nova-spacing-xs));
+  right: 0;
+  background-color: var(--nova-bg-primary);
+  border-radius: var(--nova-border-radius-sm);
+  box-shadow: var(--nova-shadow-md);
+  z-index: 10;
+  min-width: 160px;
+  overflow: hidden;
+  border: 1px solid var(--nova-border-color);
+  padding: var(--nova-spacing-xs) 0;
+}
+
+.options-menu button {
+  display: flex;
+  align-items: center;
+  gap: var(--nova-spacing-sm);
+  padding: var(--nova-spacing-sm) var(--nova-spacing-lg);
+  width: 100%;
+  text-align: left;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: var(--nova-font-size-base);
+  color: var(--nova-text-primary);
+  transition: background-color 0.15s;
+}
+
+.options-menu button:hover {
+  background-color: var(--nova-bg-hover);
+  border-radius: 0; /* Remove border-radius on hover */
+}
+
+.options-menu button svg {
+  font-size: var(--nova-font-size-lg);
+  color: var(--nova-text-secondary);
+}
+
+.options-menu .edit-button {
+  /* Keep default color */
+}
+
+.options-menu .delete-button {
+  color: var(--nova-text-delete);
+}
+.options-menu .delete-button svg {
+  color: var(--nova-text-delete);
+}
+.options-menu .delete-button:hover {
+  background-color: rgba(217, 48, 37, 0.1);
+  border-radius: 0; /* Remove border-radius on hover */
+}
+
+/* Style for disabled message in archived course menu */
+.options-menu .archived-message {
+  padding: var(--nova-spacing-sm) var(--nova-spacing-lg);
+  font-size: var(--nova-font-size-sm);
+  color: var(--nova-text-secondary);
+  font-style: italic;
+  display: block; /* Ensure it takes full width */
+}
+
+/* Main Course Content Area Wrapper */
+.stream-container .course-main-area,
+.stream-content .course-main-area,
+.announcements-section .course-main-area {
+  background-color: var(--nova-bg-primary);
+  border: 3px solid #000000; /* Changed from 1px to 3px and using explicit black color */
+  border-radius: var(--nova-border-radius);
+  padding: var(--nova-spacing-xl);
+  margin-top: var(--nova-spacing-xl); /* Add space below top bar */
+}
+
+/* Style attach button within the stream editor */
+.course-main-area .editor-footer .attach-btn {
+  composes: btn;
+  background: none;
+  border: none; /* No border */
+  color: var(--nova-primary);
+  padding: var(--nova-spacing-lg);
+  font-weight: 500;
+}
+
+/* Style attach button hover */
+.course-main-area .editor-footer .attach-btn:hover {
+  color: #333333; /* Darker gray on hover */
+  background-color: var(--nova-bg-hover);
+}
+
+/* Style post button within the stream editor */
+.course-main-area .editor-actions .post-btn {
+  /* Override btn-primary styles */
+  composes: btn; /* Base styles */
+  background-color: #000000; /* Black background */
+  color: #ffffff; /* White text */
+  border-color: #000000; /* Black border */
+}
+
+/* Style post button hover */
+.course-main-area .editor-actions .post-btn:hover {
+  background-color: #333333; /* Darker gray hover */
+  border-color: #333333;
+  color: #ffffff;
+}
+
+/* Style post button disabled */
+.course-main-area .editor-actions .post-btn:disabled {
+  background-color: #cccccc; /* Lighter gray disabled */
+  border-color: #cccccc;
+  color: #666666; /* Darker gray text */
+  cursor: not-allowed;
+}
+
+/* --- Style the Update button in the Edit Modal --- */
+.stream-edit-modal .modal-actions .post-btn {
+  composes: btn; /* Base styles */
+  background-color: #000000 !important; /* Black background, use !important to override specificity if needed */
+  color: #ffffff !important; /* White text */
+  border-color: #000000 !important; /* Black border */
+}
+
+.stream-edit-modal .modal-actions .post-btn:hover {
+  background-color: #333333 !important; /* Darker gray hover */
+  border-color: #333333 !important;
+  color: #ffffff !important;
+}
+
+.stream-edit-modal .modal-actions .post-btn:disabled {
+  background-color: #cccccc !important; /* Lighter gray disabled */
+  border-color: #cccccc !important;
+  color: #666666 !important; /* Darker gray text */
+  cursor: not-allowed;
+}
+/* --- End Edit Modal Button Style --- */
+
+/* Responsive styles */
+@media (max-width: 768px) {
+  .stream-content {
+    grid-template-columns: 1fr;
+  }
+
+  .course-info-panel {
+    order: -1;
+  }
+
+  .editor-toolbar {
+    overflow-x: auto;
+    padding: var(--nova-spacing-sm);
+  }
+
+  .editor-actions {
+    flex-direction: column;
+    gap: var(--nova-spacing-sm);
+  }
+
+  .stream-container .cancel-btn,
+  .course-main-area .cancel-btn,
+  .stream-edit-modal .cancel-btn,
+  .link-confirmation-modal .cancel-btn,
+  .link-url-modal .cancel-btn,
+  .file-preview-modal .cancel-btn,
+  .attachment-removal-modal .cancel-btn,
+  .post-btn {
+    width: 100%;
+  }
+
+  /* Modal adjustments for mobile */
+  .modal-content, 
+  .modal-content.stream-edit-modal {
+    width: 98%;
+    max-width: 100%;
+    margin: 0;
+    border-radius: var(--nova-border-radius-sm);
+  }
+  
+  /* Adjust padding for overlay on mobile */
+  .modal-overlay.stream-modal-overlay,
+  .stream-modal-overlay {
+    padding: 10px;
+  }
+}
+
+/* Ensure top bar content (user profile) is pushed right */
+.dashboard-page .top-bar {
+  justify-content: flex-end; /* Override dashboard default if needed */
+}
+
+/* Link styles in announcement content */
+.stream-item .announcement-content a,
+.stream-item .material-content a,
+.editor-content a {
+  color: #000000; /* Changed to black */
+  text-decoration: none;
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  padding-right: 1.5em;
+  transition: color 0.2s;
+}
+
+.stream-item .announcement-content a:hover,
+.stream-item .material-content a:hover,
+.editor-content a:hover {
+  text-decoration: underline;
+  color: #333333; /* Dark gray on hover */
+}
+
+.stream-item .announcement-content a.external-link::after,
+.stream-item .material-content a.external-link::after,
+.editor-content a.external-link::after {
+  content: '↗';
+  font-size: 0.8em;
+  margin-left: 0.3em;
+  vertical-align: super;
+}
+
+/* Link Confirmation Modal */
+.link-confirmation-modal {
+  max-width: 500px;
+  width: 90%;
+  /* Remove these properties as they're now defined in the shared styles */
+  /*
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1100;
+  background-color: var(--nova-bg-primary);
+  border-radius: var(--nova-border-radius);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+  border: 1px solid var(--nova-border-strong);
+  */
+}
+
+.link-confirmation-modal .modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--nova-spacing-md) var(--nova-spacing-lg);
+  border-bottom: 1px solid var(--nova-border-color-light);
+  background-color: #f8f9fa;
+}
+
+.link-confirmation-modal .modal-header h3 {
+  margin: 0;
+  font-size: var(--nova-font-size-lg);
+  font-weight: 600;
+  color: var(--nova-text-primary);
+}
+
+.link-confirmation-modal .close-modal {
+  composes: btn-icon;
+}
+
+.link-confirmation-modal .modal-body {
+  padding: var(--nova-spacing-xl);
+}
+
+.link-confirmation-modal .modal-body p {
+  margin-top: 0;
+  margin-bottom: var(--nova-spacing-md);
+  color: var(--nova-text-primary);
+}
+
+.link-confirmation-modal .link-url {
+  display: flex;
+  align-items: center;
+  gap: var(--nova-spacing-sm);
+  padding: var(--nova-spacing-md);
+  background-color: var(--nova-bg-tertiary);
+  border-radius: var(--nova-border-radius-sm);
+  word-break: break-all;
+  border: 1px solid var(--nova-border-color);
+}
+
+.link-confirmation-modal .link-url svg {
+  color: var(--nova-text-secondary);
+  flex-shrink: 0;
+}
+
+.link-confirmation-modal .modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--nova-spacing-md);
+  padding: var(--nova-spacing-lg);
+  border-top: 1px solid var(--nova-border-color-light);
+}
+
+.link-confirmation-modal .cancel-btn {
+  /* Style inherited from the more specific selectors above */
+}
+
+.link-confirmation-modal .confirm-btn {
+  composes: btn;
+  background-color: #000000;
+  color: #ffffff;
+  border-color: #000000;
+}
+
+.link-confirmation-modal .confirm-btn:hover {
+  background-color: #333333;
+  border-color: #333333;
+}
+
+/* Overlay for link confirmation - higher z-index than regular modals */
+.link-confirmation-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.6); /* Darker background */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1099; /* Just below the link modal but above other content */
+}
+
+/* Modal Overlay */
+.modal-overlay.stream-modal-overlay,
+.stream-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  width: 100%; /* Ensure overlay covers full width */
+  padding: 2% 5%; /* Add padding to give more space around modal */
+}
+
+.modal-content {
+  background-color: var(--nova-bg-primary);
+  border-radius: var(--nova-border-radius);
+  width: 95%; /* Increased from 90% to 95% for wider modal */
+  max-width: 1000px; /* Increased from 800px to 1000px for wider modal */
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: var(--nova-shadow-md);
+  border: 1px solid var(--nova-border-strong);
+}
+
+/* Specific style for edit modal to make it even wider */
+.modal-content.stream-edit-modal {
+  width: 95%; /* Increased width for edit modal */
+  max-width: 1100px; /* Make even wider than general modal */
+  margin: auto;
+}
+
+/* Override Dashboard Modal Form Styles */
+.stream-edit-modal .modal-form,
+.link-confirmation-modal .modal-form,
+.rich-editor-container .editor-form {
+  /* Reset any inherited styles */
+  all: unset;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+/* Override form group styles from dashboard */
+.stream-edit-modal .modal-form .form-group,
+.rich-editor-container .editor-form .form-group {
+  margin-bottom: 0;
+  width: 100%;
+}
+
+/* Override label styles */
+.stream-edit-modal .modal-form label,
+.rich-editor-container .editor-form label {
+  display: block;
+  margin-bottom: var(--nova-spacing-sm);
+  font-size: var(--nova-font-size-sm);
+  color: var(--nova-text-secondary);
+  font-weight: 500;
+}
+
+/* Override input styles */
+.stream-edit-modal .modal-form input[type="text"],
+.stream-edit-modal .modal-form input[type="password"],
+.stream-edit-modal .modal-form input[type="email"],
+.stream-edit-modal .modal-form input[type="number"],
+.stream-edit-modal .modal-form textarea,
+.stream-edit-modal .modal-form select,
+.rich-editor-container .editor-form input[type="text"],
+.rich-editor-container .editor-form input[type="password"],
+.rich-editor-container .editor-form input[type="email"],
+.rich-editor-container .editor-form input[type="number"],
+.rich-editor-container .editor-form textarea,
+.rich-editor-container .editor-form select {
+  width: 100%;
+  padding: var(--nova-spacing-sm) var(--nova-spacing-md);
+  border: 1px solid var(--nova-border-color);
+  border-radius: var(--nova-border-radius-sm);
+  font-size: var(--nova-font-size-base);
+  background-color: var(--nova-bg-primary);
+  transition: border-color 0.2s, box-shadow 0.2s;
+  outline: none;
+}
+
+/* Focus state for inputs */
+.stream-edit-modal .modal-form input:focus,
+.stream-edit-modal .modal-form textarea:focus,
+.stream-edit-modal .modal-form select:focus,
+.rich-editor-container .editor-form input:focus,
+.rich-editor-container .editor-form textarea:focus,
+.rich-editor-container .editor-form select:focus {
+  border-color: var(--nova-primary);
+  box-shadow: 0 0 0 2px rgba(26, 115, 232, 0.2);
+}
+
+/* Specific style for title input to ensure it follows Stream design */
+.title-input-container .title-input {
+  width: 100%;
+  padding: var(--nova-spacing-sm) var(--nova-spacing-md);
+  border: 1px solid var(--nova-border-color);
+  border-radius: var(--nova-border-radius-sm);
+  font-size: var(--nova-font-size-base);
+  background-color: var(--nova-bg-primary);
+  transition: border-color 0.2s, box-shadow 0.2s;
+  outline: none;
+}
+
+.title-input-container .title-input:focus {
+  border-color: var(--nova-primary);
+  box-shadow: 0 0 0 2px rgba(26, 115, 232, 0.2);
+  outline: none;
+}
+
+/* Modal Overlay and positioning */
+.link-confirmation-overlay.stream-modal-overlay,
+.stream-modal-overlay.link-confirmation-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.6); /* Darker background */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1099; /* Just below the link modal but above other content */
+}
+
+/* Shared modal positioning for both link modals */
+.link-url-modal,
+.link-confirmation-modal {
+  position: relative; /* Change from fixed to relative */
+  max-width: 500px;
+  width: 90%;
+  background-color: var(--nova-bg-primary);
+  border-radius: var(--nova-border-radius);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+  border: 1px solid var(--nova-border-strong);
+  /* Remove transform properties that could cause animation issues */
+  animation: fadeIn 0.2s ease;
+}
+
+/* Link URL Modal specific styles */
+.link-url-modal .modal-body {
+  padding: var(--nova-spacing-xl);
+}
+
+.link-url-modal .form-group {
+  margin-bottom: 0;
+}
+
+.link-url-modal label {
+  display: block;
+  margin-bottom: 12px;
+  font-weight: 500;
+  color: var(--nova-text-primary);
+}
+
+.link-url-input {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--nova-border-color);
+  border-radius: var(--nova-border-radius-sm);
+  font-size: 16px;
+  background-color: var(--nova-bg-primary);
+}
+
+.link-url-input:focus {
+  outline: none;
+  border-color: var(--nova-primary);
+  box-shadow: 0 0 0 2px rgba(26, 115, 232, 0.2);
+}
+
+/* Shared Modal Header Styles */
+.link-url-modal .modal-header,
+.link-confirmation-modal .modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--nova-spacing-md) var(--nova-spacing-lg);
+  border-bottom: 1px solid var(--nova-border-color-light);
+  background-color: #f8f9fa;
+}
+
+/* Simple fade in animation */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* Shared modal styles */
+.link-url-modal .modal-actions,
+.link-confirmation-modal .modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--nova-spacing-md);
+  padding: var(--nova-spacing-lg);
+  border-top: 1px solid var(--nova-border-color-light);
+}
+
+.link-url-modal .confirm-btn,
+.link-confirmation-modal .confirm-btn {
+  composes: btn;
+  background-color: #000000;
+  color: #ffffff;
+  border-color: #000000;
+}
+
+.link-url-modal .confirm-btn:hover,
+.link-confirmation-modal .confirm-btn:hover {
+  background-color: #333333;
+  border-color: #333333;
+}
+
+.link-url-modal .cancel-btn,
+.link-confirmation-modal .cancel-btn {
+  /* Style inherited from the more specific selectors above */
+}
+
+/* Ensure content in link modals is properly centered */
+.link-url-modal .modal-content,
+.link-confirmation-modal .modal-content {
+  text-align: left;
+  width: 100%;
+}
+
+/* Fix button layout in modals */
+.link-url-modal .modal-actions button,
+.link-confirmation-modal .modal-actions button {
+  min-width: 100px;
+}
+
+/* Tooltip styles for button hover tooltips */
+.editor-toolbar button[title]:hover::after {
+  content: attr(title);
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: rgba(0, 0, 0, 0.8);
+  color: white;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 12px;
+  white-space: nowrap;
+  pointer-events: none;
+  margin-bottom: 5px;
+  z-index: 10;
+}
+
+.editor-toolbar button {
+  position: relative;
+}
+
+/* File Preview Modal */
+.file-preview-overlay.stream-modal-overlay,
+.stream-modal-overlay.file-preview-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.8); /* Darker background for better visibility */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1200; /* Higher than other modals */
+}
+
+.file-preview-modal {
+  position: relative;
+  max-width: 90%;
+  width: auto;
+  height: auto;
+  max-height: 90vh;
+  background-color: var(--nova-bg-primary);
+  border-radius: var(--nova-border-radius);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+  border: 1px solid var(--nova-border-strong);
+  animation: fadeIn 0.2s ease;
+  overflow: hidden;
+}
+
+.file-preview-modal .modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--nova-spacing-md) var(--nova-spacing-lg);
+  border-bottom: 1px solid var(--nova-border-color-light);
+  background-color: #f8f9fa;
+}
+
+.file-preview-modal .modal-header h3 {
+  margin: 0;
+  font-size: var(--nova-font-size-lg);
+  font-weight: 600;
+  color: var(--nova-text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 80%;
+}
+
+.file-preview-modal .modal-body {
+  padding: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: auto;
+  background-color: #f0f0f0; /* Light gray background for better contrast */
+  min-height: 300px;
+  min-width: 300px;
+}
+
+/* Image Preview */
+.file-preview-image {
+  max-width: 100%;
+  max-height: 70vh;
+  object-fit: contain;
+}
+
+/* PDF Preview */
+.file-preview-pdf {
+  width: 100%;
+  height: 70vh;
+  border: none;
+}
+
+/* Video Preview */
+.file-preview-video {
+  max-width: 100%;
+  max-height: 70vh;
+}
+
+/* Audio Preview */
+.file-preview-audio {
+  width: 100%;
+  max-width: 600px;
+  margin: 20px;
+}
+
+/* Text Preview */
+.file-preview-text {
+  width: 100%;
+  max-height: 70vh;
+  overflow: auto;
+  padding: 20px;
+  white-space: pre-wrap;
+  font-family: monospace;
+  font-size: 14px;
+  line-height: 1.5;
+  background-color: white;
+}
+
+/* Office Preview */
+.file-preview-office {
+  width: 100%;
+  height: 70vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  text-align: center;
+}
+
+.file-preview-office img {
+  max-width: 120px;
+  margin-bottom: 20px;
+}
+
+/* Non-previewable file display */
+.file-preview-not-available {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 40px;
+  text-align: center;
+  background-color: white;
+  width: 100%;
+  height: 100%;
+  min-height: 400px;
+}
+
+.file-icon-large {
+  margin-bottom: 20px;
+}
+
+.preview-message {
+  font-size: 16px;
+  color: #555;
+  margin-bottom: 20px;
+}
+
+.download-btn {
+  display: inline-block;
+  padding: 10px 20px;
+  background-color: #1a73e8;
+  color: white;
+  border-radius: 4px;
+  text-decoration: none;
+  font-weight: 500;
+  transition: background-color 0.2s;
+  border: none;
+  cursor: pointer;
+}
+
+.download-btn:hover {
+  background-color: #1557b0;
+  text-decoration: none;
+  color: white;
+}
+
+/* Attachment Removal Confirmation Modal */
+.attachment-removal-modal {
+  max-width: 500px;
+  width: 90%;
+}
+
+.attachment-removal-modal .modal-body {
+  padding: var(--nova-spacing-xl);
+}
+
+.attachment-removal-modal .attachment-name {
+  display: flex;
+  align-items: center;
+  gap: var(--nova-spacing-sm);
+  padding: var(--nova-spacing-md);
+  margin: var(--nova-spacing-md) 0;
+  background-color: var(--nova-bg-tertiary);
+  border-radius: var(--nova-border-radius-sm);
+  word-break: break-all;
+  border: 1px solid var(--nova-border-color);
+  font-weight: 500;
+}
+
+.attachment-removal-modal .warning-text {
+  color: var(--nova-text-delete);
+  font-size: var(--nova-font-size-sm);
+  margin-top: var(--nova-spacing-md);
+}
+
+.attachment-removal-modal .danger-btn {
+  background-color: var(--nova-text-delete);
+  border-color: var(--nova-text-delete);
+  color: var(--nova-text-on-primary);
+  display: flex;
+  align-items: center;
+  gap: var(--nova-spacing-sm);
+}
+
+.attachment-removal-modal .danger-btn svg {
+  width: 16px;
+  height: 16px;
+}
+
+.attachment-removal-modal .danger-btn:hover {
+  background-color: #b71c1c; /* Darker red */
+  border-color: #b71c1c;
+}
+
+/* Tooltip for remove button - REMOVED this general tooltip */
+/* .remove-attachment-btn { */
+/*   position: relative; */
+/* } */
+
+/* .remove-attachment-btn:hover::after { */
+/*   content: attr(title);  */ /* Use the title attribute */
+/*   position: absolute; */
+/*   bottom: 100%; */
+/*   left: 50%; */
+/*   transform: translateX(-50%) translateY(-5px); */ /* Position above */
+/*   background-color: rgba(0, 0, 0, 0.8); */
+/*   color: white; */
+/*   padding: 4px 8px; */
+/*   border-radius: 4px; */
+/*   font-size: 12px; */
+/*   white-space: nowrap; */
+/*   z-index: 10; */
+/*   pointer-events: none; */ /* Allow clicks through */
+/*   opacity: 0; */
+/*   transition: opacity 0.2s; */
+/* } */
+
+/* .remove-attachment-btn:hover::after { */
+/*   opacity: 1; */
+/* } */
+
+
+.remove-attachment-btn svg,
+.options-toggle svg,
+.enrollment-code-actions .options-toggle svg {
+  vertical-align: middle; /* Better alignment */
+  outline: none !important; /* Remove outline */
+}
+
+/* Enrollment Code Header/Actions */
+.enrollment-code-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.enrollment-code-actions {
+  position: relative;
+}
+
+.enrollment-code-actions .options-toggle {
+  background: none;
+  border: none;
+  padding: 5px;
+  font-size: 14px;
+  color: #666;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.enrollment-code-actions .options-toggle:hover {
+  background-color: #f0f0f0;
+  color: #333;
+}
+
+.enrollment-code-actions .options-menu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background: #fff;
+  border-radius: 4px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  z-index: 100;
+  min-width: 180px;
+  overflow: hidden;
+}
+
+.enrollment-code-actions .options-menu button {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  text-align: left;
+  padding: 10px 12px;
+  border: none;
+  background: none;
+  font-size: 14px;
+  cursor: pointer;
+  gap: 8px;
+}
+
+.enrollment-code-actions .options-menu button:hover {
+  background-color: #f5f5f5;
+}
+
+.enrollment-code-actions .toggle-button.enabled {
+  color: #FF7171;
+}
+
+.enrollment-code-actions .toggle-button.disabled {
+  color: #14A38B;
+}
+
+.enrollment-code-actions .regenerate-button {
+  color: #2B78E4;
+}
+
+.code-disabled {
+  color: var(--nova-text-light);
+  font-style: italic;
+}
+
+.loading-spinner {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(0, 0, 0, 0.1);
+  border-left-color: var(--nova-text-secondary);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-left: var(--nova-spacing-sm);
+  vertical-align: middle;
+  outline: none !important; /* Remove outline */
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Hover styles for announcement attachments specifically */
+.announcement-attachments .file-attachment:hover .remove-attachment-btn {
+    opacity: 1;
+    outline: none !important; /* Remove outline */
+}
+
+/* Hover styles for editor attachments specifically */
+.editor-attachments .file-attachment:hover .remove-attachment-btn {
+    opacity: 1;
+    outline: none !important; /* Remove outline */
+}
+
+/* Consolidation and cleanup of remove-attachment-btn styles */
+/* Remove redundant selectors if base .remove-attachment-btn covers all cases */
+
+/* Ensure hover effect is consistent */
+.remove-attachment-btn:hover {
+    background-color: #fce8e6; /* Lighter red background */
+    color: var(--nova-text-delete); /* Red color */
+    outline: none !important; /* Remove outline */
+}
+
+/* Adjustments for Announcement Options Menu */
+.announcement-actions .options-menu button:hover {
+    background-color: rgba(0, 0, 0, 0.05); /* Subtle hover */
+    outline: none !important; /* Remove outline */
+}
+
+/* Stream Item - Announcement Card */
+.announcement-card {
+    /* Inherits from .stream-item */
+}
+
+/* Stream Item - Material Card */
+.material-card {
+    /* Inherits from .stream-item */
+}
+
+/* Ensure options toggle button has no outline */
+.options-toggle {
+    outline: none !important;
+}
+
+.options-toggle:focus,
+.options-toggle:focus-visible {
+    outline: none !important;
+    box-shadow: none; /* Remove any focus ring */
+} 

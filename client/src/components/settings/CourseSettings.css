@@ -1,0 +1,28 @@
+/* Course Settings specific styles */
+.course-settings-container {
+  padding: 24px;
+  background-color: var(--card-bg);
+  border-radius: var(--nova-border-radius, 12px);
+  box-shadow: var(--shadow-sm);
+  margin-bottom: 24px;
+  border: 1px solid var(--nova-border-strong, #000000);
+}
+
+.course-settings-container h1 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 16px;
+  color: var(--nova-text-primary, #0f172a);
+}
+
+.course-settings-container p {
+  color: var(--nova-text-secondary, #475569);
+  line-height: 1.5;
+}
+
+/* Responsive layout */
+@media (max-width: 768px) {
+  .course-settings-container {
+    padding: 16px;
+  }
+} 

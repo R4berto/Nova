@@ -1,0 +1,162 @@
+.course-stream {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    min-height: calc(100vh - 200px);
+    display: flex;
+    flex-direction: column;
+}
+
+.announcement-form {
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+    margin-bottom: 24px;
+    padding: 16px;
+}
+
+.form-header {
+    margin-bottom: 12px;
+}
+
+.form-header select {
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background-color: white;
+    font-size: 14px;
+}
+
+.form-content {
+    position: relative;
+}
+
+.form-content textarea {
+    width: 100%;
+    min-height: 100px;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    resize: vertical;
+    font-size: 14px;
+}
+
+.form-actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 12px;
+}
+
+.post-btn {
+    background-color: #1a73e8;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 8px 24px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.post-btn:hover {
+    background-color: #1557b0;
+}
+
+.stream-content {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    flex: 1;
+}
+
+.stream-item {
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+    padding: 16px;
+}
+
+.author-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.author-name {
+    font-weight: 500;
+    color: #202124;
+}
+
+.post-date {
+    color: #5f6368;
+    font-size: 12px;
+}
+
+.content {
+    color: #202124;
+    font-size: 14px;
+    line-height: 1.5;
+    white-space: pre-wrap;
+}
+
+.material {
+    border-left: 4px solid #1a73e8;
+}
+
+.material-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.material-type {
+    text-transform: uppercase;
+    font-size: 12px;
+    font-weight: 500;
+    color: #1a73e8;
+}
+
+.material-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.material-content h3 {
+    margin: 0 0 8px 0;
+    color: #202124;
+    font-size: 16px;
+}
+
+.material-content p {
+    margin: 0 0 12px 0;
+    color: #5f6368;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.due-date, .points {
+    font-size: 12px;
+    color: #5f6368;
+    margin-top: 8px;
+}
+
+/* Responsive styles */
+@media (max-width: 600px) {
+    .course-stream {
+        padding: 12px;
+    }
+
+    .material-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+
+    .material-info {
+        width: 100%;
+        justify-content: space-between;
+    }
+} 

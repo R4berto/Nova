@@ -1,0 +1,1094 @@
+import React, { useState, useEffect, useCallback } from 'react';
+import { useParams, useNavigate, Link } from 'react-router-dom';
+import { toast } from 'react-hot-toast';
+import { 
+  HiOutlineBell,
+  HiOutlineMenu,
+  HiOutlineX,
+  HiOutlineHome,
+  HiOutlineAcademicCap,
+  HiOutlineChatAlt2,
+  HiOutlineCog,
+  HiOutlineLogout,
+  HiOutlineArchive,
+  HiOutlineBan,
+  HiOutlineChevronDown,
+  HiOutlineClipboardList,
+  HiOutlineUserGroup,
+  HiOutlineCalendar,
+  HiOutlineAnnotation,
+  HiOutlineNewspaper,
+  HiOutlinePencilAlt,
+  HiOutlineSearch,
+  HiOutlinePresentationChartBar,
+  HiOutlinePaperAirplane,
+  HiOutlineUserCircle,
+  HiOutlinePlusCircle
+} from "react-icons/hi";
+import './Messages.css';
+import '../dashboard.css';
+import { io } from 'socket.io-client';
+
+const Messages = ({ setAuth }) => {
+  const { courseId } = useParams();
+  const navigate = useNavigate();
+  const [courseDetails, setCourseDetails] = useState(null);
+  const [userProfile, setUserProfile] = useState(null);
+  const [isTeacher, setIsTeacher] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [userRole, setUserRole] = useState(null);
+  const [inputs, setInputs] = useState({
+    first_name: "",
+    last_name: "",
+    profilePicture: null
+  });
+  const [isCoursesSubmenuOpen, setIsCoursesSubmenuOpen] = useState(false);
+  const { first_name, last_name } = inputs;
+
+  // Message state
+  const [activeConversation, setActiveConversation] = useState(null);
+  const [messageText, setMessageText] = useState('');
+  const [conversations, setConversations] = useState([]);
+  const [courseStudents, setCourseStudents] = useState([]);
+  const [newConversationModal, setNewConversationModal] = useState(false);
+  const [selectedUser, setSelectedUser] = useState(null);
+
+  // Add socket state
+  const [socket, setSocket] = useState(null);
+  const [typingUsers, setTypingUsers] = useState({});
+  const [typingTimeout, setTypingTimeout] = useState(null);
+
+  const fetchUserRole = useCallback(async () => {
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        throw new Error("No token found");
+      }
+      const response = await fetch("http://localhost:5000/auth/user-role", {
+        headers: {
+          jwt_token: token
+        }
+      });
+      if (!response.ok) {
+        throw new Error("Failed to fetch user role");
+      }
+      const data = await response.json();
+      setUserRole(data.role);
+      setIsTeacher(data.role === 'professor');
+    } catch (err) {
+      console.error("Error fetching user role:", err);
+    }
+  }, []);
+
+  const getProfile = useCallback(async () => {
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) return;
+
+      const res = await fetch("http://localhost:5000/dashboard/", {
+        method: "GET",
+        headers: { jwt_token: token }
+      });
+
+      if (!res.ok) {
+        throw new Error('Failed to fetch profile from dashboard');
+      }
+      const parseData = await res.json();
+      
+      setInputs(prevState => ({
+        ...prevState,
+        first_name: parseData.first_name,
+        last_name: parseData.last_name,
+        profilePicture: parseData.profile_picture_url || null
+      }));
+      setUserProfile({
+        user_id: parseData.user_id || parseData.id,
+        first_name: parseData.first_name,
+        last_name: parseData.last_name,
+        role: userRole || parseData.role,
+        profile_picture_url: parseData.profile_picture_url || null
+      });
+    } catch (err) {
+      console.error("Error fetching profile:", err.message);
+    }
+  }, [userRole]);
+
+  const fetchCourseMembers = useCallback(async () => {
+    if (!courseId) return;
+    
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) return;
+
+      // Try to fetch course members using the API endpoint
+      const response = await fetch(`http://localhost:5000/api/messages/courses/${courseId}/participants`, {
+        method: "GET",
+        headers: { jwt_token: token }
+      });
+
+      if (!response.ok) {
+        // Fall back to mock data for demonstration
+        console.warn("API endpoint not available. Using mock data instead.");
+        const mockStudents = [
+          { user_id: '1', first_name: 'John', last_name: 'Doe', profile_picture_url: null },
+          { user_id: '2', first_name: 'Jane', last_name: 'Smith', profile_picture_url: null },
+          { user_id: '3', first_name: 'Mike', last_name: 'Wilson', profile_picture_url: null },
+          { user_id: '4', first_name: 'Sarah', last_name: 'Johnson', profile_picture_url: null }
+        ];
+        
+        const mockProfessor = { 
+          user_id: '5', 
+          first_name: 'Professor', 
+          last_name: 'Anderson', 
+          profile_picture_url: null 
+        };
+
+        setCourseStudents([...mockStudents, mockProfessor]);
+        return;
+      }
+
+      const data = await response.json();
+      setCourseStudents(data);
+    } catch (err) {
+      console.error("Error fetching course members:", err.message);
+      // Use mock data as fallback
+      const mockStudents = [
+        { user_id: '1', first_name: 'John', last_name: 'Doe', profile_picture_url: null },
+        { user_id: '2', first_name: 'Jane', last_name: 'Smith', profile_picture_url: null },
+        { user_id: '3', first_name: 'Mike', last_name: 'Wilson', profile_picture_url: null },
+        { user_id: '4', first_name: 'Sarah', last_name: 'Johnson', profile_picture_url: null },
+        { user_id: '5', first_name: 'Professor', last_name: 'Anderson', profile_picture_url: null }
+      ];
+      setCourseStudents(mockStudents);
+    }
+  }, [courseId]);
+
+  const fetchUserConversations = useCallback(async () => {
+    if (!userProfile) return;
+
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) return;
+
+      // Try to fetch conversations using the API endpoint
+      const response = await fetch(`http://localhost:5000/api/messages/conversations`, {
+        method: "GET",
+        headers: { jwt_token: token }
+      });
+
+      if (!response.ok) {
+        // Fall back to mock data for demonstration
+        console.warn("API endpoint not available. Using mock data instead.");
+        initializeMockConversations();
+        return;
+      }
+
+      const data = await response.json();
+      
+      if (data.length === 0 && courseId) {
+        // If no conversations and we have a course ID, create a course group chat
+        await createCourseGroupChat();
+      } else {
+        setConversations(data);
+        // Set active conversation to the first one if there is no active conversation
+        if (data.length > 0 && !activeConversation) {
+          setActiveConversation(data[0].conversation_id);
+        }
+      }
+    } catch (err) {
+      console.error("Error fetching conversations:", err.message);
+      // Use mock data as fallback
+      initializeMockConversations();
+    }
+  }, [userProfile, courseId, activeConversation]);
+
+  const createCourseGroupChat = async () => {
+    if (!courseId || !userProfile) return;
+    
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) return;
+      
+      // Get the course name to use as the chat name
+      const courseName = "Course Chat"; // Default name
+      
+      // Get all course participants except the current user
+      const participantIds = courseStudents
+        .filter(student => student.user_id !== userProfile.user_id)
+        .map(student => student.user_id);
+      
+      // Create a new conversation
+      const response = await fetch(`http://localhost:5000/api/messages/conversations`, {
+        method: "POST",
+        headers: { 
+          jwt_token: token,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          name: courseName,
+          participants: participantIds,
+          conversationType: 'group',
+          courseId: courseId
+        })
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to create course group chat');
+      }
+      
+      const data = await response.json();
+      
+      // Add the new conversation to state
+      setConversations(prev => [data, ...prev]);
+      setActiveConversation(data.conversation_id);
+      
+      toast.success('Course chat created!');
+    } catch (err) {
+      console.error("Error creating course group chat:", err.message);
+      toast.error('Could not create course chat. Using offline mode.');
+      initializeMockConversations();
+    }
+  };
+
+  const initializeMockConversations = useCallback(() => {
+    if (!userProfile || !courseStudents || courseStudents.length === 0) return;
+
+    // Mock course group chat
+    const courseConversation = {
+      conversation_id: 'course',
+      name: 'Course Chat',
+      conversation_type: 'group',
+      course_id: courseId,
+      participants: [...courseStudents.map(student => ({
+        user_id: student.user_id,
+        first_name: student.first_name,
+        last_name: student.last_name,
+        profile_picture_url: student.profile_picture_url
+      }))],
+      messages: [
+        {
+          message_id: '1',
+          sender_id: '5', // professor
+          sender_name: 'Professor Anderson',
+          content: 'Welcome to the course chat! Use this space to discuss course-related topics.',
+          sent_at: new Date(Date.now() - 1000 * 60 * 60 * 24 * 2).toISOString(), // 2 days ago
+        }
+      ]
+    };
+
+    // Mock one-on-one chats
+    const oneOnOneChats = courseStudents
+      .filter(student => student.user_id !== userProfile.user_id)
+      .map(student => ({
+        conversation_id: `private_${student.user_id}`,
+        name: `${student.first_name} ${student.last_name}`,
+        conversation_type: 'private',
+        participants: [{
+          user_id: student.user_id,
+          first_name: student.first_name,
+          last_name: student.last_name,
+          profile_picture_url: student.profile_picture_url
+        }, {
+          user_id: userProfile.user_id,
+          first_name: userProfile.first_name,
+          last_name: userProfile.last_name,
+          profile_picture_url: userProfile.profile_picture_url
+        }],
+        messages: []
+      }));
+
+    // Example messages in private chats
+    if (oneOnOneChats.length > 0) {
+      // Add a sample message to the first private chat
+      oneOnOneChats[0].messages = [
+        {
+          message_id: '2',
+          sender_id: oneOnOneChats[0].participants[0].user_id,
+          sender_name: `${oneOnOneChats[0].participants[0].first_name} ${oneOnOneChats[0].participants[0].last_name}`,
+          content: 'Hi there! I had a question about the upcoming assignment.',
+          sent_at: new Date(Date.now() - 1000 * 60 * 60 * 12).toISOString(), // 12 hours ago
+        },
+        {
+          message_id: '3',
+          sender_id: userProfile.user_id,
+          sender_name: `${userProfile.first_name} ${userProfile.last_name}`,
+          content: 'Sure, what would you like to know?',
+          sent_at: new Date(Date.now() - 1000 * 60 * 60 * 11).toISOString(), // 11 hours ago
+        }
+      ];
+    }
+
+    setConversations([courseConversation, ...oneOnOneChats]);
+    setActiveConversation('course');
+  }, [userProfile, courseStudents, courseId]);
+
+  const fetchConversationMessages = useCallback(async (conversationId) => {
+    if (!conversationId || !userProfile) return;
+    
+    // Check if the conversation ID is a mock ID (string) or a real ID (number)
+    const isNumericId = !isNaN(parseInt(conversationId));
+    
+    // If it's not a numeric ID, it's a mock conversation, so we don't need to fetch from API
+    if (!isNumericId) {
+      console.log("Using mock conversation data for ID:", conversationId);
+      return;
+    }
+    
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) return;
+      
+      // Try to fetch messages using the API endpoint
+      const response = await fetch(`http://localhost:5000/api/messages/conversations/${conversationId}/messages`, {
+        method: "GET",
+        headers: { jwt_token: token }
+      });
+      
+      if (!response.ok) {
+        // Fall back to mock data or existing data
+        console.warn("API endpoint not available. Using existing data instead.");
+        return;
+      }
+      
+      const data = await response.json();
+      
+      // Update the conversation messages
+      setConversations(prev => 
+        prev.map(conv => 
+          conv.conversation_id === conversationId 
+            ? { ...conv, messages: data }
+            : conv
+        )
+      );
+      
+      // Mark messages as read
+      await fetch(`http://localhost:5000/api/messages/conversations/${conversationId}/read`, {
+        method: "PUT",
+        headers: { jwt_token: token }
+      });
+    } catch (err) {
+      console.error("Error fetching messages:", err.message);
+    }
+  }, [userProfile]);
+
+  // Initialize socket connection
+  useEffect(() => {
+    if (!userProfile) return;
+
+    const token = localStorage.getItem("token");
+    if (!token) return;
+
+    // Create socket connection
+    const newSocket = io('http://localhost:5000', {
+      auth: { token: localStorage.getItem("token") }
+    });
+
+    newSocket.on('connect', () => {
+      console.log('Connected to WebSocket server');
+    });
+
+    newSocket.on('connect_error', (err) => {
+      console.error('WebSocket connection error:', err.message);
+      toast.error('Real-time messaging unavailable. Using offline mode.');
+    });
+
+    // Listen for new messages
+    newSocket.on('new_message', (message) => {
+      if (message.sender_id !== userProfile.user_id) {
+        // Add the message to the conversation
+        setConversations(prev => 
+          prev.map(conv => 
+            conv.conversation_id === message.conversation_id 
+              ? { ...conv, messages: [...(conv.messages || []), message] }
+              : conv
+          )
+        );
+
+        // Play notification sound if in a different conversation
+        if (activeConversation !== message.conversation_id) {
+          // TODO: Play notification sound
+        }
+      }
+    });
+
+    // Listen for typing indicators
+    newSocket.on('typing_indicator', (data) => {
+      if (data.is_typing) {
+        setTypingUsers(prev => ({
+          ...prev,
+          [data.conversation_id]: {
+            ...prev[data.conversation_id],
+            [data.user_id]: data.user_name
+          }
+        }));
+      } else {
+        setTypingUsers(prev => {
+          const updatedConversation = { ...prev[data.conversation_id] };
+          delete updatedConversation[data.user_id];
+          return {
+            ...prev,
+            [data.conversation_id]: updatedConversation
+          };
+        });
+      }
+    });
+
+    // Listen for read receipts
+    newSocket.on('messages_read', (data) => {
+      // Update read status for messages
+      // This is for showing read receipts
+      console.log('Messages read:', data);
+    });
+
+    // Listen for message delivery confirmation
+    newSocket.on('message_delivered', (data) => {
+      // Update message status from "sending" to "sent"
+      console.log('Message delivered:', data);
+    });
+
+    // Listen for errors
+    newSocket.on('error', (error) => {
+      console.error('WebSocket error:', error);
+      toast.error(error.message || 'An error occurred with messaging');
+    });
+
+    setSocket(newSocket);
+
+    // Cleanup on unmount
+    return () => {
+      if (newSocket) {
+        newSocket.disconnect();
+      }
+    };
+  }, [userProfile]);
+
+  // Update handleSendMessage function
+  const handleSendMessage = async () => {
+    if (!messageText.trim() || !activeConversation || !userProfile) return;
+
+    try {
+      // Optimistically update the UI first
+      const tempMessageId = `temp_${Date.now()}`;
+      const tempMessage = {
+        message_id: tempMessageId,
+        conversation_id: activeConversation,
+        sender_id: userProfile.user_id,
+        sender_name: `${userProfile.first_name} ${userProfile.last_name}`,
+        content: messageText.trim(),
+        sent_at: new Date().toISOString(),
+        profile_picture_url: userProfile.profile_picture_url,
+        is_sending: true
+      };
+      
+      setConversations(prev => 
+        prev.map(conv => 
+          conv.conversation_id === activeConversation 
+            ? { ...conv, messages: [...(conv.messages || []), tempMessage] }
+            : conv
+        )
+      );
+      
+      // Clear the input
+      const messageToBeSent = messageText.trim();
+      setMessageText('');
+      
+      // Check if the conversation ID is a mock ID (string) or a real ID (number)
+      const isNumericId = !isNaN(parseInt(activeConversation));
+      
+      // Try to send via WebSocket first if it's a real conversation ID
+      if (socket && socket.connected && isNumericId) {
+        socket.emit('send_message', {
+          conversation_id: activeConversation,
+          content: messageToBeSent
+        });
+        return;
+      }
+      
+      // If it's a mock conversation, just update the UI and return
+      if (!isNumericId) {
+        // Remove the sending indicator after a delay to simulate sending
+        setTimeout(() => {
+          setConversations(prev => 
+            prev.map(conv => 
+              conv.conversation_id === activeConversation 
+                ? { 
+                    ...conv, 
+                    messages: conv.messages.map(msg => 
+                      msg.message_id === tempMessageId ? { ...msg, is_sending: false } : msg
+                    )
+                  }
+                : conv
+            )
+          );
+        }, 500);
+        return;
+      }
+      
+      // Fall back to REST API if WebSocket is not available for real conversations
+      const token = localStorage.getItem("token");
+      if (!token) return;
+      
+      const response = await fetch(`http://localhost:5000/api/messages/conversations/${activeConversation}/messages`, {
+        method: "POST",
+        headers: { 
+          jwt_token: token,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          content: messageToBeSent
+        })
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to send message');
+      }
+      
+      // Get the real message data from the response
+      const sentMessage = await response.json();
+      
+      // Replace the temp message with the real message
+      setConversations(prev => 
+        prev.map(conv => 
+          conv.conversation_id === activeConversation 
+            ? { 
+                ...conv, 
+                messages: conv.messages.map(msg => 
+                  msg.message_id === tempMessageId ? sentMessage : msg
+                )
+              }
+            : conv
+        )
+      );
+      
+    } catch (err) {
+      console.error("Error sending message:", err.message);
+      toast.error('Failed to send message. Using offline mode.');
+      
+      // Update the UI with a completed message anyway in offline mode
+      setConversations(prev => 
+        prev.map(conv => 
+          conv.conversation_id === activeConversation 
+            ? { 
+                ...conv, 
+                messages: conv.messages.map(msg => 
+                  msg.is_sending ? { ...msg, is_sending: false } : msg
+                )
+              }
+            : conv
+        )
+      );
+    }
+  };
+
+  // Add typing indicator functionality
+  const handleMessageInput = (e) => {
+    setMessageText(e.target.value);
+    
+    // Check if the conversation ID is a mock ID (string) or a real ID (number)
+    const isNumericId = !isNaN(parseInt(activeConversation));
+    
+    // Send typing indicator if socket is connected and it's a real conversation
+    if (socket && socket.connected && activeConversation && isNumericId) {
+      // Clear existing timeout
+      if (typingTimeout) {
+        clearTimeout(typingTimeout);
+      }
+      
+      // Send typing start
+      socket.emit('typing_start', { conversation_id: activeConversation });
+      
+      // Set timeout to send typing end after 2 seconds of inactivity
+      const timeout = setTimeout(() => {
+        socket.emit('typing_end', { conversation_id: activeConversation });
+      }, 2000);
+      
+      setTypingTimeout(timeout);
+    }
+  };
+
+  // Mark messages as read when conversation is viewed
+  useEffect(() => {
+    if (!activeConversation || !userProfile || !socket) return;
+    
+    // Check if the conversation ID is a mock ID (string) or a real ID (number)
+    const isNumericId = !isNaN(parseInt(activeConversation));
+    
+    // Only proceed with real conversations (numeric IDs)
+    if (!isNumericId) return;
+    
+    // Mark messages as read in this conversation
+    socket.emit('mark_as_read', { conversation_id: activeConversation });
+    
+    // Also make API call as fallback
+    const token = localStorage.getItem("token");
+    if (token) {
+      fetch(`http://localhost:5000/api/messages/conversations/${activeConversation}/read`, {
+        method: "PUT",
+        headers: { jwt_token: token }
+      }).catch(err => console.error("Error marking messages as read:", err));
+    }
+  }, [activeConversation, userProfile, socket]);
+
+  const startNewConversation = async (user) => {
+    if (!user || !userProfile) return;
+    
+    // Check if a conversation already exists
+    const existingConversation = conversations.find(conv => 
+      conv.conversation_type === 'private' && 
+      conv.participants && 
+      conv.participants.some(p => p.user_id === user.user_id) &&
+      conv.participants.some(p => p.user_id === userProfile.user_id)
+    );
+
+    if (existingConversation) {
+      setActiveConversation(existingConversation.conversation_id);
+      setNewConversationModal(false);
+      return;
+    }
+
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) return;
+      
+      // Create a new conversation via API
+      const response = await fetch(`http://localhost:5000/api/messages/conversations`, {
+        method: "POST",
+        headers: { 
+          jwt_token: token,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          name: `${user.first_name} ${user.last_name}`,
+          participants: [user.user_id],
+          conversationType: 'private'
+        })
+      });
+      
+      if (!response.ok) {
+        // Fall back to mock mode
+        throw new Error('Failed to create conversation');
+      }
+      
+      const data = await response.json();
+      
+      // Add the new conversation to state
+      setConversations(prev => [data, ...prev]);
+      setActiveConversation(data.conversation_id);
+      setNewConversationModal(false);
+      
+      toast.success(`Started conversation with ${user.first_name}`);
+    } catch (err) {
+      console.error("Error creating conversation:", err.message);
+      toast.error('Could not create conversation. Using offline mode.');
+      
+      // Create a mock conversation in offline mode
+      const newConversationId = `private_${user.user_id}_${Date.now()}`;
+      const newConversation = {
+        conversation_id: newConversationId,
+        name: `${user.first_name} ${user.last_name}`,
+        conversation_type: 'private',
+        participants: [{
+          user_id: user.user_id,
+          first_name: user.first_name,
+          last_name: user.last_name,
+          profile_picture_url: user.profile_picture_url
+        }, {
+          user_id: userProfile.user_id,
+          first_name: userProfile.first_name,
+          last_name: userProfile.last_name,
+          profile_picture_url: userProfile.profile_picture_url
+        }],
+        messages: []
+      };
+      
+      setConversations(prev => [newConversation, ...prev]);
+      setActiveConversation(newConversationId);
+      setNewConversationModal(false);
+    }
+  };
+
+  useEffect(() => {
+    const checkIfMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    checkIfMobile();
+    window.addEventListener("resize", checkIfMobile);
+    return () => {
+      window.removeEventListener("resize", checkIfMobile);
+    };
+  }, []);
+
+  useEffect(() => {
+    const loadUserData = async () => {
+      await fetchUserRole();
+      await getProfile();
+      setLoading(false);
+    };
+    loadUserData();
+  }, [fetchUserRole, getProfile]);
+
+  useEffect(() => {
+    if (courseId) {
+      fetchCourseMembers();
+    }
+  }, [courseId, fetchCourseMembers]);
+
+  useEffect(() => {
+    if (userProfile) {
+      fetchUserConversations();
+    }
+  }, [userProfile, fetchUserConversations]);
+
+  useEffect(() => {
+    if (activeConversation) {
+      fetchConversationMessages(activeConversation);
+    }
+  }, [activeConversation, fetchConversationMessages]);
+
+  const formatTimestamp = (timestamp) => {
+    const date = new Date(timestamp);
+    const now = new Date();
+    const diffInDays = Math.floor((now - date) / (1000 * 60 * 60 * 24));
+    
+    if (diffInDays === 0) {
+      return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    } else if (diffInDays === 1) {
+      return 'Yesterday';
+    } else if (diffInDays < 7) {
+      return date.toLocaleDateString([], { weekday: 'short' });
+    } else {
+      return date.toLocaleDateString([], { month: 'short', day: 'numeric' });
+    }
+  };
+  
+  const tabs = [
+    { id: 'stream', label: 'Stream' },
+    { id: 'messages', label: 'Messages' },
+    { id: 'assignments', label: 'Assignments' },
+    { id: 'exams', label: 'Exams' },
+    { id: 'people', label: 'People' },
+    { id: 'grades', label: 'Grades' }
+  ];
+
+  if (loading) {
+    return (
+      <div className="dashboard-container dashboard-page">
+        <div className="loading">Loading messages...</div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="dashboard-container dashboard-page">
+      <div
+        className={`sidebar-overlay ${sidebarOpen ? 'open' : ''}`}
+        onClick={() => setSidebarOpen(false)}
+      ></div>
+
+      <div className={`sidebar ${sidebarOpen ? 'open' : ''}`}>
+        <div className="logo-container">
+          <img src="/logo.png" alt="Nova Logo" className="logo" />
+          <h2>Nova</h2>
+        </div>
+
+        <div className="sidebar-header">
+          <h3>General</h3>
+        </div>
+
+        <nav className="sidebar-nav">
+          <Link to="/dashboard" className="nav-item">
+            <HiOutlineHome className="nav-icon" />
+            <span>Dashboard</span>
+          </Link>
+          <div className={`nav-item has-submenu ${isCoursesSubmenuOpen ? 'active' : ''}`}>
+            <span onClick={() => setIsCoursesSubmenuOpen(!isCoursesSubmenuOpen)}>
+              <HiOutlineClipboardList className="nav-icon" />
+              <span>Courses</span>
+              <HiOutlineChevronDown className="submenu-toggle" />
+            </span>
+            <div className="submenu">
+              <Link to="/courses" className="submenu-item">
+                <span>All Courses</span>
+              </Link>
+              <Link to={`/courses/${courseId}/announcements`} className="submenu-item">
+                <HiOutlineAnnotation className="nav-icon" />
+                <span>Announcements</span>
+              </Link>
+              <Link to={`/courses/${courseId}/assignments`} className="submenu-item">
+                <HiOutlineClipboardList className="nav-icon" />
+                <span>Assignments</span>
+              </Link>
+              <Link to={`/courses/${courseId}/exam`} className="submenu-item">
+                <HiOutlinePencilAlt className="nav-icon" />
+                <span>Exam</span>
+              </Link>
+              <Link to={`/courses/${courseId}/grades`} className="submenu-item">
+                <HiOutlinePresentationChartBar className="nav-icon" />
+                <span>Grades</span>
+              </Link>
+              <Link to={`/courses/${courseId}/people`} className="submenu-item">
+                <HiOutlineUserGroup className="nav-icon" />
+                <span>People</span>
+              </Link>
+            </div>
+          </div>
+        </nav>
+      </div>
+      
+      <div className="main-content">
+        <div className="messages-container">
+          <div className="messages-header">
+            <div className="mobile-menu-toggle" onClick={() => setSidebarOpen(!sidebarOpen)}>
+              {sidebarOpen ? <HiOutlineX className="nav-icon" /> : <HiOutlineMenu className="nav-icon" />}
+            </div>
+            <h1>Messages</h1>
+            <div className="notification-bell">
+              <HiOutlineBell className="nav-icon" />
+              <span className="notification-badge">2</span>
+            </div>
+          </div>
+
+          <div className="messages-content">
+            <div className="conversations-list">
+              <div className="conversations-header">
+                <h2>Conversations</h2>
+                <button 
+                  className="new-conversation-button"
+                  onClick={() => setNewConversationModal(true)}
+                >
+                  <HiOutlinePlusCircle className="nav-icon" />
+                  <span>New</span>
+                </button>
+              </div>
+
+              {conversations.length === 0 ? (
+                <div className="no-conversations">
+                  <p>No conversations yet</p>
+                </div>
+              ) : (
+                <div className="conversations">
+                  {conversations.map(conversation => (
+                    <div 
+                      key={conversation.conversation_id} 
+                      className={`conversation-item ${activeConversation === conversation.conversation_id ? 'active' : ''}`}
+                      onClick={() => setActiveConversation(conversation.conversation_id)}
+                    >
+                      {conversation.conversation_type === 'group' ? (
+                        <div className="conversation-avatar group">
+                          <HiOutlineUserGroup className="nav-icon" />
+                        </div>
+                      ) : (
+                        <div className="conversation-avatar">
+                          {conversation.participants && conversation.participants.find(p => p.user_id !== userProfile?.user_id)?.profile_picture_url ? (
+                            <img 
+                              src={conversation.participants.find(p => p.user_id !== userProfile?.user_id).profile_picture_url} 
+                              alt="Profile" 
+                            />
+                          ) : (
+                            <HiOutlineUserCircle className="nav-icon" />
+                          )}
+                        </div>
+                      )}
+                      <div className="conversation-info">
+                        <div className="conversation-name">
+                          {conversation.conversation_type === 'group' 
+                            ? conversation.name 
+                            : conversation.participants?.find(p => p.user_id !== userProfile?.user_id)
+                              ? `${conversation.participants.find(p => p.user_id !== userProfile?.user_id).first_name} ${conversation.participants.find(p => p.user_id !== userProfile?.user_id).last_name}`
+                              : 'Unknown'
+                          }
+                        </div>
+                        <div className="conversation-last-message">
+                          {conversation.messages && conversation.messages.length > 0 
+                            ? conversation.messages[conversation.messages.length - 1].content.length > 25
+                              ? conversation.messages[conversation.messages.length - 1].content.substring(0, 25) + '...'
+                              : conversation.messages[conversation.messages.length - 1].content
+                            : 'No messages yet'
+                          }
+                        </div>
+                      </div>
+                      <div className="conversation-time">
+                        {conversation.messages && conversation.messages.length > 0 
+                          ? formatTimestamp(conversation.messages[conversation.messages.length - 1].sent_at)
+                          : ''
+                        }
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            <div className="messages-view">
+              {activeConversation ? (
+                <>
+                  <div className="active-conversation-header">
+                    {conversations.find(c => c.conversation_id === activeConversation)?.conversation_type === 'group' ? (
+                      <div className="conversation-avatar group">
+                        <HiOutlineUserGroup className="nav-icon" />
+                      </div>
+                    ) : (
+                      <div className="conversation-avatar">
+                        {conversations.find(c => c.conversation_id === activeConversation)?.participants?.find(p => p.user_id !== userProfile?.user_id)?.profile_picture_url ? (
+                          <img 
+                            src={conversations.find(c => c.conversation_id === activeConversation).participants.find(p => p.user_id !== userProfile?.user_id).profile_picture_url} 
+                            alt="Profile" 
+                          />
+                        ) : (
+                          <HiOutlineUserCircle className="nav-icon" />
+                        )}
+                      </div>
+                    )}
+                    <div className="conversation-info">
+                      <div className="conversation-name">
+                        {conversations.find(c => c.conversation_id === activeConversation)?.conversation_type === 'group' 
+                          ? conversations.find(c => c.conversation_id === activeConversation)?.name 
+                          : conversations.find(c => c.conversation_id === activeConversation)?.participants?.find(p => p.user_id !== userProfile?.user_id)
+                            ? `${conversations.find(c => c.conversation_id === activeConversation).participants.find(p => p.user_id !== userProfile?.user_id).first_name} ${conversations.find(c => c.conversation_id === activeConversation).participants.find(p => p.user_id !== userProfile?.user_id).last_name}`
+                            : 'Unknown'
+                        }
+                      </div>
+                      <div className="conversation-participants">
+                        {conversations.find(c => c.conversation_id === activeConversation)?.conversation_type === 'group' && 
+                          conversations.find(c => c.conversation_id === activeConversation)?.participants && 
+                          `${conversations.find(c => c.conversation_id === activeConversation).participants.length} participants`
+                        }
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="messages-list">
+                    {conversations.find(c => c.conversation_id === activeConversation)?.messages && 
+                     conversations.find(c => c.conversation_id === activeConversation).messages.length > 0 ? (
+                      conversations.find(c => c.conversation_id === activeConversation).messages.map((message, index) => (
+                        <div 
+                          key={message.message_id || index} 
+                          className={`message-item ${message.sender_id === userProfile?.user_id ? 'sent' : 'received'}`}
+                        >
+                          {message.sender_id !== userProfile?.user_id && (
+                            <div className="message-avatar">
+                              {message.profile_picture_url ? (
+                                <img src={message.profile_picture_url} alt="Profile" />
+                              ) : (
+                                <HiOutlineUserCircle className="nav-icon" />
+                              )}
+                            </div>
+                          )}
+                          <div className="message-content">
+                            {message.sender_id !== userProfile?.user_id && (
+                              <div className="message-sender">{message.sender_name}</div>
+                            )}
+                            <div className="message-bubble">
+                              <div className="message-text">{message.content}</div>
+                              <div className="message-time">
+                                {formatTimestamp(message.sent_at)}
+                                {message.is_sending && <span className="sending-indicator"> • Sending...</span>}
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      ))
+                    ) : (
+                      <div className="no-messages">
+                        <p>No messages yet. Start the conversation!</p>
+                      </div>
+                    )}
+                    
+                    {/* Typing indicators */}
+                    {typingUsers[activeConversation] && Object.keys(typingUsers[activeConversation]).length > 0 && (
+                      <div className="typing-indicator">
+                        {Object.values(typingUsers[activeConversation]).join(', ')} {Object.values(typingUsers[activeConversation]).length === 1 ? 'is' : 'are'} typing...
+                      </div>
+                    )}
+                  </div>
+                  
+                  <div className="message-input-container">
+                    <input 
+                      type="text" 
+                      className="message-input" 
+                      placeholder="Type a message..." 
+                      value={messageText}
+                      onChange={handleMessageInput}
+                      onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
+                    />
+                    <button 
+                      className="send-button" 
+                      onClick={handleSendMessage}
+                      disabled={!messageText.trim()}
+                    >
+                      <HiOutlinePaperAirplane className="send-icon" />
+                    </button>
+                  </div>
+                </>
+              ) : (
+                <div className="no-active-conversation">
+                  <p>Select a conversation or start a new one</p>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+        
+        {/* New conversation modal */}
+        {newConversationModal && (
+          <div className="modal-overlay" onClick={() => setNewConversationModal(false)}>
+            <div className="modal-content" onClick={e => e.stopPropagation()}>
+              <div className="modal-header">
+                <h2>New Conversation</h2>
+                <button className="close-button" onClick={() => setNewConversationModal(false)}>
+                  <HiOutlineX className="nav-icon" />
+                </button>
+              </div>
+              <div className="modal-body">
+                <div className="search-container">
+                  <HiOutlineSearch className="search-icon" />
+                  <input 
+                    type="text" 
+                    className="search-input" 
+                    placeholder="Search for people..." 
+                    value={searchTerm}
+                    onChange={e => setSearchTerm(e.target.value)}
+                  />
+                </div>
+                <div className="users-list">
+                  {courseStudents
+                    .filter(student => 
+                      student.user_id !== userProfile?.user_id && 
+                      (student.first_name.toLowerCase().includes(searchTerm.toLowerCase()) || 
+                      student.last_name.toLowerCase().includes(searchTerm.toLowerCase()))
+                    )
+                    .map(student => (
+                      <div 
+                        key={student.user_id} 
+                        className="user-item"
+                        onClick={() => startNewConversation(student)}
+                      >
+                        <div className="user-avatar">
+                          {student.profile_picture_url ? (
+                            <img src={student.profile_picture_url} alt="Profile" />
+                          ) : (
+                            <HiOutlineUserCircle className="nav-icon" />
+                          )}
+                        </div>
+                        <div className="user-info">
+                          <div className="user-name">{student.first_name} {student.last_name}</div>
+                          <div className="user-role">{student.role === 'professor' ? 'Professor' : 'Student'}</div>
+                        </div>
+                      </div>
+                    ))
+                  }
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+export default Messages; 
