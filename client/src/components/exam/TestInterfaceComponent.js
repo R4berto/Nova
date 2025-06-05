@@ -329,16 +329,20 @@ const TestInterfaceComponent = ({
   const handleStartExam = async () => {
     // Check course status first
     if (!canTakeNewExams) {
+      console.error("Cannot start exam: Course status does not allow taking new exams");
       return;
     }
     
     // Check if exam is past due
     if (selectedExam && isExamPastDue(selectedExam)) {
+      console.error("Cannot start exam: Exam is past due");
       return;
     }
     
     try {
       setSubmitting(true);
+      
+      console.log("Starting exam with exam_id:", selectedExam?.exam_id);
       
       // Start the exam
       const response = await fetch(`${API_BASE_URL}/student-exams/start/${selectedExam.exam_id}`, {
@@ -349,16 +353,38 @@ const TestInterfaceComponent = ({
         }
       });
       
+      console.log("Server response status:", response.status);
+      console.log("Server response headers:", Object.fromEntries(response.headers.entries()));
+      
       if (!response.ok) {
         const errorData = await response.json();
+        console.error("Server error response:", errorData);
         throw new Error(errorData.error || 'Failed to start exam');
       }
       
       const data = await response.json();
-      setSubmissionId(data.submission.submission_id);
+      console.log("Raw server response:", data);
+      
+      if (!data) {
+        console.error("Server returned null or undefined response");
+        throw new Error('Server returned empty response');
+      }
+      
+      if (!data.submission_id) {
+        console.error("Response missing submission_id. Full response:", data);
+        throw new Error('Invalid response format from server - missing submission_id');
+      }
+      
+      setSubmissionId(data.submission_id);
       setExamStarted(true);
     } catch (err) {
       console.error("Error starting exam:", err);
+      console.error("Error details:", {
+        message: err.message,
+        stack: err.stack,
+        selectedExam: selectedExam,
+        examId: selectedExam?.exam_id
+      });
     } finally {
       setSubmitting(false);
     }

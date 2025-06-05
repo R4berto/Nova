@@ -1825,6 +1825,35 @@ input:checked + .toggle-slider:before {
   background-color: #f3f4f6;
 }
 
+/* Add specific styling for clear-all-button */
+.notification-actions .clear-all-button {
+  background-color: #000000; /* Black background to match other elements */
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 0 12px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: background-color 0.2s ease;
+  width: 80px; /* Smaller fixed width */
+  height: 32px; /* Smaller fixed height */
+  outline: none;
+  white-space: nowrap;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+}
+
+.notification-actions .clear-all-button:hover {
+  background-color: #333333; /* Darker gray on hover */
+}
+
+.notification-actions .clear-all-button:disabled {
+  display: none; /* Just hide the button when disabled */
+}
+
 /* Enhanced Sidebar Collapsed State Styles */
 .dashboard-page .sidebar.collapsed {
   min-width: var(--sidebar-collapsed-width);

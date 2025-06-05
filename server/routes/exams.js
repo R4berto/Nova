@@ -561,7 +561,8 @@ router.get("/:examId/submissions", authorize, async (req, res) => {
        FROM exam_submission es
        JOIN users u ON es.student_id = u.user_id
        JOIN exam e ON es.exam_id = e.exam_id
-       WHERE es.exam_id = $1
+       WHERE es.exam_id = $1 
+       AND es.submitted_at IS NOT NULL
        ORDER BY es.submitted_at DESC`,
       [examId]
     );
@@ -750,6 +751,18 @@ router.put("/:examId/submissions/:submissionId/recheck", authorize, async (req, 
          SET score = $1, is_graded = true, updated_at = CURRENT_TIMESTAMP
          WHERE submission_id = $2`,
         [totalScore, submissionId]
+      );
+      
+      // Get the updated submission
+      const updatedSubmission = await client.query(
+        `SELECT es.*, 
+                u.first_name, u.last_name, u.email,
+                e.title as exam_title
+         FROM exam_submission es
+         JOIN users u ON es.student_id = u.user_id
+         JOIN exam e ON es.exam_id = e.exam_id
+         WHERE es.submission_id = $1`,
+        [submissionId]
       );
       
       // Create a log entry for the grade change

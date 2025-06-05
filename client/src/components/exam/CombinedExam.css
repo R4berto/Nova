@@ -3531,3 +3531,31 @@ input:checked + .toggle-slider:before {
     display: block;
   }
 }
+
+.offline-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 14px;
+  border-radius: var(--nova-border-radius);
+  font-weight: var(--nova-font-weight-medium);
+  font-size: var(--nova-font-size-sm);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-right: 10px;
+  gap: 6px;
+  white-space: nowrap;
+  background-color: #fff3e0;
+  color: #f57c00;
+  border: 1px solid #ffe0b2;
+}
+
+.offline-btn:hover:not(:disabled) {
+  background-color: #ffe0b2;
+}
+
+.offline-btn:disabled {
+  background-color: #cccccc;
+  color: #666666;
+  cursor: not-allowed;
+}

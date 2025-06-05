@@ -998,6 +998,17 @@ const PrivateMessages = ({ setAuth }) => {
       setActiveConversationState(newConversation.conversation_id);
       setNewConversationModal(false);
       
+      // Immediately update the URL to the new conversation's user
+      if (newConversation.participants) {
+        const otherParticipant = newConversation.participants.find(
+          p => p.user_id !== userProfile.user_id
+        );
+        if (otherParticipant) {
+          setIsInternalNavigation(true);
+          navigate(`/messages/${otherParticipant.user_id}`, { replace: true });
+          setTimeout(() => setIsInternalNavigation(false), 50);
+        }
+      }
       toast.success(`Started conversation with ${user.first_name}`);
     } catch (err) {
       console.error("Error creating conversation:", err.message);
@@ -1849,8 +1860,8 @@ const PrivateMessages = ({ setAuth }) => {
                     className="new-conversation-button"
                     onClick={() => setNewConversationModal(true)}
                   >
-                    <HiOutlinePlusCircle className="nav-icon" />
-                    <span>New Chat</span>
+                    <HiOutlinePlusCircle className="nav-icon-plus" />
+                    <span>Search User</span>
                   </button>
                 </div>
 
@@ -2443,9 +2454,22 @@ const PrivateMessages = ({ setAuth }) => {
                                 key={user.user_id} 
                                 className="user-selection-card"
                                 onClick={() => {
-                                  // Update URL and start conversation
-                                  navigate(`/messages/${user.user_id}`);
-                                  startNewConversation(user);
+                                  // Check if conversation already exists
+                                  const existingConversation = conversations.find(conv => 
+                                    conv.participants && 
+                                    conv.participants.some(p => p.user_id === user.user_id) &&
+                                    conv.participants.some(p => p.user_id === userProfile?.user_id)
+                                  );
+                                  if (existingConversation) {
+                                    setActiveConversation(existingConversation.conversation_id);
+                                    setNewConversationModal(false);
+                                    // Update URL to show the other participant's ID
+                                    setIsInternalNavigation(true);
+                                    navigate(`/messages/${user.user_id}`, { replace: true });
+                                    setTimeout(() => setIsInternalNavigation(false), 50);
+                                  } else {
+                                    startNewConversation(user);
+                                  }
                                 }}
                               >
                                 <div className="user-avatar">
@@ -2524,7 +2548,24 @@ const PrivateMessages = ({ setAuth }) => {
                         <div 
                           key={user.user_id} 
                           className="user-item"
-                          onClick={() => startNewConversation(user)}
+                          onClick={() => {
+                            // Check if conversation already exists
+                            const existingConversation = conversations.find(conv => 
+                              conv.participants && 
+                              conv.participants.some(p => p.user_id === user.user_id) &&
+                              conv.participants.some(p => p.user_id === userProfile?.user_id)
+                            );
+                            if (existingConversation) {
+                              setActiveConversation(existingConversation.conversation_id);
+                              setNewConversationModal(false);
+                              // Update URL to show the other participant's ID
+                              setIsInternalNavigation(true);
+                              navigate(`/messages/${user.user_id}`, { replace: true });
+                              setTimeout(() => setIsInternalNavigation(false), 50);
+                            } else {
+                              startNewConversation(user);
+                            }
+                          }}
                         >
                           <div className="user-avatar">
                             {user.profile_picture_url ? (
@@ -2537,12 +2578,12 @@ const PrivateMessages = ({ setAuth }) => {
                               <HiOutlineUserCircle className={`user-icon ${onlineUsers.has(user.user_id) ? 'online' : ''}`} />
                             )}
                           </div>
-                          <div className="user-info">
-                            <div className="user-name">
+                          <div className="user-info newconv">
+                            <div className="user-info newconv">
                               {user.first_name} {user.last_name}
                               {onlineUsers.has(user.user_id) && <span className="online-indicator">• Online</span>}
                             </div>
-                            <div className="user-role">{user.role === 'professor' ? 'Professor' : 'Student'}</div>
+                            <div className="user-role newconv">{user.role === 'professor' ? 'Professor' : 'Student'}</div>
                           </div>
                         </div>
                       ))}
@@ -2585,12 +2626,10 @@ const PrivateMessages = ({ setAuth }) => {
                         p => p.user_id !== userProfile?.user_id
                       );
                       const isOnline = onlineUsers.has(otherParticipant?.user_id);
-                      
                       return (
                         <div 
                           key={conversation.conversation_id} 
-                          className="conversation-item-modal"
-                          onClick={() => handleForwardMessage(conversation.conversation_id)}
+                          className="conversation-item-modal forward-row"
                         >
                           <div className="conversation-avatar">
                             {otherParticipant?.profile_picture_url ? (
@@ -2612,6 +2651,12 @@ const PrivateMessages = ({ setAuth }) => {
                               {isOnline && <span className="online-indicator">• Online</span>}
                             </div>
                           </div>
+                          <button 
+                            className="send-forward-button"
+                            onClick={() => handleForwardMessage(conversation.conversation_id)}
+                          >
+                            Send
+                          </button>
                         </div>
                       );
                     })}

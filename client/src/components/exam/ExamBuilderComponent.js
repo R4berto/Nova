@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { toast } from 'react-hot-toast';
-import { FaTrash, FaDownload, FaUpload } from 'react-icons/fa';
+import { FaTrash, FaDownload, FaUpload, FaFileDownload } from 'react-icons/fa';
 import { useLocation, useNavigate } from 'react-router-dom';
 import './CombinedExam.css';
 
@@ -1588,6 +1588,43 @@ const ExamBuilderComponent = ({ courseId, examId: propExamId, courseStatus = 'ac
     return questions;
   };
 
+  const handleDownloadOfflineCreator = async () => {
+    try {
+      // Show loading toast
+      toast.loading('Downloading offline exam creator...');
+
+      // Fetch the HTML file
+      const response = await fetch(`${API_BASE_URL}/offline/examcreation.html`);
+      if (!response.ok) {
+        throw new Error('Failed to download offline exam creator');
+      }
+
+      // Get the blob from the response
+      const blob = await response.blob();
+
+      // Create a download link
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = 'exam_creator_offline.html';
+
+      // Trigger the download
+      document.body.appendChild(link);
+      link.click();
+
+      // Cleanup
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+
+      toast.dismiss();
+      toast.success('Offline exam creator downloaded successfully!');
+    } catch (error) {
+      console.error('Error downloading offline exam creator:', error);
+      toast.dismiss();
+      toast.error('Failed to download offline exam creator. Please try again.');
+    }
+  };
+
   return (
     <div className="exam-builder-container" key={`exam-builder-${resetKey}`}>
       <h2>{loadedExamId ? `Edit Exam: ${examTitle}` : 'Create New Exam'}</h2>
@@ -1631,6 +1668,14 @@ const ExamBuilderComponent = ({ courseId, examId: propExamId, courseStatus = 'ac
         >
           <FaUpload /> Import Exam
         </button>
+
+        <button 
+          className="offline-creator-btn"
+          onClick={handleDownloadOfflineCreator}
+          title="Download offline exam creator"
+        >
+          <FaFileDownload /> Download Offline Creator
+        </button>
         
         <button 
           className="exam-reset-btn"
@@ -1656,6 +1701,61 @@ const ExamBuilderComponent = ({ courseId, examId: propExamId, courseStatus = 'ac
           </div>
         )}
       </div>
+
+      <style jsx>{`
+        .import-export-actions {
+          display: flex;
+          gap: 10px;
+          margin-bottom: 20px;
+          flex-wrap: wrap;
+        }
+
+        .import-export-actions button {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          padding: 10px 15px;
+          border: none;
+          border-radius: 5px;
+          cursor: pointer;
+          font-weight: 500;
+          transition: all 0.2s ease;
+        }
+
+        .import-export-actions button:disabled {
+          opacity: 0.6;
+          cursor: not-allowed;
+        }
+
+        .export-btn {
+          background-color: #4CAF50;
+          color: white;
+        }
+
+        .import-btn {
+          background-color: #2196F3;
+          color: white;
+        }
+
+        .offline-creator-btn {
+          background-color: #9C27B0;
+          color: white;
+        }
+
+        .exam-reset-btn {
+          background-color: #f44336;
+          color: white;
+        }
+
+        .import-export-actions button:hover:not(:disabled) {
+          opacity: 0.9;
+          transform: translateY(-1px);
+        }
+
+        .import-export-actions button svg {
+          font-size: 1.1em;
+        }
+      `}</style>
       
       <div className="exam-builder-layout">
         {/* Left Column - Questions List */}
@@ -1711,6 +1811,13 @@ const ExamBuilderComponent = ({ courseId, examId: propExamId, courseStatus = 'ac
                   title={!isModificationAllowed ? `Publishing is disabled in ${courseStatus} courses` : ''}
                 >
                   {saving ? 'Processing...' : isPublished ? 'Unpublish' : 'Publish'}
+                </button>
+                <button
+                  className="btn btn-secondary"
+                  onClick={handleDownloadOfflineCreator}
+                  title="Download offline exam creator"
+                >
+                  <i className="fas fa-download"></i> Download Offline Creator
                 </button>
               </div>
             )}

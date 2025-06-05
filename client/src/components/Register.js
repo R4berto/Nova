@@ -178,9 +178,6 @@ const Register = ({ setAuth }) => {
   return (
     <div className="container">
       <div className="info-section">
-        <div className="logo-wrapper">
-          <img src="/logo.png" alt="Nova Logo" className="nova-logo" />
-        </div>
         <h1>Join Nova</h1>
         <p className="subtitle">Start your journey to academic excellence</p>
 

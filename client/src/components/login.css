@@ -38,7 +38,7 @@ body {
     flex: 1;
     order: 1;
     padding: 60px;
-    background: linear-gradient(145deg, #1a2b4c 0%, #343c5a 100%);
+    background: linear-gradient(145deg, #323232 0%, #756F86 33%, #495057 66%, #343a40 100%);
     color: white;
     display: flex;
     flex-direction: column;
@@ -84,21 +84,7 @@ body {
 }
 
 /* Logo styling */
-.logo-wrapper {
-    position: absolute;
-    top: 30px;
-    left: 60px;
-    display: flex;
-    align-items: center;
-    z-index: 10;
-}
 
-.nova-logo {
-    width: 60px;
-    height: 60px;
-    border-radius: 12px;
-    object-fit: contain;
-}
 
 .info-section h1 {
     font-size: 42px;
@@ -192,6 +178,7 @@ body {
     justify-content: center;
     padding: 60px;
     background-color: #f0f4ff;
+    position: relative;
 }
 
 .form-container {
@@ -203,6 +190,7 @@ body {
     box-shadow: none;
     transition: var(--transition-main);
     animation: fadeIn 0.6s ease-out;
+    border: 1px solid black;
 }
 
 @keyframes fadeIn {
@@ -224,32 +212,21 @@ body {
     text-align: center;
 }
 
-.form-group {
+.form-section .form-container .form-group {
     margin-bottom: 28px;
     animation: slideUp 0.4s ease-out forwards;
     opacity: 0;
 }
 
-.form-group:nth-child(1) {
+.form-section .form-container .form-group:nth-child(1) {
     animation-delay: 0.2s;
 }
 
-.form-group:nth-child(2) {
+.form-section .form-container .form-group:nth-child(2) {
     animation-delay: 0.3s;
 }
 
-@keyframes slideUp {
-    from {
-        opacity: 0;
-        transform: translateY(10px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-.form-group label {
+.form-section .form-container .form-group label {
     display: block;
     font-size: 14px;
     font-weight: 500;
@@ -258,7 +235,7 @@ body {
     transition: var(--transition-main);
 }
 
-.form-group input {
+.form-section .form-container .form-group input {
     width: 100%;
     padding: 14px 16px;
     border: 1px solid var(--border-color);
@@ -269,7 +246,7 @@ body {
     color: var(--text-color);
 }
 
-.form-group input:focus {
+.form-section .form-container .form-group input:focus {
     outline: none;
     border-color: var(--primary-color);
     box-shadow: 0 0 0 4px rgba(107, 158, 251, 0.1);

@@ -4640,11 +4640,13 @@ const Assignments = ({ setAuth }) => {
                                           />
                                         </div>
                                         <div className="student-info">
-                                          <div className={`student-name ${missingAssignments[student.student_id || student.user_id]?.[selectedAssignment.assignment_id] ? 'missing-assignment' : ''}`}>
-                                            {student.first_name} {student.last_name}
-                                          </div>
-                                          <div className="student-score">
-                                            {`${formatGrade(studentSubmission?.grade)}/${selectedAssignment.points || 100}`}
+                                          <div className={`student-name ${missingAssignments[student.student_id || student.user_id]?.[selectedAssignment.assignment_id] ? 'missing-assignment' : ''}`}
+                                            data-fullname={`${student.first_name} ${student.last_name}`}
+                                            style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', lineHeight: '1.1', whiteSpace: 'normal', overflow: 'visible', textOverflow: 'clip', padding: 0 }}
+                                          >
+                                            {['name-desc', 'name-asc'].includes(sortOption)
+                                              ? (<><span style={{fontWeight:600}}>{student.last_name}</span><span style={{fontWeight:400}}>{student.first_name}</span></>)
+                                              : (<><span style={{fontWeight:600}}>{student.first_name}</span><span style={{fontWeight:400}}>{student.last_name}</span></>)}
                                           </div>
                                         </div>
                                         <div className="student-grading">
@@ -4656,7 +4658,7 @@ const Assignments = ({ setAuth }) => {
                                               data-student-id={student.student_id || student.user_id}
                                               placeholder={studentSubmission?.grade ? String(studentSubmission.grade) : '0'}
                                               max={selectedAssignment?.points || 100}
-                                              value={grading[student.student_id || student.user_id] || studentSubmission?.grade || ''}
+                                              value={grading[student.student_id || student.user_id] !== undefined ? grading[student.student_id || student.user_id] : (studentSubmission?.grade || '')}
                                               disabled={!!gradeLoading[student.student_id || student.user_id] || courseDetails?.status === 'archived'}
                                               onChange={e => {
                                                 let value = e.target.value;
@@ -4708,7 +4710,7 @@ const Assignments = ({ setAuth }) => {
                                               }}
                                               onClick={e => e.stopPropagation()}
                                             />
-                                            <span className="grade-max">/{selectedAssignment?.points || 100}</span>
+                                            <span className="grade-max">/&nbsp;{selectedAssignment?.points || 100}</span>
                                             <div 
                                               className="grade-hamburger"
                                               onClick={e => {
@@ -4796,11 +4798,13 @@ const Assignments = ({ setAuth }) => {
                                           />
                                         </div>
                                         <div className="student-info">
-                                          <div className={`student-name ${missingAssignments[student.student_id || student.user_id]?.[selectedAssignment.assignment_id] ? 'missing-assignment' : ''}`}>
-                                            {student.first_name} {student.last_name}
-                                          </div>
-                                          <div className="student-score">
-                                            {`${formatGrade(studentSubmission?.grade)}/${selectedAssignment.points || 100}`}
+                                          <div className={`student-name ${missingAssignments[student.student_id || student.user_id]?.[selectedAssignment.assignment_id] ? 'missing-assignment' : ''}`}
+                                            data-fullname={`${student.first_name} ${student.last_name}`}
+                                            style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', lineHeight: '1.1', whiteSpace: 'normal', overflow: 'visible', textOverflow: 'clip', padding: 0 }}
+                                          >
+                                            {['name-desc', 'name-asc'].includes(sortOption)
+                                              ? (<><span style={{fontWeight:600}}>{student.last_name}</span><span style={{fontWeight:400}}>{student.first_name}</span></>)
+                                              : (<><span style={{fontWeight:600}}>{student.first_name}</span><span style={{fontWeight:400}}>{student.last_name}</span></>)}
                                           </div>
                                         </div>
                                         <div className="student-grading">
@@ -4810,7 +4814,7 @@ const Assignments = ({ setAuth }) => {
                                               type="text" 
                                               className="grade-input" 
                                               data-student-id={student.student_id || student.user_id}
-                                              value={grading[student.student_id || student.user_id] || studentSubmission.grade || ''}
+                                              value={grading[student.student_id || student.user_id] !== undefined ? grading[student.student_id || student.user_id] : (studentSubmission?.grade || '')}
                                               disabled={courseDetails?.status === 'archived'}
                                               onChange={(e) => {
                                                 let value = e.target.value;
@@ -4825,7 +4829,7 @@ const Assignments = ({ setAuth }) => {
                                                 }
                                               }}
                                             />
-                                            <span className="grade-max">/{selectedAssignment?.points || 100}</span>
+                                            <span className="grade-max">/&nbsp;{selectedAssignment?.points || 100}</span>
                                             <div 
                                               className="grade-hamburger"
                                               onClick={(e) => {

@@ -908,7 +908,7 @@ export default function Settings({ setAuth }) {
             />
           </div>
 
-          <div className="form-group">
+          <div className="form-group l-name">
             <label htmlFor="last_name">Last Name</label>
             <input
               type="text"
@@ -1055,7 +1055,7 @@ export default function Settings({ setAuth }) {
           
           {courseHistory.map(course => (
             <div key={course.course_id} className="course-history-item">
-              <div className="course-info">
+              <div className="course-information">
                 <h3>{course.course_name}</h3>
                 <p>{course.description}</p>
                 <div className="settings-course-meta">

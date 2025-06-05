@@ -65,7 +65,7 @@
 .new-conversation-button {
   display: flex;
   align-items: center;
-  background-color: var(--primary-color);
+  background-color: black;
   color: white;
   border: none;
   border-radius: 4px;
@@ -74,8 +74,14 @@
   cursor: pointer;
 }
 
+svg.newconv-icon{
+  margin-right: 3px;
+}
+
 .new-conversation-button:hover {
-  background-color: var(--primary-color-dark);
+  background-color: white;
+  color: black;
+  border: 2px solid black;
 }
 
 .new-conversation-button .nav-icon {
@@ -1908,7 +1914,7 @@ button.scroll-to-bottom-button .scroll-arrow-svg {
   border-radius: 8px;
   margin-bottom: 6px;
   cursor: pointer;
-  max-width: 200px;
+  
 }
 
 .file-icon {

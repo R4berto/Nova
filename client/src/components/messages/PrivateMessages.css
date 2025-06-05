@@ -490,7 +490,7 @@
   border-radius: 8px;
   margin-bottom: 6px;
   cursor: pointer;
-  max-width: 200px;
+  
 }
 
 .file-icon {
@@ -609,6 +609,14 @@
   overflow: hidden;
 }
 
+.nav-icon-plus{
+  margin-right: 10px;
+}
+
+.newconv{
+  text-align: left;
+}
+
 .user-selection-card .user-name {
   font-weight: 600;
   margin-bottom: 4px;
@@ -719,3 +727,46 @@
   width: 100%;
   background-color: var(--selected-item-bg);
 } 
+
+/* Forward message modal row alignment */
+.forward-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 0;
+  border-bottom: 1px solid #f0f0f0;
+  gap: 16px;
+}
+
+.forward-row .conversation-avatar {
+  width: 40px;
+  height: 40px;
+  margin-right: 12px;
+  flex-shrink: 0;
+}
+
+.forward-row .conversation-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.send-forward-button {
+  background-color: #2563eb;
+  color: #fff;
+  border: none;
+  border-radius: 20px;
+  padding: 6px 18px;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s, box-shadow 0.2s;
+  box-shadow: 0 2px 8px rgba(37,99,235,0.08);
+  margin-left: 16px;
+}
+.send-forward-button:hover, .send-forward-button:focus {
+  background-color: #1d4ed8;
+  outline: none;
+}

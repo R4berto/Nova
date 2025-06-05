@@ -69,18 +69,17 @@
 /* Lower z-index for assignment details modal - make sure it's below regular modals */
 .assignments-container .modal-content.assignment-details-modal,
 .assignments-container.modal-content.assignment-details-modal {
-  z-index: calc(var(--z-assignment-details) + 1);
-  width: 1000px; /* Fixed width */
-  height: 700px; /* Fixed height */
-  max-width: 90%; /* For smaller screens */
-  max-height: 90vh; /* For smaller screens */
-  display: flex;
-  flex-direction: column;
   background-color: white;
   border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+  width: 95%; /* Almost full width of the screen */
+  height: 90vh; /* Almost full height of the viewport */
+  max-width: 1800px; /* Maximum width limit */
   overflow-y: auto;
   position: relative;
+  z-index: calc(var(--z-assignment-details) + 1);
+  display: flex;
+  flex-direction: column;
 }
 
 /* Specific modal overlays */
@@ -100,9 +99,9 @@
 .assignments-container .modal-content.grading-modal,
 .assignments-container.modal-content.grading-modal {
   z-index: calc(var(--z-grading-modal) + 1);
-  max-width: 90%;
+  max-width: 90dvw;
   width: 900px;
-  max-height: 90vh;
+  max-height: 90vdh;
 }
 
 .assignments-container .modal-content.file-preview-modal,
@@ -926,9 +925,9 @@
 /* Assignment details modal should have a fixed size for both tabs */
 .assignments-container .modal-content.assignment-details-modal,
 .assignments-container.modal-content.assignment-details-modal {
-  width: 1000px; /* Fixed width */
+  width: 1360px; /* Fixed width */
   height: 700px; /* Fixed height */
-  max-width: 90%; /* For smaller screens */
+  max-width: 90dvw; /* For smaller screens */
   max-height: 90vh; /* For smaller screens */
   display: flex;
   flex-direction: column;
@@ -1558,19 +1557,32 @@
 .student-work-content {
   display: flex;
   flex-grow: 1;
-  height: calc(100% - 60px);
-  box-sizing: border-box; /* Ensure border is included in dimensions */
-  min-height: 400px; /* Add minimum height to ensure visibility */
+  height: calc(100% - 70px);
+  min-height: 400px;
+  overflow: hidden;
+  /* Set flex ratio for left and right panels */
 }
 
 .student-list-panel {
-  width: 350px;
-  border-right: 2px solid #000000; /* Change to border-right only */
+  width: 0;
+  min-width: 0;
+  flex: 0 0 40%;
+  max-width: 40%;
+  border-right: 2px solid #000000;
   display: flex;
   flex-direction: column;
   height: 100%;
   overflow-y: auto;
-  box-sizing: border-box; /* Ensure border is included in dimensions */
+  box-sizing: border-box;
+  flex-shrink: 0;
+}
+
+.submission-panel {
+  flex: 0 0 60%;
+  max-width: 60%;
+  overflow-y: auto;
+  padding: 20px;
+  box-sizing: border-box;
 }
 
 .student-list-header {
@@ -1769,6 +1781,9 @@
   padding: 10px 16px;
   border-bottom: 1px solid #f1f3f4;
   transition: background-color 0.2s ease;
+  min-height: 60px;
+  height: 60px;
+  box-sizing: border-box;
 }
 
 .student-entry:hover {
@@ -1818,19 +1833,52 @@
 }
 
 .student-info {
-  flex-grow: 1;
-  max-width: calc(100% - 150px); /* Ensure name has enough space */
+  flex: 1 1 0;
+  min-width: 0;
+  max-width: 220px;
   margin-right: 10px;
+  display: flex;
+  align-items: center;
 }
 
 .student-name {
   font-size: 14px;
   font-weight: 500;
   color: #202124;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  max-width: 100%;
+  max-width: 180px;
+  cursor: pointer;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  line-height: 1.1;
+  white-space: normal;
+  overflow: visible;
+  text-overflow: unset;
+  padding: 0;
+}
+.student-name span:first-child {
+  font-weight: 600;
+}
+.student-name span:last-child {
+  font-weight: 400;
+}
+.student-name:hover::after {
+  content: attr(data-fullname);
+  position: absolute;
+  left: 0;
+  top: 100%;
+  background: #333;
+  color: #fff;
+  padding: 4px 10px;
+  border-radius: 4px;
+  font-size: 13px;
+  white-space: pre;
+  z-index: 10;
+  min-width: 100px;
+  max-width: 350px;
+  overflow-wrap: break-word;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
 }
 
 .student-score {
@@ -1846,25 +1894,30 @@
 .student-grading {
   display: flex;
   align-items: center;
-  margin-left: auto; /* Push to the right side */
-  gap: 8px;
+  margin-left: auto;
+  gap: 16px; /* Increased gap for equal spacing between grade-input-container elements */
+  min-width: 110px;
 }
 
 .grade-divider {
   width: 1px;
-  height: 40px;
-  background-color: #dadce0; /* Lighter color, similar to borders */
+  height: 32px;
+  background-color: #dadce0;
   margin-right: 12px;
+  align-self: center;
 }
 
 .grade-input-container {
   display: flex;
   align-items: center;
   white-space: nowrap;
+  margin-right: 0; /* Remove if present */
 }
 
 .grade-input {
-  width: 40px;
+  width: 56px;
+  min-width: 56px;
+  max-width: 56px;
   height: 28px;
   border: 1px solid #dadce0;
   border-radius: 4px;
@@ -1872,6 +1925,7 @@
   font-size: 14px;
   text-align: center;
   color: #202124;
+  box-sizing: border-box;
 }
 
 .grade-hamburger {
@@ -3072,7 +3126,6 @@
 .grading-form input,
 .grading-form textarea {
   padding: 10px;
-  border: 2px solid #000000; /* Add black border to inputs and textareas */
   border-radius: 4px;
   font-size: 14px;
 }
@@ -3571,7 +3624,7 @@
 }
 
 .student-work-content {
-  height: calc(100% - 60px); /* Full height minus toolbar height */
+  height: calc(100% - 70px); /* Full height minus toolbar height */
   display: flex;
 }
 
@@ -4433,7 +4486,6 @@ html body .assignments-container input[type="email"],
 html body .assignments-container input[type="password"],
 html body .assignments-container textarea,
 html body .assignments-container select {
-  border: 2px solid #000000;
   color: #000000;
   background-color: #ffffff;
 }
@@ -4587,19 +4639,22 @@ html body div.assignments-container.assignments-container div.assignments-conten
 }
 
 .student-list-panel {
-  width: 350px;
-  min-width: 350px; /* Prevent panel from shrinking */
+  width: 0;
+  min-width: 0;
+  flex: 0 0 40%;
+  max-width: 40%;
   border-right: 2px solid #000000;
   display: flex;
   flex-direction: column;
   height: 100%;
   overflow-y: auto;
   box-sizing: border-box;
-  flex-shrink: 0; /* Prevent panel from shrinking */
+  flex-shrink: 0;
 }
 
 .submission-panel {
-  flex: 1;
+  flex: 0 0 60%;
+  max-width: 60%;
   overflow-y: auto;
   padding: 20px;
   box-sizing: border-box;
@@ -4724,4 +4779,8 @@ html body div.assignments-container.assignments-container div.assignments-conten
 /* Override any existing margin or padding that might affect alignment */
 .assignments-container .assignment-form-container .form-group .attachment-buttons > * {
   margin: 0;
+}
+
+.student-name.missing-assignment {
+  color: #d93025 !important; /* Red color for missing assignments */
 }

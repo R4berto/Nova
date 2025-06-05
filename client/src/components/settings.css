@@ -52,11 +52,12 @@
 
 .settings-icon {
   font-size: 18px;
+  margin-right: 8px;
 }
 
 /* Page Title */
 .page-title h1 {
-  font-size: 24px;
+  font-size: 18px;
   font-weight: 600;
   color: #1f2937;
   margin: 0;
@@ -213,6 +214,10 @@
   flex: 1;
 }
 
+div.form-group + .l-name{
+  margin-top: 0px;
+}
+
 .form-group {
   margin-bottom: 20px;
 }
@@ -350,13 +355,13 @@
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
 }
 
-.course-info h3 {
+.course-information h3 {
   margin: 0 0 8px 0;
   font-size: 18px;
   color: #1f2937;
 }
 
-.course-info p {
+.course-information p {
   margin: 0 0 8px 0;
   color: #6b7280;
   font-size: 14px;

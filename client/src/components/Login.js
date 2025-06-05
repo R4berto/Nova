@@ -165,9 +165,6 @@ const Login = ({ setAuth }) => {
   return (
     <div className="container">
       <div className="info-section">
-        <div className="logo-wrapper">
-          <img src="/logo.png" alt="Nova Logo" className="nova-logo" />
-        </div>
         <h1>Welcome to Nova</h1>
         <p className="subtitle">Your path to excellence in learning</p>
         

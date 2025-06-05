@@ -20,6 +20,9 @@ app.use(express.urlencoded({ limit: '500mb', extended: true }));
 // Configure express to serve static files from the uploads directory
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
+// Serve static files from the public directory
+app.use('/offline', express.static(path.join(__dirname, '../public/offline')));
+
 // Also add a direct path for the Activity_2_beziermethod.png file
 app.get('/Activity_2_beziermethod.png', (req, res) => {
   // Try to find the file in various locations

@@ -261,45 +261,79 @@ router.post("/submit/:submissionId", authorize, async (req, res) => {
       [submissionId]
     );
 
-    // Calculate score
-    const totalPossiblePoints = questions.rows.reduce((sum, q) => sum + q.points, 0);
-    let totalEarnedPoints = 0;
-
-    answers.rows.forEach(answer => {
-      if (answer.is_correct && answer.points_earned) {
-        totalEarnedPoints += parseFloat(answer.points_earned);
-      }
-    });
-
-    // Update the submission record as submitted
-    const updatedSubmission = await pool.query(
-      `UPDATE exam_submission
-       SET submitted_at = CURRENT_TIMESTAMP, 
-           score = $1,
-           total_points = $2,
-           is_graded = true
-       WHERE submission_id = $3
-       RETURNING *`,
-      [totalEarnedPoints, totalPossiblePoints, submissionId]
-    );
-    
-    // Track activity for DSS
+    // Start a transaction
+    const client = await pool.connect();
     try {
-      await activityService.logExamActivity(studentId, examId, 'exam_submission', {
-        submission_id: submissionId,
-        score: totalEarnedPoints,
-        total_points: totalPossiblePoints,
-        timestamp: new Date()
-      });
-    } catch (activityError) {
-      console.error('Failed to log exam submission activity:', activityError);
-      // Continue processing even if activity logging fails
-    }
+      await client.query('BEGIN');
 
-    res.json({
-      message: "Exam submitted successfully",
-      submission: updatedSubmission.rows[0]
-    });
+      // Calculate score and grade each answer
+      const totalPossiblePoints = questions.rows.reduce((sum, q) => sum + q.points, 0);
+      let totalEarnedPoints = 0;
+
+      // Grade each answer
+      for (const answer of answers.rows) {
+        const question = questions.rows.find(q => q.question_id === answer.question_id);
+        if (!question) continue;
+
+        // Grade the answer
+        const gradingResult = gradeAnswer(question, answer.student_answer);
+        console.log(`Grading question ${question.question_id}:`, {
+          type: question.type,
+          correct_answer: question.correct_answer,
+          student_answer: answer.student_answer,
+          result: gradingResult
+        });
+
+        // Update the answer with grading results
+        await client.query(
+          `UPDATE student_answer 
+           SET is_correct = $1, points_earned = $2, updated_at = CURRENT_TIMESTAMP
+           WHERE answer_id = $3`,
+          [gradingResult.is_correct, gradingResult.points_earned, answer.answer_id]
+        );
+
+        if (gradingResult.is_correct) {
+          totalEarnedPoints += parseFloat(gradingResult.points_earned);
+        }
+      }
+
+      // Update the submission record as submitted
+      const updatedSubmission = await client.query(
+        `UPDATE exam_submission
+         SET submitted_at = CURRENT_TIMESTAMP, 
+             score = $1,
+             total_points = $2,
+             is_graded = true
+         WHERE submission_id = $3
+         RETURNING *`,
+        [totalEarnedPoints, totalPossiblePoints, submissionId]
+      );
+
+      await client.query('COMMIT');
+      
+      // Track activity for DSS
+      try {
+        await activityService.logExamActivity(studentId, examId, 'exam_submission', {
+          submission_id: submissionId,
+          score: totalEarnedPoints,
+          total_points: totalPossiblePoints,
+          timestamp: new Date()
+        });
+      } catch (activityError) {
+        console.error('Failed to log exam submission activity:', activityError);
+        // Continue processing even if activity logging fails
+      }
+
+      res.json({
+        message: "Exam submitted successfully",
+        submission: updatedSubmission.rows[0]
+      });
+    } catch (err) {
+      await client.query('ROLLBACK');
+      throw err;
+    } finally {
+      client.release();
+    }
   } catch (err) {
     console.error("Submit exam error:", err.message);
     res.status(500).json({ error: "Server error" });

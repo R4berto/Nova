@@ -1730,7 +1730,21 @@ const Stream = ({ setAuth }) => {
                                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M16.5 6V3.5C16.5 2.12 15.38 1 14 1H5.5C4.12 1 3 2.12 3 3.5V18.5C3 19.88 4.12 21 5.5 21H18.5C19.88 21 21 19.88 21 18.5V8.5L16.5 6ZM5.5 3H14V7.5H18.5V18.5H5.5V3ZM7 14H17V16H7V14ZM7 10H17V12H7V10Z"/></svg>
                             )}
                           </span>
-                          <span className="attachment-file">
+                          <span 
+                            className="attachment-file file-preview-link"
+                            onClick={() => {
+                              if (attachment.file instanceof File) {
+                                const tempUrl = URL.createObjectURL(attachment.file);
+                                setFilePreviewModal({
+                                  isOpen: true,
+                                  file: attachment.name,
+                                  type: getFileTypeFromUrl(attachment.name),
+                                  url: tempUrl
+                                });
+                              }
+                            }}
+                            style={{cursor: 'pointer'}}
+                          >
                             {attachment.name}
                           </span>
                           <span className="file-size">
@@ -2053,30 +2067,20 @@ const Stream = ({ setAuth }) => {
                           </span>
                           <span 
                             className="attachment-file file-preview-link"
-                            onClick={(e) => {
-                              e.preventDefault();
-                              // Handle different types of attachments
+                            onClick={() => {
                               if (attachment.file instanceof File) {
-                                // For newly added files
                                 const tempUrl = URL.createObjectURL(attachment.file);
                                 setFilePreviewModal({
                                   isOpen: true,
-                                  file: attachment.name || attachment.file.name,
-                                  type: getFileTypeFromUrl(attachment.name || attachment.file.name),
+                                  file: attachment.name,
+                                  type: getFileTypeFromUrl(attachment.name),
                                   url: tempUrl
-                                });
-                              } else if (attachment.file_url) {
-                                // For existing files with URLs
-                                setFilePreviewModal({
-                                  isOpen: true,
-                                  file: attachment.file_name || 'File',
-                                  type: getFileTypeFromUrl(attachment.file_url),
-                                  url: attachment.file_url
                                 });
                               }
                             }}
+                            style={{cursor: 'pointer'}}
                           >
-                            {attachment.name || attachment.file_name}
+                            {attachment.name}
                           </span>
                            <span className="file-size">
                              ({formatFileSize(attachment.size || attachment.file_size || 0)})
