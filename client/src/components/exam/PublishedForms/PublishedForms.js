@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { toast } from 'react-hot-toast';
 import { FaClock, FaCalendarAlt, FaExclamationTriangle, FaEdit } from 'react-icons/fa';
 import { BsTrash } from 'react-icons/bs';
@@ -83,16 +83,7 @@ const PublishedForms = ({ courseId, onSwitchTab, userRole = "professor", courseS
     }
   }, [userRole, onSwitchTab]);
 
-  // Fetch existing exams for this course
-  useEffect(() => {
-    if (courseId && userRole === "professor") {
-      fetchExams();
-    } else if (!courseId) {
-      setApiError('No course ID provided. Please select a course first.');
-    }
-  }, [courseId, userRole]);
-
-  const fetchExams = async () => {
+  const fetchExams = useCallback(async () => {
     if (!courseId) {
       setApiError('No course ID provided. Please select a course first.');
       return;
@@ -136,7 +127,16 @@ const PublishedForms = ({ courseId, onSwitchTab, userRole = "professor", courseS
     } finally {
       setLoading(false);
     }
-  };
+  }, [courseId]);
+
+  // Fetch existing exams for this course
+  useEffect(() => {
+    if (courseId && userRole === "professor") {
+      fetchExams();
+    } else if (!courseId) {
+      setApiError('No course ID provided. Please select a course first.');
+    }
+  }, [courseId, userRole, fetchExams]);
 
   const handleCreateNewExam = () => {
     // Check if exam creation is allowed
@@ -249,22 +249,20 @@ const PublishedForms = ({ courseId, onSwitchTab, userRole = "professor", courseS
         </div>
       )}
       
-      {/* Exam Management Controls */}
-      <div className="exam-controls">
-        <button 
-          className={`control-btn ${!isModificationAllowed ? 'disabled' : ''}`}
-          onClick={handleCreateNewExam}
-          disabled={deleting || !isModificationAllowed}
-          title={!isModificationAllowed ? `Exam creation is disabled in ${courseStatus} courses` : ''}
-        >
-          {isModificationAllowed ? 'Create New Exam' : 'View Only Mode'}
-        </button>
-      </div>
-      
       {/* Exams List */}
       <div className="exam-list-header">
         <h3 className="exam-list-title">Your Exams</h3>
         <span className="exam-list-count">{exams.length}</span>
+        <div style={{ marginLeft: 'auto' }}>
+          <button 
+            className={`control-btn ${!isModificationAllowed ? 'disabled' : ''}`}
+            onClick={handleCreateNewExam}
+            disabled={deleting || !isModificationAllowed}
+            title={!isModificationAllowed ? `Exam creation is disabled in ${courseStatus} courses` : ''}
+          >
+            {isModificationAllowed ? 'Create New Exam' : 'View Only Mode'}
+          </button>
+        </div>
       </div>
       
       {loading ? (

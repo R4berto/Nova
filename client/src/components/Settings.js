@@ -1177,7 +1177,7 @@ export default function Settings({ setAuth }) {
           zIndex: 1000
         }}>
           <div className="crop-modal-content" style={{ 
-            backgroundColor: '#222', 
+            backgroundColor: '#fff', 
             borderRadius: '8px', 
             width: '90%', 
             maxWidth: '500px',
@@ -1192,7 +1192,7 @@ export default function Settings({ setAuth }) {
               alignItems: 'center', 
               borderBottom: '1px solid #333' 
             }}>
-              <h2 style={{ margin: 0, fontSize: '18px' }}>Set Profile Picture</h2>
+              <h2 style={{ margin: 0, fontSize: '18px', color: '#000'}}>Set Profile Picture</h2>
               <button 
                 className="close-modal" 
                 onClick={closeCropModal}
@@ -1345,32 +1345,52 @@ export default function Settings({ setAuth }) {
                 borderTop: '1px solid #333' 
               }}
             >
-              <div className="modal-actions" style={{ display: 'flex', gap: '10px', marginLeft: 'auto' }}>
+              <div className="settings-modal-actions" style={{ display: 'flex', gap: '10px', marginLeft: 'auto' }}>
                 <button 
-                  className="cancel-btn" 
+                  className="settings-cancel-btn" 
                   onClick={closeCropModal}
                   style={{ 
                     padding: '8px 15px', 
                     borderRadius: '4px', 
                     border: 'none', 
-                    background: '#444', 
+                    background: 'black', 
                     color: '#fff',
-                    cursor: 'pointer' 
+                    cursor: 'pointer',
+                    transition: 'background-color 0.3s, transform 0.2s'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.target.style.background = '#333';
+                    e.target.style.transform = 'scale(1.05)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.target.style.background = 'black';
+                    e.target.style.transform = 'scale(1)';
                   }}
                 >
                   Cancel
                 </button>
                 <button
-                  className="save-btn"
+                  className="settings-save-btn"
                   onClick={uploadCroppedImage}
                   disabled={isSaving}
                   style={{ 
                     padding: '8px 15px', 
                     borderRadius: '4px', 
                     border: 'none', 
-                    background: '#1e88e5', 
+                    background: 'black', 
                     color: 'white', 
-                    cursor: 'pointer' 
+                    cursor: 'pointer',
+                    transition: 'background-color 0.3s, transform 0.2s'
+                  }}
+                  onMouseEnter={(e) => {
+                    if (!isSaving) {
+                      e.target.style.background = '#333';
+                      e.target.style.transform = 'scale(1.05)';
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    e.target.style.background = 'black';
+                    e.target.style.transform = 'scale(1)';
                   }}
                 >
                   {isSaving ? 'Saving...' : 'Save'}

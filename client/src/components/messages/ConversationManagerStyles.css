@@ -1,0 +1,237 @@
+/* Enhanced Conversation Management Styles */
+
+/* Urgent unread conversation styling */
+.conversation-item.urgent-unread {
+  border-left: 4px solid #007bff;
+  background: linear-gradient(90deg, rgba(0, 123, 255, 0.05) 0%, transparent 100%);
+  position: relative;
+}
+
+.conversation-item.urgent-unread .conversation-name {
+  font-weight: 700;
+  color: #0056b3;
+}
+
+.conversation-item.urgent-unread .conversation-last-message {
+  font-weight: 600;
+  color: #495057;
+}
+
+/* Enhanced unread indicator dot */
+.conversation-item.urgent-unread .unread-indicator {
+  width: 12px;
+  height: 12px;
+  background: #007bff;
+  border-radius: 50%;
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  box-shadow: 0 2px 4px rgba(0, 123, 255, 0.3);
+  /* Remove glow animation for cleaner look */
+}
+
+/* Conversation item hover effects for unread */
+.conversation-item.urgent-unread:hover {
+  background: linear-gradient(90deg, rgba(0, 123, 255, 0.1) 0%, rgba(0, 123, 255, 0.02) 100%);
+  transform: translateX(2px);
+  transition: all 0.2s ease;
+}
+
+/* Active conversation with unread messages */
+.conversation-item.urgent-unread.active {
+  background: linear-gradient(90deg, rgba(0, 123, 255, 0.15) 0%, rgba(0, 123, 255, 0.05) 100%);
+  border-left-color: #0056b3;
+}
+
+/* High priority unread indicator for multiple unread messages */
+.conversation-item.high-priority-unread {
+  border-left: 5px solid #dc3545;
+  background: linear-gradient(90deg, rgba(220, 53, 69, 0.05) 0%, transparent 100%);
+}
+
+.conversation-item.high-priority-unread .unread-indicator {
+  background: #dc3545;
+  box-shadow: 0 0 8px rgba(220, 53, 69, 0.5);
+}
+
+.conversation-item.high-priority-unread .conversation-name {
+  color: #dc3545;
+}
+
+/* Smart conversation selection indicator */
+.conversation-item.smart-selected {
+  position: relative;
+}
+
+.conversation-item.smart-selected::before {
+  content: '';
+  position: absolute;
+  left: -2px;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: #28a745;
+  border-radius: 0 2px 2px 0;
+}
+
+/* Fade in animation for new conversations */
+.conversation-item.new-conversation {
+  animation: fadeInConversation 0.5s ease-in-out;
+}
+
+@keyframes fadeInConversation {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Enhanced browser notification styling */
+.browser-title-indicator {
+  position: relative;
+}
+
+/* Loading state for conversation switching */
+.conversation-item.switching {
+  opacity: 0.7;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+/* Conversation list enhanced states */
+.conversations-list.has-unread {
+  border-top: 3px solid #007bff;
+}
+
+.conversations-list.all-read {
+  border-top: 3px solid #28a745;
+}
+
+/* Unread counter badge for header */
+.unread-counter-badge {
+  background: #007bff;
+  color: white;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: bold;
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  border: 2px solid white;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* High unread count styling */
+.unread-counter-badge.high-count {
+  background: #dc3545;
+  animation: pulseHighCount 1s ease-in-out infinite;
+}
+
+@keyframes pulseHighCount {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+}
+
+/* Conversation item priority indicators */
+.conversation-item.priority-1 {
+  order: -3; /* Highest priority */
+}
+
+.conversation-item.priority-2 {
+  order: -2; /* Medium priority */
+}
+
+.conversation-item.priority-3 {
+  order: -1; /* Lower priority */
+}
+
+/* Smart selection tooltip */
+.smart-selection-tooltip {
+  position: absolute;
+  background: rgba(0, 0, 0, 0.8);
+  color: white;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  white-space: nowrap;
+  z-index: 1000;
+  top: -30px;
+  left: 50%;
+  transform: translateX(-50%);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+}
+
+.conversation-item:hover .smart-selection-tooltip {
+  opacity: 1;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .conversation-item.urgent-unread {
+    border-left-width: 3px;
+  }
+  
+  .unread-indicator {
+    width: 10px;
+    height: 10px;
+  }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .conversation-item.urgent-unread {
+    background: linear-gradient(90deg, rgba(64, 149, 255, 0.1) 0%, transparent 100%);
+    border-left-color: #4095ff;
+  }
+  
+  .conversation-item.urgent-unread .conversation-name {
+    color: #4095ff;
+  }
+  
+  .conversation-item.urgent-unread .unread-indicator {
+    background: #4095ff;
+    border-color: #1a1a1a;
+  }
+}
+
+/* Performance optimizations */
+.conversation-item {
+  will-change: transform, background;
+  backface-visibility: hidden;
+}
+
+/* Accessibility improvements */
+.conversation-item.urgent-unread {
+  outline: none;
+}
+
+.conversation-item.urgent-unread:focus {
+  outline: 2px solid #007bff;
+  outline-offset: 2px;
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .unread-counter-badge.high-count {
+    animation: none;
+  }
+  
+  .conversation-item {
+    transition: none;
+  }
+} 

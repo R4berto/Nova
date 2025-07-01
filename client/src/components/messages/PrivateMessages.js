@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { useNavigate, Link, useLocation, useParams } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
 import EmojiPicker from 'emoji-picker-react';
@@ -22,8 +22,11 @@ import {
 import { io } from 'socket.io-client';
 import './Messages.css'; // We can reuse the same CSS
 import './PrivateMessages.css'; // Import the new CSS file
+import './ConversationManagerStyles.css'; // Import enhanced conversation styles
 import Sidebar from '../Sidebar';
 import LoadingIndicator from '../common/LoadingIndicator';
+import { useConversationManager } from '../../hooks/useConversationManager';
+import { createOptimizedSortFunction } from '../../utils/conversationManager';
 
 const PrivateMessages = ({ setAuth }) => {
   const navigate = useNavigate();
@@ -83,9 +86,13 @@ const PrivateMessages = ({ setAuth }) => {
   const fileInputRef = useRef(null);
   const emojiPickerRef = useRef(null);
 
-  // Add debugging for unread messages
+  // Add debugging for unread messages and persist changes
   useEffect(() => {
     console.log("Current unread messages state:", unreadMessages);
+    // Persist unread messages to localStorage whenever it changes
+    if (Object.keys(unreadMessages).length > 0) {
+      localStorage.setItem('unreadMessages', JSON.stringify(unreadMessages));
+    }
   }, [unreadMessages]);
 
   // Add a ref for the messages list container and state for scroll button
@@ -238,31 +245,41 @@ const PrivateMessages = ({ setAuth }) => {
 
       const data = await response.json();
       
-      // Sort conversations by last message time
-      const sortedConversations = data.sort((a, b) => {
-        const aTime = a.last_message_time ? new Date(a.last_message_time) : new Date(0);
-        const bTime = b.last_message_time ? new Date(b.last_message_time) : new Date(0);
-        return bTime - aTime;
-      });
+      // Sort conversations by timestamp only (unread priority was removed)
+      const sortFn = createOptimizedSortFunction({});
+      const sortedConversations = data.sort(sortFn);
       
       setConversations(sortedConversations);
       
-      // Initialize unread messages state
+      // Initialize unread messages state from server data and localStorage
+      const savedUnreadState = JSON.parse(localStorage.getItem('unreadMessages') || '{}');
       const initialUnreadState = {};
+      
       sortedConversations.forEach(conv => {
-        // Check if conversation has unread flag from API
-        initialUnreadState[conv.conversation_id] = conv.unread_messages || false;
+        // Use server data as primary source with unread_messages field, 
+        // fallback to previously known unread status from state
+        initialUnreadState[conv.conversation_id] = 
+          conv.unread_messages || // From server
+          unreadMessages[conv.conversation_id] || // From current state
+          savedUnreadState[conv.conversation_id] || // From localStorage
+          false;
       });
       
-      console.log("Setting initial unread state:", initialUnreadState);
+      console.log("Setting initial unread state from server data:", initialUnreadState);
       setUnreadMessages(initialUnreadState);
       
-      // Set active conversation if none is selected
+      // Save to localStorage for persistence
+      localStorage.setItem('unreadMessages', JSON.stringify(initialUnreadState));
+      
+      // Set active conversation using smart logic
       if (sortedConversations.length > 0 && !activeConversation) {
-        setActiveConversation(sortedConversations[0].conversation_id);
+        const smartActiveConversation = getSmartInitialConversation();
+        if (smartActiveConversation) {
+          setActiveConversation(smartActiveConversation);
+        }
       }
     } catch (err) {
-      console.error("Error fetching conversations:", err.message);
+      console.error("Error fetching conversations:", err);
       toast.error('Failed to load conversations');
     }
   }, [userProfile]);
@@ -418,12 +435,9 @@ const PrivateMessages = ({ setAuth }) => {
               : conv
           );
           
-          // Then sort conversations by last message time
-          updatedConversations = updatedConversations.sort((a, b) => {
-            const aTime = a.last_message_time ? new Date(a.last_message_time) : new Date(0);
-            const bTime = b.last_message_time ? new Date(b.last_message_time) : new Date(0);
-            return bTime - aTime;
-          });
+          // Then sort conversations - prioritize unread messages, then by last message time
+          const sortFn = createOptimizedSortFunction(unreadMessages);
+          updatedConversations = updatedConversations.sort(sortFn);
           
           return updatedConversations;
         }
@@ -444,12 +458,9 @@ const PrivateMessages = ({ setAuth }) => {
                 ...prevConvs
               ];
               
-              // Sort by last message time
-              return newConvs.sort((a, b) => {
-                const aTime = a.last_message_time ? new Date(a.last_message_time) : new Date(0);
-                const bTime = b.last_message_time ? new Date(b.last_message_time) : new Date(0);
-                return bTime - aTime;
-              });
+              // Sort by unread status and last message time
+              const sortFn = createOptimizedSortFunction(unreadMessages);
+              return newConvs.sort(sortFn);
             });
           })
           .catch(err => console.error("Error fetching new conversation:", err));
@@ -465,6 +476,8 @@ const PrivateMessages = ({ setAuth }) => {
             [message.conversation_id]: true
           };
           console.log("Updated unread state:", newState);
+          // Persist to localStorage
+          localStorage.setItem('unreadMessages', JSON.stringify(newState));
           return newState;
         });
       } else if (activeConversation === message.conversation_id && shouldAutoScroll) {
@@ -601,10 +614,15 @@ const PrivateMessages = ({ setAuth }) => {
         console.log(`Marking conversation ${activeConversation} as read due to user interaction`);
         
         // Mark ONLY the active conversation as read
-        setUnreadMessages(prev => ({
-          ...prev,
-          [activeConversation]: false
-        }));
+        setUnreadMessages(prev => {
+          const newState = {
+            ...prev,
+            [activeConversation]: false
+          };
+          // Persist to localStorage
+          localStorage.setItem('unreadMessages', JSON.stringify(newState));
+          return newState;
+        });
         
         // Notify server that messages are read
         if (socket && socket.connected) {
@@ -651,10 +669,15 @@ const PrivateMessages = ({ setAuth }) => {
   const handleSendMessage = async () => {
     // Mark messages as read when sending a reply
     if (activeConversation && unreadMessages[activeConversation]) {
-      setUnreadMessages(prev => ({
-        ...prev,
-        [activeConversation]: false
-      }));
+      setUnreadMessages(prev => {
+        const newState = {
+          ...prev,
+          [activeConversation]: false
+        };
+        // Persist to localStorage
+        localStorage.setItem('unreadMessages', JSON.stringify(newState));
+        return newState;
+      });
       
       // Notify server that messages are read
       if (socket && socket.connected) {
@@ -727,12 +750,9 @@ const PrivateMessages = ({ setAuth }) => {
           return conv;
         });
         
-        // Sort conversations by the most recent message
-        return updatedConversations.sort((a, b) => {
-          const aTime = a.last_message_time ? new Date(a.last_message_time) : new Date(0);
-          const bTime = b.last_message_time ? new Date(b.last_message_time) : new Date(0);
-          return bTime - aTime;
-        });
+        // Sort conversations by unread status and most recent message
+        const sortFn = createOptimizedSortFunction(unreadMessages);
+        return updatedConversations.sort(sortFn);
       });
 
       const messageToSend = messageText.trim();
@@ -826,10 +846,15 @@ const PrivateMessages = ({ setAuth }) => {
     
     // Mark messages as read when sending a like
     if (activeConversation && unreadMessages[activeConversation]) {
-      setUnreadMessages(prev => ({
-        ...prev,
-        [activeConversation]: false
-      }));
+      setUnreadMessages(prev => {
+        const newState = {
+          ...prev,
+          [activeConversation]: false
+        };
+        // Persist to localStorage
+        localStorage.setItem('unreadMessages', JSON.stringify(newState));
+        return newState;
+      });
       
       // Notify server that messages are read
       if (socket && socket.connected) {
@@ -868,12 +893,9 @@ const PrivateMessages = ({ setAuth }) => {
           return conv;
         });
         
-        // Sort conversations by the most recent message
-        return updatedConversations.sort((a, b) => {
-          const aTime = a.last_message_time ? new Date(a.last_message_time) : new Date(0);
-          const bTime = b.last_message_time ? new Date(b.last_message_time) : new Date(0);
-          return bTime - aTime;
-        });
+        // Sort conversations by unread status and most recent message
+        const sortFn = createOptimizedSortFunction(unreadMessages);
+        return updatedConversations.sort(sortFn);
       });
       
       // Send to server
@@ -967,8 +989,9 @@ const PrivateMessages = ({ setAuth }) => {
     );
 
     if (existingConversation) {
-      // Use setActiveConversationState to avoid circular dependency
+      // Use setActiveConversationState to avoid circular dependency, but persist for navigation continuity
       setActiveConversationState(existingConversation.conversation_id);
+      persistConversation(existingConversation.conversation_id);
       setNewConversationModal(false);
       return;
     }
@@ -994,8 +1017,9 @@ const PrivateMessages = ({ setAuth }) => {
 
       const newConversation = await response.json();
       setConversations(prev => [newConversation, ...prev]);
-      // Use setActiveConversationState to avoid circular dependency
+      // Use setActiveConversationState to avoid circular dependency, but persist for navigation continuity
       setActiveConversationState(newConversation.conversation_id);
+      persistConversation(newConversation.conversation_id);
       setNewConversationModal(false);
       
       // Immediately update the URL to the new conversation's user
@@ -1399,6 +1423,27 @@ const PrivateMessages = ({ setAuth }) => {
   // Add flag to track internal navigation
   const [isInternalNavigation, setIsInternalNavigation] = useState(false);
   
+  // Use the conversation manager hook
+  const conversationManager = useConversationManager(
+    conversations,
+    unreadMessages,
+    userProfile,
+    'Nova - Private Messages'
+  );
+  
+  // Get sorted conversations from the manager
+  const { 
+    sortedConversations, 
+    totalUnreadCount, 
+    getSmartInitialConversation,
+    persistConversation,
+    clearPersistence,
+    getConversationClasses,
+    getConversationByUserId,
+    getOtherParticipant,
+    hasUnreadMessages
+  } = conversationManager;
+  
   // Handle message forwarding
   const openForwardModal = (message) => {
     setForwardingMessage(message);
@@ -1604,16 +1649,14 @@ const PrivateMessages = ({ setAuth }) => {
       
       console.log("URL contains userId:", userId, "Looking for conversation with this user");
       
-      // Check if conversation with this user already exists
-      const existingConversation = conversations.find(conv => 
-        conv.participants && 
-        conv.participants.some(p => p.user_id.toString() === userId.toString())
-      );
+      // Check if conversation with this user already exists using conversation manager
+      const existingConversation = getConversationByUserId(userId);
       
       if (existingConversation) {
         console.log("Found existing conversation:", existingConversation.conversation_id);
-        // Use setActiveConversationState directly to avoid circular dependency
+        // Use setActiveConversationState directly to avoid circular dependency, but persist for navigation continuity
         setActiveConversationState(existingConversation.conversation_id);
+        persistConversation(existingConversation.conversation_id);
         return;
       }
       
@@ -1655,6 +1698,9 @@ const PrivateMessages = ({ setAuth }) => {
     // If selecting the same conversation, do nothing
     if (conversationId === activeConversation) return;
 
+    // Persist the conversation selection for smart restoration
+    persistConversation(conversationId);
+
     // Start transition
     setIsConversationChanging(true);
     
@@ -1668,9 +1714,7 @@ const PrivateMessages = ({ setAuth }) => {
     if (conversationId && userProfile) {
       const conversation = conversations.find(c => c.conversation_id === conversationId);
       if (conversation && conversation.participants) {
-        const otherParticipant = conversation.participants.find(
-          p => p.user_id !== userProfile.user_id
-        );
+        const otherParticipant = getOtherParticipant(conversation);
         
         if (otherParticipant) {
           // Set flag to indicate this is an internal navigation
@@ -1686,7 +1730,7 @@ const PrivateMessages = ({ setAuth }) => {
         }
       }
     }
-  }, [navigate, conversations, userProfile, setIsInternalNavigation, activeConversation]);
+  }, [navigate, conversations, userProfile, setIsInternalNavigation, activeConversation, persistConversation, getOtherParticipant]);
 
   if (loading) {
     return (
@@ -1808,6 +1852,8 @@ const PrivateMessages = ({ setAuth }) => {
         onLogout={(e) => {
           e.preventDefault();
           localStorage.removeItem('token');
+          localStorage.removeItem('unreadMessages'); // Clear unread messages on logout
+          clearPersistence(); // Clear conversation persistence on logout
           if (setAuth) setAuth(false);
           toast.success('Logged out successfully!');
           navigate('/login');
@@ -1855,7 +1901,14 @@ const PrivateMessages = ({ setAuth }) => {
               {/* Conversations list */}
               <div className="conversations-list">
                 <div className="conversations-header">
-                  <h2>Private Messages</h2>
+                  <h2>
+                    Private Messages
+                    {totalUnreadCount > 0 && (
+                      <span className={`unread-counter-badge ${totalUnreadCount > 5 ? 'high-count' : ''}`}>
+                        {totalUnreadCount > 99 ? '99+' : totalUnreadCount}
+                      </span>
+                    )}
+                  </h2>
                   <button 
                     className="new-conversation-button"
                     onClick={() => setNewConversationModal(true)}
@@ -1865,7 +1918,7 @@ const PrivateMessages = ({ setAuth }) => {
                   </button>
                 </div>
 
-                {conversations.length === 0 ? (
+                {conversations.length === 0 && !loading ? (
                   <div className="no-conversations">
                     <p>No conversations yet</p>
                     <button 
@@ -1875,9 +1928,9 @@ const PrivateMessages = ({ setAuth }) => {
                       Start a conversation
                     </button>
                   </div>
-                ) : (
+                ) : conversations.length > 0 ? (
                   <div className="conversations">
-                    {conversations
+                    {sortedConversations
                       .filter(conversation => {
                         if (!searchTerm) return true;
                         const otherParticipant = conversation.participants && conversation.participants.find(
@@ -1902,7 +1955,7 @@ const PrivateMessages = ({ setAuth }) => {
                         return (
                           <div 
                             key={conversation.conversation_id} 
-                            className={`conversation-item ${activeConversation === conversation.conversation_id ? 'active' : ''} ${hasUnread === true ? 'unread' : ''}`}
+                            className={getConversationClasses(conversation, activeConversation)}
                             onClick={() => setActiveConversation(conversation.conversation_id)}
                           >
                             <div className="conversation-avatar">
@@ -1944,7 +1997,7 @@ const PrivateMessages = ({ setAuth }) => {
                         );
                       })}
                   </div>
-                )}
+                ) : null}
               </div>
 
               {/* Message view */}
@@ -1989,10 +2042,15 @@ const PrivateMessages = ({ setAuth }) => {
                                   className="mark-read-button"
                                   onClick={() => {
                                     // Mark conversation as read
-                                    setUnreadMessages(prev => ({
-                                      ...prev,
-                                      [activeConversation]: false
-                                    }));
+                                    setUnreadMessages(prev => {
+                                      const newState = {
+                                        ...prev,
+                                        [activeConversation]: false
+                                      };
+                                      // Persist to localStorage
+                                      localStorage.setItem('unreadMessages', JSON.stringify(newState));
+                                      return newState;
+                                    });
                                     
                                     // Notify server that messages are read
                                     if (socket && socket.connected) {
@@ -2021,7 +2079,6 @@ const PrivateMessages = ({ setAuth }) => {
                     {isSearchingMessages && (
                       <div className="message-search-container">
                         <div className="message-search-input-wrapper">
-                          <HiOutlineSearch className="search-icon" />
                           <input
                             type="text"
                             className="message-search-input"
@@ -2432,7 +2489,6 @@ const PrivateMessages = ({ setAuth }) => {
                       <div className="user-selection-section">
                         <h4>Start a conversation with:</h4>
                         <div className="search-container">
-                          <HiOutlineSearch className="search-icon" />
                           <input 
                             type="text" 
                             className="search-input" 
@@ -2444,11 +2500,14 @@ const PrivateMessages = ({ setAuth }) => {
                         
                         <div className="users-grid">
                           {allUsers
-                            .filter(user => 
-                              user.first_name.toLowerCase().includes(searchTerm.toLowerCase()) || 
-                              user.last_name.toLowerCase().includes(searchTerm.toLowerCase())
-                            )
-                            .slice(0, 8) // Limit number of users shown
+                            .filter(user => {
+                              const fullName = `${user.first_name} ${user.last_name}`.toLowerCase();
+                              const searchLower = searchTerm.toLowerCase();
+                              return fullName.includes(searchLower) || 
+                                user.first_name.toLowerCase().includes(searchLower) || 
+                                user.last_name.toLowerCase().includes(searchLower);
+                            })
+                            .slice(0, 9) // Limit number of users shown
                             .map(user => (
                               <div 
                                 key={user.user_id} 
@@ -2463,12 +2522,14 @@ const PrivateMessages = ({ setAuth }) => {
                                   if (existingConversation) {
                                     setActiveConversation(existingConversation.conversation_id);
                                     setNewConversationModal(false);
+                                    setSearchTerm(""); // Clear search input after finding person
                                     // Update URL to show the other participant's ID
                                     setIsInternalNavigation(true);
                                     navigate(`/messages/${user.user_id}`, { replace: true });
                                     setTimeout(() => setIsInternalNavigation(false), 50);
                                   } else {
                                     startNewConversation(user);
+                                    setSearchTerm(""); // Clear search input after starting conversation
                                   }
                                 }}
                               >
@@ -2493,14 +2554,17 @@ const PrivateMessages = ({ setAuth }) => {
                               </div>
                             ))}
                             
-                          {allUsers.filter(user => 
-                            user.first_name.toLowerCase().includes(searchTerm.toLowerCase()) || 
-                            user.last_name.toLowerCase().includes(searchTerm.toLowerCase())
-                          ).length === 0 && (
-                            <div className="no-users-found">
-                              <p>No users found matching "{searchTerm}"</p>
-                            </div>
-                          )}
+                                              {allUsers.filter(user => {
+                      const fullName = `${user.first_name} ${user.last_name}`.toLowerCase();
+                      const searchLower = searchTerm.toLowerCase();
+                      return fullName.includes(searchLower) || 
+                        user.first_name.toLowerCase().includes(searchLower) || 
+                        user.last_name.toLowerCase().includes(searchLower);
+                    }).length === 0 && (
+                      <div className="no-users-found">
+                        <p>No users found matching "{searchTerm}"</p>
+                      </div>
+                    )}
                         </div>
                         
                         <button 
@@ -2519,17 +2583,22 @@ const PrivateMessages = ({ setAuth }) => {
 
           {/* New conversation modal */}
           {newConversationModal && (
-            <div className="modal-overlay" onClick={() => setNewConversationModal(false)}>
+            <div className="modal-overlay" onClick={() => {
+              setNewConversationModal(false);
+              setSearchTerm(""); // Clear search input when modal closes
+            }}>
               <div className="modal-content" onClick={e => e.stopPropagation()}>
                 <div className="modal-header">
                   <h2>New Conversation</h2>
-                  <button className="close-button" onClick={() => setNewConversationModal(false)}>
+                  <button className="close-button" onClick={() => {
+                    setNewConversationModal(false);
+                    setSearchTerm(""); // Clear search input when modal closes
+                  }}>
                     <HiOutlineX className="nav-icon" />
                   </button>
                 </div>
                 <div className="modal-body">
                   <div className="search-container">
-                    <HiOutlineSearch className="search-icon" />
                     <input 
                       type="text" 
                       className="search-input" 
@@ -2540,10 +2609,13 @@ const PrivateMessages = ({ setAuth }) => {
                   </div>
                   <div className="users-list">
                     {allUsers
-                      .filter(user => 
-                        user.first_name.toLowerCase().includes(searchTerm.toLowerCase()) || 
-                        user.last_name.toLowerCase().includes(searchTerm.toLowerCase())
-                      )
+                      .filter(user => {
+                        const fullName = `${user.first_name} ${user.last_name}`.toLowerCase();
+                        const searchLower = searchTerm.toLowerCase();
+                        return fullName.includes(searchLower) || 
+                          user.first_name.toLowerCase().includes(searchLower) || 
+                          user.last_name.toLowerCase().includes(searchLower);
+                      })
                       .map(user => (
                         <div 
                           key={user.user_id} 
@@ -2558,12 +2630,14 @@ const PrivateMessages = ({ setAuth }) => {
                             if (existingConversation) {
                               setActiveConversation(existingConversation.conversation_id);
                               setNewConversationModal(false);
+                              setSearchTerm(""); // Clear search input after finding person
                               // Update URL to show the other participant's ID
                               setIsInternalNavigation(true);
                               navigate(`/messages/${user.user_id}`, { replace: true });
                               setTimeout(() => setIsInternalNavigation(false), 50);
                             } else {
                               startNewConversation(user);
+                              setSearchTerm(""); // Clear search input after starting conversation
                             }
                           }}
                         >
@@ -2588,10 +2662,13 @@ const PrivateMessages = ({ setAuth }) => {
                         </div>
                       ))}
                     
-                    {allUsers.filter(user => 
-                      user.first_name.toLowerCase().includes(searchTerm.toLowerCase()) || 
-                      user.last_name.toLowerCase().includes(searchTerm.toLowerCase())
-                    ).length === 0 && (
+                    {allUsers.filter(user => {
+                      const fullName = `${user.first_name} ${user.last_name}`.toLowerCase();
+                      const searchLower = searchTerm.toLowerCase();
+                      return fullName.includes(searchLower) || 
+                        user.first_name.toLowerCase().includes(searchLower) || 
+                        user.last_name.toLowerCase().includes(searchLower);
+                    }).length === 0 && (
                       <div className="no-users-found">
                         <p>No users found matching "{searchTerm}"</p>
                       </div>

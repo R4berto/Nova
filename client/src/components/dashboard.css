@@ -204,7 +204,7 @@ body {
 /* Also scope submenu and items */
 .dashboard-page .submenu {
   display: none;
-  padding-left: calc(16px + 1.25rem + 12px);
+  padding: 10px 16px;
   margin-top: 4px;
   margin-bottom: 8px;
 }
@@ -217,7 +217,7 @@ body {
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 10px 0;
+  padding: 10px 16px;
   color: #000000; /* Black submenu text */
   text-decoration: none;
   border-radius: 8px;
@@ -234,7 +234,7 @@ body {
 .dashboard-page .submenu-item.active {
   color: #000000; /* Black submenu text when active */
   font-weight: 500;
-  background-color: var(--sidebar-active-bg); /* Ensure this is applied */
+  background-color: #f3f4f6; /* Ensure this is applied */
 }
 
 /* Add hover effect for active submenu item as well */
@@ -352,6 +352,7 @@ box-sizing: border-box;
 position: relative;
 flex: 1; /* Take up remaining space like settings.css */
 overflow-y: auto; /* Allow scrolling if content overflows */
+background-color: rgba(255, 255, 255, 0.495); /* Very light background base */
 }
 
 /* Top Bar Styles */
@@ -709,7 +710,7 @@ overflow-y: auto; /* Allow scrolling if content overflows */
 
 /* Simplified View All Button */
 .view-all-btn {
-  color: #2B78E4; /* Changed from var(--primary-color) to #2B78E4 */
+  color: black; /* Changed from var(--primary-color) to #2B78E4 */
   text-decoration: none;
   font-size: 0.875rem; /* Restore size */
   font-weight: 500;
@@ -722,7 +723,7 @@ overflow-y: auto; /* Allow scrolling if content overflows */
 }
 
 .view-all-btn:hover {
-  color: #1a5fb3; /* Darker shade for hover */
+  color: black; 
   text-decoration: underline; /* Restore underline */
   opacity: 1;
 }
@@ -960,528 +961,260 @@ overflow-y: auto; /* Allow scrolling if content overflows */
   margin-right: 8px;
 }
 
-/* Modal Styles - Simplified */
-.modal-overlay {
+/* Modal Styles - Updated to match classroom.css */
+.dashboard-page .modal-overlay {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(45, 55, 72, 0.6); /* Use dark gray with opacity */
+  background-color: rgba(0, 0, 0, 0.6); /* Darker overlay */
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 1000;
-  animation: fadeIn 0.2s ease; /* Faster fade */
+  z-index: 1050; /* Ensure above most things */
+  animation: fadeIn 0.2s ease forwards;
 }
 
-.modal-content {
-  background-color: var(--background); /* Use main background */
-  border-radius: 8px; /* Reduced radius */
-  border: 1px solid var(--border-color);
-  width: 100%;
-  max-width: 450px; /* Slightly smaller max width */
+.dashboard-page .modal-content {
+  background-color: var(--nova-bg-primary);
+  border-radius: var(--nova-border-radius); /* Consistent radius */
+  padding: 0; /* Remove padding, apply to sections */
+  width: 90%; /* Use percentage width */
+  max-width: 600px; /* Max width */
   max-height: 90vh;
-  overflow: hidden; /* Hide overflow, rely on internal scrolling */
+  overflow: hidden; /* Hide overflow, rely on internal */
   display: flex;
   flex-direction: column;
-  /* box-shadow: var(--shadow-lg); Removed shadow */
-  animation: scaleIn 0.2s ease; /* Faster scale */
+  border: 1px solid var(--nova-border-strong); /* Black border */
+  box-shadow: none; /* Remove shadow */
+  animation: scaleIn 0.2s ease forwards;
 }
 
-/* Apply internal scrolling if needed */
-.modal-body {
-  overflow-y: auto;
-  padding: 20px 24px;
-}
-
-.error {
-  color: var(--error-color);
-}
-
-/* Modal Header - Simplified */
-.modal-header {
+.dashboard-page .modal-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 16px 24px; /* Adjusted padding */
-  border-bottom: 1px solid var(--border-color); /* Use variable */
+  padding: var(--nova-spacing-lg) var(--nova-spacing-xl);
+  border-bottom: 1px solid var(--nova-border-strong); /* Black border */
   flex-shrink: 0;
 }
 
-.modal-header h2 {
-  font-size: 16px; /* Subheading size */
+.dashboard-page .modal-header h2 {
+  margin: 0;
+  color: var(--nova-text-primary);
+  font-size: 1.25rem; /* Slightly smaller */
   font-weight: 600;
 }
 
-.modal-header .close-modal {
-   /* Apply base .btn style or create specific */
-   background: none;
-   border: none;
-   color: var(--text-color);
-   opacity: 0.7;
-   font-size: 16px;
-   padding: 4px;
-   cursor: pointer;
-   line-height: 1;
+.dashboard-page .close-modal {
+  background: none;
+  border: none;
+  color: var(--nova-text-secondary);
+  cursor: pointer;
+  padding: var(--nova-spacing-xs);
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s, color 0.2s;
+  width: 32px;
+  height: 32px;
 }
 
-.modal-header .close-modal:hover {
-    opacity: 1;
+.dashboard-page .close-modal:hover {
+  background-color: var(--nova-bg-hover);
+  color: var(--nova-text-primary);
 }
 
-/* Responsive Adjustments */
-@media (max-width: 1400px) {
-  .content-wrapper {
-    max-width: 1000px;
-  }
+.dashboard-page .modal-form {
+  padding: var(--nova-spacing-xl); /* Add padding here */
+  overflow-y: auto; /* Allow vertical scroll */
+  flex-grow: 1;
 }
 
-@media (max-width: 1200px) {
-  .content-wrapper {
-    max-width: 900px;
-  }
-  
-  .stats-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
+.dashboard-page .form-group {
+  margin-bottom: var(--nova-spacing-lg);
 }
 
-@media (max-width: 992px) {
-  .content-wrapper {
-    max-width: 100%;
-    padding: 0 1rem;
-  }
-  
-  .course-grid {
-    grid-template-columns: 1fr;
-  }
+.dashboard-page .form-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); /* Responsive columns */
+  gap: var(--nova-spacing-lg);
 }
 
-@media (max-width: 768px) {
-  :root {
-    --space-md: 12px;
-    --space-lg: 16px;
-  }
-
-  .dashboard-container {
-    display: block;
-  }
-
-  .dashboard-container .main-content {
-    width: 100%;
-  }
-
-  .content-wrapper {
-    padding: var(--space-lg);
-  }
-
-  .dashboard-container .sidebar.open {
-    transform: translateX(0);
-  }
-
-  .top-bar {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 16px;
-  }
-
-  .search-container {
-    width: 100%;
-    max-width: 100%;
-    margin-bottom: 8px;
-  }
-
-  .search-bar {
-    width: 100%;
-    max-width: 100%;
-  }
-
-  .top-bar-right {
-    width: 100%;
-    justify-content: space-between;
-  }
-
-  .user-profile {
-    margin-left: auto;
-  }
-
-  .stats-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .course-grid {
-    grid-template-columns: 1fr;
-  }
+.dashboard-page .form-group label {
+  display: block;
+  margin-bottom: var(--nova-spacing-sm);
+  font-weight: 500;
+  color: var(--nova-text-primary);
+  font-size: 0.9rem;
 }
 
-/* Additional Spacing Fixes */
-.dashboard-container .logout-button {
-  margin-top: auto;
-  margin-bottom: 0.5rem;
+.dashboard-page .form-group input[type="text"],
+.dashboard-page .form-group input[type="password"],
+.dashboard-page .form-group input[type="email"],
+.dashboard-page .form-group input[type="number"],
+.dashboard-page .form-group textarea,
+.dashboard-page .form-group select {
+  width: 100%;
+  padding: var(--nova-spacing-sm) var(--nova-spacing-md);
+  border: 1px solid var(--nova-border-color);
+  border-radius: var(--nova-border-radius-sm);
+  font-size: 0.95rem;
+  color: var(--nova-text-primary);
+  background-color: var(--nova-bg-primary);
+  transition: border-color 0.2s, box-shadow 0.2s;
 }
 
-/* Course Card Content Spacing */
-.course-header h3 {
-  font-size: 1rem;
-  margin-bottom: 0.5rem;
-  font-weight: 600;
+.dashboard-page .form-group input[type="text"]:focus,
+.dashboard-page .form-group input[type="password"]:focus,
+.dashboard-page .form-group input[type="email"]:focus,
+.dashboard-page .form-group input[type="number"]:focus,
+.dashboard-page .form-group textarea:focus,
+.dashboard-page .form-group select:focus {
+  outline: none;
+  border-color: var(--nova-primary);
+  box-shadow: 0 0 0 2px rgba(26, 115, 232, 0.2);
 }
 
-.course-body p {
-  font-size: 0.875rem;
+.dashboard-page .form-group textarea {
+  min-height: 100px;
+  resize: vertical;
+}
+
+.dashboard-page .modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--nova-spacing-md);
+  margin-top: var(--nova-spacing-xl);
+  padding: var(--nova-spacing-lg) var(--nova-spacing-xl);
+  border-top: 1px solid var(--nova-border-strong); /* Black border */
+  background-color: var(--nova-bg-secondary); /* Slight contrast */
+  flex-shrink: 0;
+}
+
+/* Style modal buttons */
+.dashboard-page .submit-btn,
+.dashboard-page .cancel-btn,
+.dashboard-page .delete-btn, 
+.dashboard-page .warning-btn,
+.dashboard-page .success-btn {
+  padding: var(--nova-spacing-sm) var(--nova-spacing-lg);
+  border: 1px solid var(--nova-border-strong); /* Default black border */
+  border-radius: var(--nova-border-radius-sm);
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s, color 0.2s, border-color 0.2s;
+  font-size: 0.9rem;
+}
+
+.dashboard-page .submit-btn {
+  background-color: var(--nova-border-strong); /* Black background */
+  color: var(--nova-bg-primary); /* White text */
+}
+.dashboard-page .submit-btn:hover {
+  background-color: #333;
+  border-color: #333;
+}
+
+.dashboard-page .cancel-btn {
+  background-color: var(--nova-bg-primary); /* White background */
+  color: var(--nova-text-primary); /* Black text */
+  border-color: var(--nova-border-color); /* Lighter border */
+}
+.dashboard-page .cancel-btn:hover {
+  background-color: var(--nova-bg-tertiary);
+  border-color: var(--nova-border-strong);
+}
+
+/* Specific colors for confirmation modals */
+.dashboard-page .delete-btn,
+.dashboard-page .warning-btn { /* Assuming warning is for archive/inactivate */
+  background-color: #d93025; /* Red background */
+  color: var(--nova-bg-primary); /* White text */
+  border-color: #d93025; /* Red border */
+}
+.dashboard-page .delete-btn:hover,
+.dashboard-page .warning-btn:hover {
+  background-color: #c5221f; /* Darker red */
+  border-color: #c5221f;
+}
+
+.dashboard-page .success-btn { /* Assuming success is for reactivate */
+  background-color: #1e8e3e; /* Green background */
+  color: var(--nova-bg-primary); /* White text */
+  border-color: #1e8e3e; /* Green border */
+}
+.dashboard-page .success-btn:hover {
+  background-color: #187a33; /* Darker green */
+  border-color: #187a33;
+}
+
+/* Help text styling */
+.dashboard-page .help-text {
+  font-size: 0.85rem;
+  color: var(--nova-text-secondary);
+  margin-top: var(--nova-spacing-xs);
   line-height: 1.4;
 }
 
-/* Stats Card Content Spacing */
-.stats-info h3 {
-  font-size: 0.75rem;
-  margin-bottom: 0.25rem;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
+/* Error input styling */
+.dashboard-page .error-input {
+  border-color: #d93025 !important;
+  box-shadow: 0 0 0 2px rgba(217, 48, 37, 0.2) !important;
 }
 
-.stats-info p {
-  font-size: 1.25rem;
+.dashboard-page .error-input:focus {
+  border-color: #d93025 !important;
+  box-shadow: 0 0 0 2px rgba(217, 48, 37, 0.2) !important;
+}
+
+/* Error container styling */
+.dashboard-page .error-container {
+  margin-top: var(--nova-spacing-md);
+  padding: var(--nova-spacing-md);
+  background-color: rgba(217, 48, 37, 0.05);
+  border-radius: var(--nova-border-radius-sm);
+  border-left: 3px solid #d93025;
+}
+
+/* Error message text styling */
+.dashboard-page .error-message-text {
+  color: #d93025;
+  font-size: 0.9rem;
+  font-weight: 500;
+  margin-bottom: var(--nova-spacing-sm);
+  line-height: 1.4;
+}
+
+.dashboard-page .error-message-text strong {
   font-weight: 600;
 }
 
-/* Ensure proper content width */
-.dashboard-content {
-  width: 100%;
-  max-width: 1400px;
-  margin: 0 auto;
-}
-
-/* Improve search input appearance */
-.search-input {
-  background-color: var(--background);
-  transition: all 0.2s ease;
-  margin-left: 0; /* Remove the 5em margin that's causing misalignment */
-}
-
-.search-input:hover {
-  border-color: var(--primary-color);
-}
-
-/* Fix notification badge positioning */
-.notification-badge {
-  top: 0;
-  right: 0;
-  padding: 0.125rem 0.375rem;
-  font-size: 0.6875rem;
-  min-width: 18px;
-  height: 18px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-/* Improve search input appearance */
-.search-input {
-  background-color: var(--background);
-  transition: all 0.2s ease;
-}
-
-.search-input:hover {
-  border-color: var(--primary-color);
-}
-
-/* Mobile Responsive Styles */
-@media (max-width: 768px) {
-  .dashboard-container .sidebar {
-    transform: translateX(-100%);
-    transition: transform 0.3s ease;
-  }
-
-  .dashboard-container .sidebar.open {
-    transform: translateX(0);
-  }
-
-  .dashboard-container .main-content {
-    margin-left: 0;
-  }
-
-  .dashboard-container .sidebar-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: rgba(0, 0, 0, 0.5);
-    z-index: 999;
-  }
-
-  .dashboard-container .sidebar-toggle {
-    display: block;
-    position: fixed;
-    top: 1rem;
-    left: 1rem;
-    z-index: 1001;
-    background: none;
-    border: none;
-    color: var(--text-color);
-    font-size: 1.5rem;
-    cursor: pointer;
-  }
-
-  .top-bar {
-    flex-direction: column;
-    gap: 1rem;
-  }
-
-  .search-container {
-    max-width: 100%;
-  }
-
-  .stats-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .course-grid {
-    grid-template-columns: 1fr;
-  }
-}
-
-/* Simplified Floating Action Button */
-.floating-action-btn {
-  position: fixed;
-  bottom: 30px;
-  right: 30px;
-  width: 60px; /* Restore size */
-  height: 60px;
-  border-radius: 50%;
-  background-color: var(--primary-color);
-  color: white;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 24px; /* Restore size */
-  box-shadow: var(--shadow-md); /* Restore shadow */
-  border: none;
-  cursor: pointer;
-  transition: transform 0.3s ease, background-color 0.3s ease; /* Restore transition */
-  z-index: 100;
-  text-decoration: none;
-  opacity: 1; /* Reset opacity */
-}
-
-.floating-action-btn.professor-btn {
-  /* background-color: var(--success-color); Changed to black */
-  background-color: #000000; /* Black background */
-}
-
-.floating-action-btn.professor-btn:hover {
-  /* background-color: var(--success-color); Changed to darker gray */
-  background-color: #333333 !important; /* Darker gray on hover with !important to override general rule */
-  opacity: 0.9;
-  transform: translateY(-3px); 
-  box-shadow: var(--shadow-lg); 
-}
-
-.floating-action-btn:hover {
-  background-color: var(--primary-hover); /* Restore hover color */
-  opacity: 1;
-  transform: translateY(-3px); /* Restore transform */
-  box-shadow: var(--shadow-lg); /* Restore shadow */
-}
-
-/* Ensure professor button doesn't inherit general hover styles */
-.floating-action-btn.professor-btn:hover {
-  background-color: #333333 !important; /* Keep dark gray, not blue */
-}
-
-.floating-action-btn:active {
-  transform: translateY(0); /* Restore active state */
-  box-shadow: var(--shadow-sm); /* Restore shadow */
-  opacity: 1;
-}
-
-@media (max-width: 768px) {
-  .floating-action-btn {
-    bottom: 20px;
-    right: 20px;
-    width: 50px;
-    height: 50px;
-    font-size: 20px;
-  }
-}
-
-.error-container {
-  margin-top: 8px;
-  padding: 10px;
-  background-color: rgba(255, 0, 0, 0.05);
-  border-radius: 6px;
-  border-left: 3px solid var(--alert-red);
-}
-
-.error-message-text {
-  color: var(--alert-red);
-  font-size: 14px;
-  font-weight: 500;
-  margin: 0 0 8px 0;
-}
-
-/* Simplified Try New Code Button */
-.try-new-code-btn {
+/* Try new code button styling */
+.dashboard-page .try-new-code-btn {
   background-color: transparent;
-  color: var(--primary-color);
-  border: 1px solid var(--primary-color); /* Restore border */
-  border-radius: 4px;
-  padding: 6px 12px; /* Restore padding */
-  font-size: 14px;
-  font-weight: 500; 
+  color: #d93025;
+  border: 1px solid #d93025;
+  border-radius: var(--nova-border-radius-sm);
+  padding: var(--nova-spacing-xs) var(--nova-spacing-sm);
+  font-size: 0.85rem;
+  font-weight: 500;
   cursor: pointer;
-  transition: all 0.2s ease; /* Restore transition */
-  margin-top: 8px;
-  display: block; /* Restore display */
-  opacity: 1; /* Reset opacity */
-}
-
-.try-new-code-btn:hover {
-  background-color: var(--primary-color);
-  color: white;
-  opacity: 1;
-}
-
-/* New submenu styles */
-.dashboard-container .nav-item.has-submenu {
-  padding: 0;
-}
-
-.dashboard-container .nav-item.has-submenu > span {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 14px 16px;
-  width: 100%;
-  cursor: pointer;
-}
-
-.dashboard-container .nav-item.has-submenu.active .submenu-toggle {
-  transform: rotate(180deg);
-}
-
-.dashboard-container .nav-item.has-submenu.active .submenu {
-  display: block;
-}
-
-.dashboard-container .submenu-item {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 10px 0;
-  color: #000000;
-  text-decoration: none;
-  border-radius: 8px;
   transition: all 0.2s ease;
-  font-size: 0.9rem;
-  position: relative;
+  display: inline-block;
+  text-decoration: none;
 }
 
-.dashboard-container .submenu-item:hover {
-  color:black;
-}
-
-.dashboard-container .submenu-item.active {
-  color: black;
-  font-weight: 500;
-}
-
-/* Simplified Modal Buttons */
-.modal-actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 12px;
-  padding: 16px 24px;
-  border-top: 1px solid var(--border-color);
-  background-color: var(--background); /* Restore background */
-}
-
-.modal-actions .btn {
-  /* Inherits base .btn styles */
-}
-
-.modal-actions .cancel-btn {
-  /* Style for cancel: default .btn */
-  color: var(--text-color);
-  background-color: var(--background);
-  border-color: var(--border-color);
-  opacity: 1;
-}
-
-.modal-actions .cancel-btn:hover {
-  opacity: 1;
-  background-color: var(--accent-color); 
-  border-color: var(--text-secondary);
-}
-
-.modal-actions .submit-btn {
-  /* Style for submit: primary button */
-  background-color: var(--primary-color);
-  border-color: var(--primary-color);
+.dashboard-page .try-new-code-btn:hover {
+  background-color: #d93025;
   color: white;
+  transform: translateY(-1px);
 }
 
-.modal-actions .submit-btn:hover {
-  background-color: var(--primary-hover);
-  border-color: var(--primary-hover);
-  opacity: 1;
-}
-
-/* General Minimalist Input Style */
-input[type="text"],
-input[type="password"],
-input[type="email"],
-input[type="number"],
-textarea,
-select {
-  width: 100%;
-  padding: 10px 0; /* Adjust padding */
-  border: none;
-  border-bottom: 1px solid var(--border-color); /* Subtle bottom border */
-  border-radius: 0; /* Remove radius */
-  font-size: 14px; /* Standard body size */
-  background-color: transparent; /* Transparent background */
-  transition: border-color 0.2s ease;
-  outline: none; /* Remove default outline */
-}
-
-input[type="text"]:focus,
-input[type="password"]:focus,
-input[type="email"]:focus,
-input[type="number"]:focus,
-textarea:focus,
-select:focus {
-  border-bottom-color: var(--primary-color); /* Highlight border on focus */
-}
-
-/* Apply general input styles within modal forms */
-.modal-form .form-group {
-  margin-bottom: 20px; /* Add some spacing */
-}
-
-.modal-form label {
-  display: block;
-  margin-bottom: 8px;
-  font-size: 14px;
-  font-weight: 500;
-}
-
-.modal-form input[type="text"],
-.modal-form input[type="password"],
-.modal-form input[type="email"],
-.modal-form input[type="number"],
-.modal-form textarea,
-.modal-form select {
-  /* Inherit general input styles */
-}
-
-.modal-form .help-text {
-  font-size: 12px;
-  color: var(--text-color);
-  opacity: 0.7;
-  margin-top: 6px;
+.dashboard-page .try-new-code-btn:active {
+  transform: translateY(0);
 }
 
 /* Status Indicator Base */
@@ -1637,11 +1370,50 @@ select:focus {
 }
 
 .notification-item.unread {
-  background-color: #e8f4fd;
+  background-color: rgba(59, 130, 246, 0.1);
+  font-weight: 500;
+  border-left: 3px solid #3b82f6;
 }
 
 .notification-item.unread:hover {
-  background-color: #d8ecfc;
+  background-color: rgba(59, 130, 246, 0.15);
+}
+
+/* Dashboard notification read indicator styles */
+.dashboard-notification-read-indicator {
+  position: relative;
+}
+
+.dashboard-notification-read-indicator::after {
+  content: "✓";
+  position: absolute;
+  top: 10px;
+  right: 15px;
+  color: #28a745;
+  font-weight: bold;
+  font-size: 16px;
+  opacity: 0.7;
+}
+
+.notification-item:not(.unread) {
+  position: relative;
+  background-color: #fafafa;
+  border-left: 3px solid #888;
+  opacity: 0.85;
+  color: #555;
+}
+
+.notification-item:not(.unread):hover {
+  background-color: #f0f0f0;
+  opacity: 0.95;
+}
+
+.notification-item:not(.unread) .notification-content {
+  padding-right: 30px;
+}
+
+.notification-item:not(.unread) .notification-time {
+  color: #888;
 }
 
 .notification-content p {

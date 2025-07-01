@@ -195,6 +195,7 @@ router.get("/analytics/:examId", authorize, professorOnly, async (req, res) => {
     const { examId } = req.params;
     const professorId = req.user.id;
     const includeNonParticipants = req.query.includeNonParticipants === 'true';
+    const forceShow = req.query.forceShow === 'true';
     
     // Verify professor has access to this exam
     const examCheck = await pool.query(
@@ -220,7 +221,7 @@ router.get("/analytics/:examId", authorize, professorOnly, async (req, res) => {
     const now = new Date();
     const isDueOver = examCheck.rows[0].due_date && new Date(examCheck.rows[0].due_date) < now;
     
-    if (includeNonParticipants && isDueOver) {
+    if (includeNonParticipants && (isDueOver || forceShow)) {
       // Include enrolled students who have not taken the exam with zero scores
       submissions = (await pool.query(
         `SELECT 

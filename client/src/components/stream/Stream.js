@@ -74,6 +74,13 @@ const Stream = ({ setAuth }) => {
   const [editingAnnouncement, setEditingAnnouncement] = useState(null);
   const [showOptions, setShowOptions] = useState({});
   const editorRef = useRef(null);
+  
+  // Add state for upcoming assignments and exams
+  const [upcomingItems, setUpcomingItems] = useState({
+    assignments: [],
+    exams: []
+  });
+  const [loadingUpcoming, setLoadingUpcoming] = useState(true);
 
   // Add state for the edit modal
   const [showEditModal, setShowEditModal] = useState(false);
@@ -140,6 +147,9 @@ const Stream = ({ setAuth }) => {
   // Add state for courses
   const [courses, setCourses] = useState([]);
   const [loadingCourses, setLoadingCourses] = useState(true);
+
+  // Add state for approval requirement
+  const [approvalRequired, setApprovalRequired] = useState(false);
 
   useEffect(() => {
     const checkIfMobile = () => {
@@ -340,6 +350,43 @@ const Stream = ({ setAuth }) => {
     }));
   };
 
+  // Toggle approval requirement
+  const toggleApprovalRequired = async (required) => {
+    if (!isTeacher || courseDetails?.status === 'archived') return;
+    
+    setEnrollmentCodeStatus(prev => ({ ...prev, isLoading: true }));
+    
+    try {
+      const response = await axios.put(
+        `http://localhost:5000/enrollment-approval/toggle-approval/${courseId}`,
+        { approval_required: required },
+        { headers: { "jwt_token": localStorage.token, "token": localStorage.token } }
+      );
+      
+      if (response.data) {
+        console.log("Approval requirement updated:", response.data);
+        
+        // Update the course details with the new approval requirement
+        setCourseDetails(prev => ({
+          ...prev,
+          approval_required: required
+        }));
+        
+        // Update the approval requirement state
+        setApprovalRequired(required);
+        
+        toast.success(`Approval requirement ${required ? 'enabled' : 'disabled'} successfully`);
+      }
+    } catch (error) {
+      console.error('Error toggling approval requirement:', error);
+      // Revert the UI state on error
+      setApprovalRequired(!required);
+      toast.error(`Failed to ${required ? 'enable' : 'disable'} approval requirement`);
+    } finally {
+      setEnrollmentCodeStatus(prev => ({ ...prev, isLoading: false }));
+    }
+  };
+
   useEffect(() => {
     const fetchCourseDetails = async () => {
       if (!courseId) return;
@@ -381,6 +428,8 @@ const Stream = ({ setAuth }) => {
               ...prev,
               isEnabled: foundCourse.enrollment_code_enabled !== false
             }));
+            // Initialize approval requirement state
+            setApprovalRequired(foundCourse.approval_required || false);
             setError(null);
             console.log("Fetched courseDetails state:", foundCourse);
           } else {
@@ -404,6 +453,8 @@ const Stream = ({ setAuth }) => {
             ...prev,
             isEnabled: data.enrollment_code_enabled !== false
           }));
+          // Initialize approval requirement state
+          setApprovalRequired(data.approval_required || false);
           setError(null);
           console.log("Fetched courseDetails state:", data);
         }
@@ -1419,6 +1470,215 @@ const Stream = ({ setAuth }) => {
     if (userRole) fetchCourses();
   }, [userRole]);
 
+  // Add function to fetch upcoming assignments and exams
+  const fetchUpcomingItems = useCallback(async () => {
+    if (!courseId) return;
+    setLoadingUpcoming(true);
+    try {
+      // Fetch upcoming assignments
+      const assignmentsResponse = await fetch(`http://localhost:5000/assignments/upcoming/${courseId}`, {
+        method: "GET",
+        headers: { 
+          "jwt_token": localStorage.token, 
+          "token": localStorage.token 
+        }
+      });
+      
+      // Fetch upcoming exams
+      const examsResponse = await fetch(`http://localhost:5000/exams/upcoming/${courseId}`, {
+        method: "GET",
+        headers: { 
+          "jwt_token": localStorage.token, 
+          "token": localStorage.token 
+        }
+      });
+      
+      // Also fetch overdue assignments (past due but not submitted)
+      const overdueAssignmentsResponse = await fetch(`http://localhost:5000/assignments/overdue/${courseId}`, {
+        method: "GET",
+        headers: { 
+          "jwt_token": localStorage.token, 
+          "token": localStorage.token 
+        }
+      });
+      
+      // Fetch overdue exams (past due but not submitted)
+      const overdueExamsResponse = await fetch(`http://localhost:5000/exams/overdue/${courseId}`, {
+        method: "GET",
+        headers: { 
+          "jwt_token": localStorage.token, 
+          "token": localStorage.token 
+        }
+      });
+      
+      // Fetch student's exam submissions to filter out submitted exams
+      const studentExamSubmissionsResponse = await fetch(`http://localhost:5000/student-exams/submissions/${courseId}`, {
+        method: "GET",
+        headers: { 
+          "jwt_token": localStorage.token, 
+          "token": localStorage.token 
+        }
+      });
+      
+      // Fetch student's assignment submissions to filter out submitted assignments
+      const studentAssignmentSubmissionsResponse = await fetch(`http://localhost:5000/assignments/${courseId}/student-submissions`, {
+        method: "GET",
+        headers: { 
+          "jwt_token": localStorage.token, 
+          "token": localStorage.token 
+        }
+      });
+      
+      let assignments = [];
+      let exams = [];
+      let overdueAssignments = [];
+      let overdueExams = [];
+      let studentExamSubmissions = [];
+      let studentAssignmentSubmissions = [];
+      
+      if (assignmentsResponse.ok) {
+        assignments = await assignmentsResponse.json();
+      }
+      
+      if (examsResponse.ok) {
+        exams = await examsResponse.json();
+      }
+      
+      if (overdueAssignmentsResponse.ok) {
+        overdueAssignments = await overdueAssignmentsResponse.json();
+      }
+      
+      if (overdueExamsResponse.ok) {
+        overdueExams = await overdueExamsResponse.json();
+      }
+      
+      if (studentExamSubmissionsResponse.ok) {
+        studentExamSubmissions = await studentExamSubmissionsResponse.json();
+      }
+      
+      if (studentAssignmentSubmissionsResponse.ok) {
+        studentAssignmentSubmissions = await studentAssignmentSubmissionsResponse.json();
+      }
+      
+      // Filter out exams that the student has already submitted
+      const submittedExamIds = studentExamSubmissions.map(submission => submission.exam_id);
+      const filteredExams = exams.filter(exam => !submittedExamIds.includes(exam.exam_id));
+      // Filter out overdue exams that the student has already submitted
+      const filteredOverdueExams = overdueExams.filter(exam => !submittedExamIds.includes(exam.exam_id)).map(exam => ({...exam, isOverdue: true}));
+      
+      // Filter out assignments that the student has already submitted
+      const submittedAssignmentIds = studentAssignmentSubmissions.map(submission => submission.assignment_id);
+      const filteredAssignments = assignments.filter(assignment => !submittedAssignmentIds.includes(assignment.assignment_id));
+      
+      // Combine upcoming and overdue assignments, marking overdue ones
+      // Note: overdue assignments are already filtered by the server to exclude submitted ones
+      const allAssignments = [
+        ...filteredAssignments,
+        ...overdueAssignments.map(item => ({...item, isOverdue: true}))
+      ].sort((a, b) => new Date(a.due_date) - new Date(b.due_date));
+      
+      // Combine upcoming and overdue exams, marking overdue ones
+      const allExams = [
+        ...filteredExams,
+        ...filteredOverdueExams
+      ].sort((a, b) => new Date(a.due_date) - new Date(b.due_date));
+      
+      setUpcomingItems({
+        assignments: Array.isArray(allAssignments) ? allAssignments : [],
+        exams: Array.isArray(allExams) ? allExams : []
+      });
+    } catch (error) {
+      console.error('Error fetching upcoming items:', error);
+      setUpcomingItems({ assignments: [], exams: [] });
+    } finally {
+      setLoadingUpcoming(false);
+    }
+  }, [courseId]);
+
+  useEffect(() => {
+    if (courseId) {
+      // Don't fetch upcoming items if course is archived or inactive
+      if (courseDetails?.status === 'archived' || courseDetails?.status === 'inactive') {
+        setLoadingUpcoming(false);
+        setUpcomingItems({ assignments: [], exams: [] });
+        return;
+      }
+      fetchUpcomingItems();
+    }
+  }, [courseId, fetchUpcomingItems, courseDetails?.status]);
+
+  // Add a function to render upcoming date in a more user-friendly format
+  const formatUpcomingDate = (dateString, isOverdue = false) => {
+    if (!dateString) return 'No due date';
+    
+    const dueDate = new Date(dateString);
+    const now = new Date();
+    
+    // Format date
+    const formattedDate = dueDate.toLocaleDateString('en-US', {
+      month: 'short', day: 'numeric'
+    });
+    
+    // Add time if it's not midnight
+    const formattedTime = dueDate.getHours() || dueDate.getMinutes() 
+      ? dueDate.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })
+      : '';
+    
+    // If it's marked as overdue, or the date is in the past
+    if (isOverdue || dueDate < now) {
+      const diffTime = now - dueDate;
+      const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+      const diffHours = Math.floor((diffTime % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      
+      if (diffDays === 0) {
+        if (diffHours < 1) {
+          return `Just overdue (${formattedDate} ${formattedTime})`;
+        }
+        return `${diffHours} hour${diffHours !== 1 ? 's' : ''} overdue (${formattedDate})`;
+      } else if (diffDays === 1) {
+        return `1 day overdue (${formattedDate})`;
+      }
+      return `${diffDays} days overdue (${formattedDate})`;
+    }
+    
+    // Calculate difference in days and hours for upcoming items
+    const diffTime = dueDate - now;
+    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+    const diffHours = Math.floor((diffTime % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    
+    // Check if it's the same day by comparing year, month, and day
+    const isSameDay = now.getFullYear() === dueDate.getFullYear() && 
+                      now.getMonth() === dueDate.getMonth() && 
+                      now.getDate() === dueDate.getDate();
+    
+    // Check if it's tomorrow
+    const tomorrow = new Date(now);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    const isTomorrow = tomorrow.getFullYear() === dueDate.getFullYear() && 
+                       tomorrow.getMonth() === dueDate.getMonth() && 
+                       tomorrow.getDate() === dueDate.getDate();
+    
+    // Return appropriate string based on due date
+    if (isSameDay) {
+      if (diffHours < 6) {
+        return `Due today at ${formattedTime} (${diffHours}h remaining)`;
+      }
+      return `Due today at ${formattedTime}`;
+    } else if (isTomorrow) {
+      return `Due tomorrow at ${formattedTime}`;
+    } else if (diffDays === 0) {
+      // Less than 24 hours but not same calendar day
+      if (diffHours < 6) {
+        return `Due soon at ${formattedTime} (${diffHours}h remaining)`;
+      }
+      return `Due today at ${formattedTime}`;
+    } else if (diffDays < 7) {
+      return `Due in ${diffDays} days (${formattedDate} at ${formattedTime})`;
+    } else {
+      return `Due on ${formattedDate} at ${formattedTime}`;
+    }
+  };
+
   if (loading) {
     return (
       <div className="dashboard-container dashboard-page">
@@ -1530,6 +1790,7 @@ const Stream = ({ setAuth }) => {
       </nav>
 
       <div className="stream-content">
+        <div className="stream-left-column">
         <div className="course-info-panel">
           <h1 className="course-code">{currentCourse.course_name}</h1>
           <h2 className="course-section">{currentCourse.section}</h2>
@@ -1565,9 +1826,17 @@ const Stream = ({ setAuth }) => {
                         {enrollmentCodeStatus.isEnabled ? 'Disable Code' : 'Enable Code'}
                       </button>
                       <button 
+                        className={`toggle-button ${approvalRequired ? 'enabled' : 'disabled'}`}
+                        onClick={() => toggleApprovalRequired(!approvalRequired)}
+                        disabled={enrollmentCodeStatus.isLoading}
+                      >
+                        {approvalRequired ? <HiOutlineBan /> : <HiOutlineAnnotation />}
+                        {approvalRequired ? 'Disable Approval' : 'Enable Approval'}
+                      </button>
+                      <button 
                         className="regenerate-button"
                         onClick={regenerateEnrollmentCode}
-                        disabled={enrollmentCodeStatus.isLoading}
+                        disabled={enrollmentCodeStatus.isLoading || courseDetails?.enrollment_code_enabled === false || enrollmentCodeStatus.isEnabled === false}
                       >
                         <FaUndo /> Generate New Code
                       </button>
@@ -1587,10 +1856,147 @@ const Stream = ({ setAuth }) => {
               ) : (
                 currentCourse.enrollment_code
               )}
-              {enrollmentCodeStatus.isLoading && <span className="loading-spinner"></span>}
             </div>
           </div>
                       )}
+        </div>
+
+        {/* Redesigned Upcoming Panel */}
+        <div className="upcoming-panel enrollment-code-box">
+          <div className="enrollment-code-header">
+            <h3>
+              <HiOutlineCalendar className="upcoming-icon" />
+              To Do List
+            </h3>
+          </div>
+          
+          {/* Show course status message if archived or inactive */}
+          {courseDetails?.status === 'archived' ? (
+            <div className="upcoming-content">
+              <div className="no-upcoming code">
+                <HiOutlineArchive className="status-icon" />
+                This course is archived. To do list is not available.
+              </div>
+            </div>
+          ) : courseDetails?.status === 'inactive' ? (
+            <div className="upcoming-content">
+              <div className="no-upcoming code">
+                <HiOutlineBan className="status-icon" />
+                This course is inactive. To do list is not available.
+              </div>
+            </div>
+          ) : (
+            <>
+              {loadingUpcoming ? (
+                <div className="upcoming-loading">
+                  <LoadingIndicator text="Loading to do items" />
+                </div>
+              ) : (
+                <div className="upcoming-content">
+                  {upcomingItems.assignments.length === 0 && upcomingItems.exams.length === 0 ? (
+                    <div className="no-upcoming code">No assignments or exams to complete</div>
+                  ) : (
+                    <>
+                      {upcomingItems.assignments.length > 0 && (
+                        <div className="upcoming-section">
+                          <h3 className="upcoming-section-title">
+                            <HiOutlineClipboardList className="section-icon" />
+                            Assignments
+                          </h3>
+                          <ul className="upcoming-list">
+                            {upcomingItems.assignments.map((assignment) => {
+                              const isPastDue = assignment.isOverdue || (assignment.due_date && new Date(assignment.due_date) < new Date());
+                              return (
+                              <li 
+                                key={`asg-${assignment.assignment_id}`} 
+                                className="upcoming-item" 
+                                data-past-due={isPastDue}
+                              >
+                                <div className="upcoming-item-content">
+                                  <div className="upcoming-item-title" onClick={() => navigate(`/courses/${courseId}/assignments?assignmentId=${assignment.assignment_id}`)}>
+                                    {assignment.title}
+                                  </div>
+                                  <div 
+                                    className="upcoming-item-due"
+                                    data-past-due={isPastDue}
+                                    data-due-soon={!isPastDue && assignment.due_date && new Date(assignment.due_date) - new Date() < 6 * 60 * 60 * 1000}
+                                  >
+                                    {formatUpcomingDate(assignment.due_date, assignment.isOverdue)}
+                                  </div>
+                                </div>
+                              </li>
+                              );
+                            })}
+                          </ul>
+                        </div>
+                      )}
+                      
+                      {upcomingItems.exams.length > 0 && (
+                        <div className="upcoming-section">
+                          <h3 className="upcoming-section-title">
+                            <HiOutlinePresentationChartBar className="section-icon" />
+                            Exams
+                          </h3>
+                          <ul className="upcoming-list">
+                            {upcomingItems.exams.map((exam) => {
+                              const isPastDue = exam.due_date && new Date(exam.due_date) < new Date();
+                              return (
+                              <li 
+                                key={`exam-${exam.exam_id}`} 
+                                className="upcoming-item"
+                                data-past-due={isPastDue}
+                              >
+                                <div className="upcoming-item-content">
+                                  <div className="upcoming-item-title" onClick={() => {
+                                    if (isTeacher) {
+                                      navigate(`/courses/${courseId}/exams?view=builder&examId=${exam.exam_id}`);
+                                    } else {
+                                      navigate(`/courses/${courseId}/exams/${exam.exam_id}`);
+                                    }
+                                  }}>
+                                    {exam.title}
+                                  </div>
+                                  <div 
+                                    className="upcoming-item-due"
+                                    data-past-due={isPastDue}
+                                    data-due-soon={!isPastDue && exam.due_date && new Date(exam.due_date) - new Date() < 6 * 60 * 60 * 1000}
+                                  >
+                                    {formatUpcomingDate(exam.due_date)}
+                                  </div>
+                                </div>
+                              </li>
+                              );
+                            })}
+                          </ul>
+                        </div>
+                      )}
+                    </>
+                  )}
+                  
+                  {/* View All Links */}
+                  <div className="upcoming-footer">
+                    {upcomingItems.assignments.length > 0 && (
+                      <button 
+                        className="view-all-btn" 
+                        onClick={() => navigate(`/courses/${courseId}/assignments`)}
+                      >
+                        View all assignments
+                      </button>
+                    )}
+                    {upcomingItems.exams.length > 0 && (
+                      <button 
+                        className="view-all-btn" 
+                        onClick={() => navigate(`/courses/${courseId}/exams`)}
+                      >
+                        View all exams
+                      </button>
+                    )}
+                  </div>
+                </div>
+              )}
+            </>
+          )}
+        </div>
         </div>
 
         <div className="announcements-section">
@@ -2069,6 +2475,7 @@ const Stream = ({ setAuth }) => {
                             className="attachment-file file-preview-link"
                             onClick={() => {
                               if (attachment.file instanceof File) {
+                                // New file, preview from blob
                                 const tempUrl = URL.createObjectURL(attachment.file);
                                 setFilePreviewModal({
                                   isOpen: true,
@@ -2076,14 +2483,22 @@ const Stream = ({ setAuth }) => {
                                   type: getFileTypeFromUrl(attachment.name),
                                   url: tempUrl
                                 });
+                              } else if (attachment.file_url) {
+                                // Existing file, preview from URL
+                                setFilePreviewModal({
+                                  isOpen: true,
+                                  file: attachment.name || attachment.file_name,
+                                  type: getFileTypeFromUrl(attachment.name || attachment.file_name),
+                                  url: attachment.file_url
+                                });
                               }
                             }}
                             style={{cursor: 'pointer'}}
                           >
-                            {attachment.name}
+                            {attachment.name || attachment.file_name}
                           </span>
-                           <span className="file-size">
-                             ({formatFileSize(attachment.size || attachment.file_size || 0)})
+                          <span className="file-size">
+                            ({formatFileSize(attachment.size || attachment.file_size || 0)})
                           </span>
                           <button 
                             type="button" 
@@ -2201,9 +2616,75 @@ const Stream = ({ setAuth }) => {
           <div className="modal-content file-preview-modal">
             <div className="modal-header">
               <h3>{filePreviewModal.file}</h3>
-              <button onClick={() => setFilePreviewModal({...filePreviewModal, isOpen: false})} className="close-modal">
-                <FaTimes />
-              </button>
+              <div className="modal-actions">
+                <button 
+                  className="download-btn"
+                  onClick={() => {
+                    const { url, file } = filePreviewModal;
+                    const fullUrl = url.startsWith('http') ? url : `http://localhost:5000${url.startsWith('/') ? '' : '/'}${url}`;
+                    
+                    // Create a download link
+                    const link = document.createElement('a');
+                    
+                    // Set properties for download
+                    link.href = fullUrl;
+                    link.setAttribute('download', file);
+                    
+                    // For file types that browsers typically try to open, force the download
+                    // by using a Blob if it's from the same origin (CORS restrictions apply)
+                    if (fullUrl.startsWith(window.location.origin) || fullUrl.startsWith('http://localhost:')) {
+                      // Show loading toast
+                      const toastId = toast.loading(`Preparing download for ${file}...`);
+                      
+                      // Fetch the file as a blob
+                      fetch(fullUrl)
+                        .then(response => response.blob())
+                        .then(blob => {
+                          // Create a blob URL
+                          const blobUrl = URL.createObjectURL(blob);
+                          
+                          // Update the link to use the blob URL which forces download
+                          link.href = blobUrl;
+                          
+                          // Trigger the download
+                          document.body.appendChild(link);
+                          link.click();
+                          
+                          // Clean up
+                          setTimeout(() => {
+                            document.body.removeChild(link);
+                            URL.revokeObjectURL(blobUrl);
+                          }, 100);
+                          
+                          // Update toast
+                          toast.success(`Downloading ${file}`, { id: toastId });
+                        })
+                        .catch(err => {
+                          console.error('Error creating blob for download:', err);
+                          // Fall back to simple download
+                          document.body.appendChild(link);
+                          link.click();
+                          document.body.removeChild(link);
+                          
+                          // Update toast
+                          toast.success(`Downloading ${file}`, { id: toastId });
+                        });
+                    } else {
+                      // For cross-origin URLs, use the simple approach
+                      document.body.appendChild(link);
+                      link.click();
+                      document.body.removeChild(link);
+                      
+                      toast.success(`Downloading ${file}`);
+                    }
+                  }}
+                >
+                  <FaPaperclip /> Download
+                </button>
+                <button onClick={() => setFilePreviewModal({...filePreviewModal, isOpen: false})} className="close-modal">
+                  <FaTimes />
+                </button>
+              </div>
             </div>
             <div className="modal-body">
               {filePreviewModal.type === 'image' && (
@@ -2253,78 +2734,6 @@ const Stream = ({ setAuth }) => {
                   </a>
                 </div>
               )}
-            </div>
-            <div className="modal-footer">
-              <button 
-                className="download-btn"
-                onClick={() => {
-                  const { url, file } = filePreviewModal;
-                  const fullUrl = url.startsWith('http') ? url : `http://localhost:5000${url.startsWith('/') ? '' : '/'}${url}`;
-                  
-                  // Create a download link
-                  const link = document.createElement('a');
-                  
-                  // Set properties for download
-                  link.href = fullUrl;
-                  link.setAttribute('download', file);
-                  
-                  // For file types that browsers typically try to open, force the download
-                  // by using a Blob if it's from the same origin (CORS restrictions apply)
-                  if (fullUrl.startsWith(window.location.origin) || fullUrl.startsWith('http://localhost:')) {
-                    // Show loading toast
-                    const toastId = toast.loading(`Preparing download for ${file}...`);
-                    
-                    // Fetch the file as a blob
-                    fetch(fullUrl)
-                      .then(response => response.blob())
-                      .then(blob => {
-                        // Create a blob URL
-                        const blobUrl = URL.createObjectURL(blob);
-                        
-                        // Update the link to use the blob URL which forces download
-                        link.href = blobUrl;
-                        
-                        // Trigger the download
-                        document.body.appendChild(link);
-                        link.click();
-                        
-                        // Clean up
-                        setTimeout(() => {
-                          document.body.removeChild(link);
-                          URL.revokeObjectURL(blobUrl);
-                        }, 100);
-                        
-                        // Update toast
-                        toast.success(`Downloading ${file}`, { id: toastId });
-                      })
-                      .catch(err => {
-                        console.error('Error creating blob for download:', err);
-                        // Fall back to simple download
-                        document.body.appendChild(link);
-                        link.click();
-                        document.body.removeChild(link);
-                        
-                        // Update toast
-                        toast.success(`Downloading ${file}`, { id: toastId });
-                      });
-                  } else {
-                    // For cross-origin URLs, use the simple approach
-                    document.body.appendChild(link);
-                    link.click();
-                    document.body.removeChild(link);
-                    
-                    toast.success(`Downloading ${file}`);
-                  }
-                }}
-              >
-                <FaPaperclip /> Download File
-              </button>
-              <button
-                className="close-btn"
-                onClick={() => setFilePreviewModal({...filePreviewModal, isOpen: false})}
-              >
-                Close
-              </button>
             </div>
           </div>
         </div>

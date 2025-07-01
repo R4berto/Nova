@@ -49,6 +49,7 @@ app.use("/auth", require("./routes/jwtAuth"));
 app.use("/dashboard", require("./routes/dashboard"));
 const coursesRouter = require("./routes/courses");
 const enrollmentRouter = require("./routes/enrollment");
+const enrollmentApprovalRouter = require("./routes/enrollmentApproval");
 const streamRouter = require("./routes/stream");
 const announcementsRouter = require("./routes/announcements");
 const assignmentsRouter = require("./routes/assignments");
@@ -58,6 +59,7 @@ const dssRouter = require("./routes/dss");
 
 app.use("/courses", coursesRouter);
 app.use("/enrollment", enrollmentRouter);
+app.use("/enrollment-approval", enrollmentApprovalRouter);
 app.use("/stream", streamRouter);
 app.use("/announcements", announcementsRouter);
 app.use("/assignments", assignmentsRouter);
@@ -73,7 +75,8 @@ app.use('/dss', dssRouter);
 const server = http.createServer(app);
 
 // Initialize WebSocket server
-initializeWebSocket(server);
+const io = initializeWebSocket(server);
+console.log("WebSocket server initialized");
 
 // Update listen to use the HTTP server instead of the Express app
 server.listen(5000, () => {

@@ -6,52 +6,113 @@
     <title>Exam Creator</title>
     <style>
         :root {
+            /* Core Colors */
+            --navy: #1a2b4c;
+            --navy-light: #2c3e60;
+            --navy-dark: #12233e;
+            --accent-teal: #4fd1dc;
+            --accent-teal-dark: #2bbbc7;
+            --accent-light: #e6f9fb;
+            
+            /* Text Colors */
+            --text-primary: #000000;
+            --text-secondary: #6c757d;
+            --text-tertiary: #adb5bd;
+            
+            /* Background Colors */
+            --bg-light: #f8f9fa;
+            --bg-white: #ffffff;
+            --bg-gray: #eef0f5;
+            
+            /* Status Colors */
+            --success-green: #2ed47a;
+            --success-green-light: #e6f7ef;
+            --alert-red: #ff5252;
+            --alert-red-light: #ffebeb;
+            --info-blue: #5893ff;
+            --info-blue-light: #ebf3ff;
+            
+            /* Border Colors */
+            --border-color: #e9ecef;
+            --border-strong: #000000;
+            
+            /* Typography */
             --font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            --color-white: #ffffff;
-            --color-black: #000000;
-            --color-gray-100: #f8f9fa;
-            --color-gray-200: #e9ecef;
-            --color-gray-300: #dee2e6;
-            --color-gray-600: #6c757d;
-            --color-green: #4caf50;
-            --color-green-dark: #45a049;
-            --color-blue: #2196f3;
-            --color-blue-dark: #0b7dda;
-            --color-red: #dc3545;
+            --font-size-xs: 12px;
+            --font-size-sm: 14px;
+            --font-size-base: 16px;
+            --font-size-lg: 18px;
+            --font-size-xl: 20px;
+            --font-size-2xl: 24px;
+            --font-weight-normal: 400;
+            --font-weight-medium: 500;
+            --font-weight-bold: 700;
+            --line-height: 1.5;
+            
+            /* Spacing */
+            --space-xs: 4px;
+            --space-sm: 8px;
+            --space-md: 16px;
+            --space-lg: 24px;
+            --space-xl: 32px;
+            --space-2xl: 48px;
+            
+            /* Borders and Shadows */
             --border-radius: 8px;
-            --spacing-sm: 8px;
-            --spacing-md: 16px;
-            --spacing-lg: 24px;
+            --border-radius-sm: 6px;
+            --border-radius-lg: 12px;
+            --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.15);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
 
         body {
             font-family: var(--font-family);
-            margin: 0;
-            padding: 20px;
-            background-color: var(--color-gray-100);
+            font-size: var(--font-size-base);
+            line-height: var(--line-height);
+            color: var(--text-primary);
+            background-color: var(--bg-light);
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            padding: var(--space-lg);
         }
 
         .container {
             max-width: 1000px;
             margin: 0 auto;
-            background-color: var(--color-white);
-            padding: var(--spacing-lg);
+            background-color: var(--bg-white);
+            padding: var(--space-xl);
             border-radius: var(--border-radius);
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            border: 1px solid var(--border-strong);
+            box-shadow: var(--shadow-sm);
         }
 
         h1, h2, h3 {
-            margin-top: 0;
+            color: var(--text-primary);
+            font-weight: var(--font-weight-bold);
+            line-height: 1.2;
+            margin-bottom: var(--space-md);
         }
 
+        h1 { font-size: var(--font-size-2xl); }
+        h2 { font-size: var(--font-size-xl); }
+        h3 { font-size: var(--font-size-lg); }
+
         .form-group {
-            margin-bottom: var(--spacing-md);
+            margin-bottom: var(--space-md);
         }
 
         label {
             display: block;
-            margin-bottom: var(--spacing-sm);
-            font-weight: 500;
+            margin-bottom: var(--space-sm);
+            font-weight: var(--font-weight-medium);
+            color: var(--text-primary);
         }
 
         input[type="text"],
@@ -59,11 +120,23 @@
         input[type="datetime-local"],
         input[type="number"] {
             width: 100%;
-            padding: 10px;
-            border: 1px solid var(--color-gray-300);
-            border-radius: 4px;
+            padding: var(--space-sm) 0;
+            border: none;
+            border-bottom: 1px solid var(--border-color);
+            border-radius: 0;
             font-family: inherit;
-            box-sizing: border-box;
+            font-size: var(--font-size-base);
+            color: var(--text-primary);
+            background-color: transparent;
+            transition: border-color 0.2s ease;
+        }
+
+        input[type="text"]:focus,
+        textarea:focus,
+        input[type="datetime-local"]:focus,
+        input[type="number"]:focus {
+            outline: none;
+            border-bottom-color: var(--accent-teal);
         }
 
         textarea {
@@ -74,98 +147,106 @@
         .btn {
             display: inline-flex;
             align-items: center;
-            gap: 8px;
-            padding: 10px 15px;
-            border-radius: 4px;
-            font-size: 14px;
-            font-weight: 500;
+            gap: var(--space-sm);
+            padding: var(--space-sm) var(--space-md);
+            border-radius: var(--border-radius);
+            font-size: var(--font-size-sm);
+            font-weight: var(--font-weight-medium);
             cursor: pointer;
-            border: none;
+            border: 1px solid var(--border-strong);
             transition: all 0.2s ease;
+            background-color: var(--bg-white);
+            color: var(--text-primary);
         }
 
-        .btn-green {
-            background-color: var(--color-green);
-            color: var(--color-white);
+        .btn:hover {
+            background-color: var(--accent-teal);
+            color: var(--bg-white);
+            border-color: var(--accent-teal);
+            transform: translateY(-2px);
         }
 
-        .btn-green:hover {
-            background-color: var(--color-green-dark);
+        .btn-primary {
+            background-color: black;
+            color: var(--bg-white);
+            border-color: var(--accent-teal);
         }
 
-        .btn-blue {
-            background-color: var(--color-blue);
-            color: var(--color-white);
+        .btn-primary:hover {
+            background-color: black;
+            border-color: var(--accent-teal-dark);
         }
 
-        .btn-blue:hover {
-            background-color: var(--color-blue-dark);
+        .btn-danger {
+            background-color: var(--alert-red);
+            color: var(--bg-white);
+            border-color: var(--alert-red);
         }
 
-        .btn-red {
-            background-color: var(--color-red);
-            color: var(--color-white);
-        }
-
-        .btn-red:hover {
-            background-color: #bd2130;
+        .btn-danger:hover {
+            background-color: var(--alert-red-light);
+            color: var(--alert-red);
+            border-color: var(--alert-red);
         }
 
         .import-export-actions {
             display: flex;
-            gap: 15px;
-            margin-bottom: 20px;
+            gap: var(--space-md);
+            margin-bottom: var(--space-lg);
             align-items: center;
             flex-wrap: wrap;
         }
 
         .questions-container {
-            margin-top: var(--spacing-lg);
+            margin-top: var(--space-xl);
         }
 
         .question-card {
-            border: 1px solid var(--color-gray-300);
+            border: 1px solid var(--border-strong);
             border-radius: var(--border-radius);
-            padding: var(--spacing-md);
-            margin-bottom: var(--spacing-md);
-            background-color: var(--color-white);
+            padding: var(--space-lg);
+            margin-bottom: var(--space-md);
+            background-color: var(--bg-white);
         }
 
         .question-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: var(--spacing-sm);
+            margin-bottom: var(--space-md);
         }
 
         .question-type-selector {
-            margin-bottom: var(--spacing-md);
+            margin-bottom: var(--space-md);
             display: flex;
-            gap: var(--spacing-sm);
+            gap: var(--space-sm);
         }
 
         .question-type-selector button {
-            padding: 8px 16px;
-            border: 1px solid var(--color-black);
-            border-radius: 4px;
-            background-color: var(--color-white);
+            padding: var(--space-sm) var(--space-md);
+            border: 1px solid var(--border-strong);
+            border-radius: var(--border-radius);
+            background-color: var(--bg-white);
+            color: var(--text-primary);
             cursor: pointer;
+            font-weight: var(--font-weight-medium);
+            transition: all 0.2s ease;
         }
 
         .question-type-selector button.active {
-            background-color: var(--color-black);
-            color: var(--color-white);
+            background-color: var(--text-primary);
+            color: var(--bg-white);
         }
 
         .options-list {
-            margin-top: var(--spacing-md);
+            margin-top: var(--space-md);
         }
 
         .option-item {
             display: flex;
             align-items: center;
-            margin-bottom: var(--spacing-sm);
-            gap: var(--spacing-sm);
+            margin-bottom: var(--space-sm);
+            gap: var(--space-sm);
         }
 
         .option-item input[type="text"] {
@@ -173,8 +254,8 @@
         }
 
         .remove-btn {
-            background-color: var(--color-red);
-            color: var(--color-white);
+            background-color: var(--alert-red);
+            color: var(--bg-white);
             border: none;
             width: 28px;
             height: 28px;
@@ -183,14 +264,21 @@
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            font-size: 16px;
+            font-size: var(--font-size-lg);
             padding: 0;
+            transition: all 0.2s ease;
+        }
+
+        .remove-btn:hover {
+            background-color: var(--alert-red-light);
+            color: var(--alert-red);
+            transform: scale(1.1);
         }
 
         .actions {
             display: flex;
             justify-content: space-between;
-            margin-top: var(--spacing-md);
+            margin-top: var(--space-md);
         }
 
         .toggle-switch {
@@ -198,7 +286,7 @@
             display: inline-block;
             width: 46px;
             height: 24px;
-            margin-right: 10px;
+            margin-right: var(--space-sm);
         }
 
         .toggle-switch input {
@@ -214,7 +302,7 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background-color: #ccc;
+            background-color: var(--border-color);
             transition: .4s;
             border-radius: 24px;
         }
@@ -226,13 +314,13 @@
             width: 18px;
             left: 3px;
             bottom: 3px;
-            background-color: white;
+            background-color: var(--bg-white);
             transition: .4s;
             border-radius: 50%;
         }
 
         input:checked + .toggle-slider {
-            background-color: var(--color-black);
+            background-color: var(--accent-teal);
         }
 
         input:checked + .toggle-slider:before {
@@ -242,155 +330,403 @@
         .multiple-answer-toggle {
             display: flex;
             align-items: center;
-            margin-bottom: var(--spacing-md);
+            margin-bottom: var(--space-md);
         }
 
         .notification {
-            padding: 10px 15px;
-            border-radius: 4px;
-            margin-bottom: 15px;
+            padding: var(--space-sm) var(--space-md);
+            border-radius: var(--border-radius);
+            margin-bottom: var(--space-md);
+            animation: slideInUp 0.3s ease;
         }
 
         .notification.success {
-            background-color: rgba(76, 175, 80, 0.1);
-            border: 1px solid rgba(76, 175, 80, 0.2);
-            color: var(--color-green);
+            background-color: var(--success-green-light);
+            border: 1px solid var(--success-green);
+            color: var(--success-green);
         }
 
         .notification.error {
-            background-color: rgba(220, 53, 69, 0.1);
-            border: 1px solid rgba(220, 53, 69, 0.2);
-            color: var(--color-red);
+            background-color: var(--alert-red-light);
+            border: 1px solid var(--alert-red);
+            color: var(--alert-red);
         }
 
         .hidden {
             display: none;
         }
+
+        @keyframes slideInUp {
+            from {
+                transform: translateY(20px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        /* Back to top button */
+        .back-to-top {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: black;
+            color: var(--bg-white);
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            cursor: pointer;
+            opacity: 0;
+            transition: opacity 0.3s, transform 0.3s;
+            border: 1px solid var(--border-strong);
+            box-shadow: var(--shadow-sm);
+            z-index: 1000;
+            transform: translateY(20px);
+        }
+        
+        .back-to-top.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .back-to-top:hover {
+            background-color: var(--accent-teal-dark);
+            transform: translateY(-5px);
+        }
+
+        @media (max-width: 640px) {
+            body {
+                padding: var(--space-md);
+            }
+
+            .container {
+                padding: var(--space-lg);
+            }
+
+            .import-export-actions {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .btn {
+                width: 35%;
+                justify-content: center;
+            }
+        }
+
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--space-lg);
+            padding: var(--space-md) 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .top-bar-left {
+            display: flex;
+            gap: var(--space-md);
+        }
+        .top-bar-right {
+            display: flex;
+            gap: var(--space-md);
+        }
+        .main-layout {
+            display: grid;
+            grid-template-columns: 1fr;
+            grid-template-rows: auto auto;
+            gap: var(--space-lg);
+        }
+        .card {
+            background: var(--bg-white);
+            border: 1px solid var(--border-strong);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-sm);
+            padding: var(--space-xl);
+        }
+        @media (max-width: 768px) {
+            .main-layout {
+                grid-template-columns: 1fr;
+            }
+        }
+        .btn-green {
+            background-color: var(--success-green);
+            color: var(--bg-white);
+            border-color: var(--success-green);
+        }
+        .btn-green:hover {
+            background-color: var(--bg-white);
+            color: #000;
+            border-color: var(--success-green);
+        }
+        .btn-black {
+            background-color: #000;
+            color: #fff;
+            border-color: #000;
+        }
+        .btn-black:hover {
+            background-color: var(--bg-white);
+            color: #000;
+            border-color: #000;
+        }
+        .btn-secondary {
+            background-color: var(--bg-white);
+            color: #000;
+            border-color: #000;
+        }
+        .btn-secondary:hover {
+            background-color: #000;
+            color: #fff;
+            border-color: #000;
+        }
+        .btn-red {
+            background-color: var(--alert-red);
+            color: var(--bg-white);
+            border-color: var(--alert-red);
+        }
+        .btn-red:hover {
+            background-color: var(--bg-white);
+            color: #000;
+            border-color: #000;
+        }
+        
+        .btn-large {
+            padding: var(--space-md) var(--space-xl);
+            font-size: var(--font-size-lg);
+            font-weight: var(--font-weight-bold);
+            min-height: 50px;
+        }
+        
+        .no-questions-placeholder {
+            background-color: #000;
+            color: #fff;
+            text-align: center;
+            padding: var(--space-2xl);
+            margin-top: var(--space-lg);
+            border-radius: var(--border-radius);
+            font-size: var(--font-size-base);
+        }
+        
+        .no-questions-placeholder p {
+            margin: 0;
+        }
+        
+        /* Toast notification styles */
+        .toast-container {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 10000;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .toast {
+            background-color: var(--alert-red);
+            color: white;
+            padding: var(--space-xl);
+            border-radius: var(--border-radius-lg);
+            margin-bottom: var(--space-md);
+            box-shadow: var(--shadow-lg);
+            animation: slideInCenter 0.3s ease;
+            min-width: 400px;
+            max-width: 600px;
+            font-size: var(--font-size-lg);
+            font-weight: var(--font-weight-medium);
+            text-align: center;
+            line-height: 1.6;
+        }
+        
+        .toast.success {
+            background-color: var(--success-green);
+        }
+        
+        .toast.warning {
+            background-color: #ff9800;
+        }
+        
+        @keyframes slideInCenter {
+            from {
+                transform: translateY(-30px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Exam Creator</h1>
-        
-        <div id="notifications"></div>
-        
-        <div class="import-export-actions">
-            <button id="exportBtn" class="btn btn-green">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-                    <path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/>
-                    <path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z"/>
-                </svg>
-                Export Exam
-            </button>
-            <button id="importBtn" class="btn btn-blue">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-                    <path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/>
-                    <path d="M7.646 1.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 2.707V11.5a.5.5 0 0 1-1 0V2.707L5.354 4.854a.5.5 0 1 1-.708-.708l3-3z"/>
-                </svg>
-                Import Exam
-            </button>
-            <input type="file" id="importFile" accept=".json" style="display:none;">
+    <div class="top-bar">
+        <div class="top-bar-left">
+            <button id="exportBtn" class="btn btn-green">Export Exam</button>
+            <button id="importBtn" class="btn btn-black">Import Exam</button>
+            <button id="resetBtn" class="btn btn-red">Reset Exam</button>
         </div>
-
-        <div class="exam-details">
-            <h2>Exam Details</h2>
-            <div class="form-group">
-                <label for="examTitle">Title <span style="color: red;">*</span></label>
-                <input type="text" id="examTitle" placeholder="Enter exam title" required>
-            </div>
-            <div class="form-group">
-                <label for="examDescription">Description</label>
-                <textarea id="examDescription" placeholder="Enter exam description (optional)"></textarea>
-            </div>
-            <div class="form-group">
-                <label for="examDueDate">Due Date</label>
-                <input type="datetime-local" id="examDueDate">
-            </div>
-        </div>
-
-        <div class="questions-container">
-            <h2>Questions</h2>
-            <div id="questionsList"></div>
-            
-            <button id="addQuestionBtn" class="btn btn-blue">Add New Question</button>
+        <div class="top-bar-right">
+            <!-- Download Offline Creator button removed -->
         </div>
     </div>
-
-    <!-- Question Template (Hidden) -->
-    <template id="questionTemplate">
-        <div class="question-card">
-            <div class="question-header">
-                <h3>Question <span class="question-number"></span></h3>
-                <button class="btn btn-red remove-question-btn">Remove</button>
-            </div>
-            
-            <div class="question-type-selector">
-                <button type="button" class="type-btn active" data-type="mcq">Multiple Choice</button>
-                <button type="button" class="type-btn" data-type="identification">Identification</button>
-            </div>
-            
-            <div class="form-group">
-                <label for="question-text">Question Text <span style="color: red;">*</span></label>
-                <textarea class="question-text" placeholder="Enter your question"></textarea>
-            </div>
-            
-            <div class="multiple-answer-toggle">
-                <label class="toggle-switch">
-                    <input type="checkbox" class="allow-multiple">
-                    <span class="toggle-slider"></span>
-                </label>
-                <span>Allow multiple correct answers</span>
-            </div>
-            
-            <div class="mcq-options">
-                <label>Options <span style="color: red;">*</span></label>
-                <div class="options-list">
-                    <!-- Options will be added here -->
+    <div class="main-layout">
+        <!-- Create New Exam -->
+        <div class="card">
+            <h2>Create New Exam</h2>
+            <div class="exam-details">
+                <div class="form-group">
+                    <label for="examTitle">Title <span style="color: var(--alert-red);">*</span></label>
+                    <input type="text" id="examTitle" placeholder="Enter exam title" required>
                 </div>
-                <button type="button" class="btn btn-blue add-option-btn">Add Option</button>
-            </div>
-            
-            <div class="identification-answer hidden">
-                <label>Correct Answer <span style="color: red;">*</span></label>
-                <div class="single-answer">
-                    <input type="text" class="correct-answer" placeholder="Enter the correct answer">
+                <div class="form-group">
+                    <label for="examDescription">Description</label>
+                    <textarea id="examDescription" placeholder="Enter exam description (optional)"></textarea>
                 </div>
-                <div class="multiple-answers hidden">
-                    <div class="multiple-answers-list">
-                        <div class="option-item">
-                            <input type="text" class="multiple-answer" placeholder="Enter a correct answer">
-                            <button type="button" class="remove-btn">×</button>
-                        </div>
-                    </div>
-                    <button type="button" class="btn btn-blue add-answer-btn">Add Another Answer</button>
+                <div class="form-group">
+                    <label for="examDueDate">Due Date</label>
+                    <input type="datetime-local" id="examDueDate" min="">
+                    <small style="color: var(--text-secondary); font-size: var(--font-size-sm); margin-top: var(--space-xs); display: block;">
+                        Students won't be able to access the exam after this date and time
+                    </small>
                 </div>
-            </div>
-            
-            <div class="form-group">
-                <label for="points">Points</label>
-                <input type="number" class="question-points" min="1" value="1">
             </div>
         </div>
-    </template>
+        
+        <!-- Exam Questions -->
+        <div class="card">
+            <h2>Exam Questions</h2>
+            <div id="questionsList"></div>
+            <div id="noQuestionsPlaceholder" class="no-questions-placeholder">
+                <p>No questions added yet.</p>
+            </div>
+            <div style="text-align: center; margin-top: var(--space-lg);">
+                <button id="addQuestionBtnBottom" class="btn btn-primary btn-large">Add New Question</button>
+            </div>
+            
+            <!-- Question Template (Hidden) -->
+            <template id="questionTemplate">
+                <div class="question-card">
+                    <div class="question-header">
+                        <h3>Question <span class="question-number"></span></h3>
+                        <button class="btn btn-danger remove-question-btn">Remove</button>
+                    </div>
+                    
+                    <div class="question-type-selector">
+                        <button type="button" class="type-btn active" data-type="mcq">Multiple Choice</button>
+                        <button type="button" class="type-btn" data-type="identification">Identification</button>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="question-text">Question Text <span style="color: var(--alert-red);">*</span></label>
+                        <textarea class="question-text" placeholder="Enter your question"></textarea>
+                    </div>
+                    
+                    <div class="multiple-answer-toggle">
+                        <label class="toggle-switch">
+                            <input type="checkbox" class="allow-multiple">
+                            <span class="toggle-slider"></span>
+                        </label>
+                        <span>Allow multiple correct answers</span>
+                    </div>
+                    
+                    <div class="mcq-options">
+                        <label>Options <span style="color: var(--alert-red);">*</span></label>
+                        <div class="options-list">
+                            <!-- Options will be added here -->
+                        </div>
+                        <button type="button" class="btn btn-primary add-option-btn">Add Option</button>
+                    </div>
+                    
+                    <div class="identification-answer hidden">
+                        <label>Correct Answer <span style="color: var(--alert-red);">*</span></label>
+                        <div class="single-answer">
+                            <input type="text" class="correct-answer" placeholder="Enter the correct answer">
+                        </div>
+                        <div class="multiple-answers hidden">
+                            <div class="multiple-answers-list">
+                                <div class="option-item">
+                                    <input type="text" class="multiple-answer" placeholder="Enter a correct answer">
+                                    <button type="button" class="remove-btn">×</button>
+                                </div>
+                            </div>
+                            <button type="button" class="btn btn-primary add-answer-btn">Add Another Answer</button>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="points">Points</label>
+                        <input type="number" class="question-points" min="1" value="1">
+                    </div>
+                </div>
+            </template>
+        </div>
+    </div>
+    <input type="file" id="importFile" accept=".json,application/json,.html,text/html" style="display:none;">
+    <div id="notifications"></div>
+    <div id="toastContainer" class="toast-container"></div>
+    <button id="backToTop" class="back-to-top" title="Back to top">↑</button>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             let questions = [];
             let questionCounter = 0;
             
+            // Back to top functionality
+            const backToTopButton = document.getElementById('backToTop');
+            
+            window.addEventListener('scroll', () => {
+                if (window.scrollY > 300) {
+                    backToTopButton.classList.add('visible');
+                } else {
+                    backToTopButton.classList.remove('visible');
+                }
+            });
+            
+            backToTopButton.addEventListener('click', () => {
+                window.scrollTo({
+                    top: 0,
+                    behavior: 'smooth'
+                });
+            });
+            
             // DOM Elements
             const examTitle = document.getElementById('examTitle');
             const examDescription = document.getElementById('examDescription');
             const examDueDate = document.getElementById('examDueDate');
             const questionsList = document.getElementById('questionsList');
-            const addQuestionBtn = document.getElementById('addQuestionBtn');
+            const addQuestionBtnBottom = document.getElementById('addQuestionBtnBottom');
             const exportBtn = document.getElementById('exportBtn');
             const importBtn = document.getElementById('importBtn');
             const importFile = document.getElementById('importFile');
             const notificationsDiv = document.getElementById('notifications');
+            const resetBtn = document.getElementById('resetBtn');
+            const noQuestionsPlaceholder = document.getElementById('noQuestionsPlaceholder');
+            
+            // Helper function to format date for datetime-local input
+            function formatDateForLocalInput(dateString) {
+                if (!dateString) return '';
+                
+                const date = new Date(dateString);
+                const year = date.getFullYear();
+                const month = String(date.getMonth() + 1).padStart(2, '0');
+                const day = String(date.getDate()).padStart(2, '0');
+                const hours = String(date.getHours()).padStart(2, '0');
+                const minutes = String(date.getMinutes()).padStart(2, '0');
+                
+                return `${year}-${month}-${day}T${hours}:${minutes}`;
+            }
+            
+            // Set minimum date for due date input to current date/time
+            examDueDate.min = new Date().toISOString().slice(0, 16);
             
             // Add a new question
-            addQuestionBtn.addEventListener('click', addNewQuestion);
+            addQuestionBtnBottom.addEventListener('click', addNewQuestion);
             
             // Export exam
             exportBtn.addEventListener('click', exportExam);
@@ -402,8 +738,51 @@
             
             importFile.addEventListener('change', importExam);
             
-            // Add first question by default
-            addNewQuestion();
+            // Reset exam
+            resetBtn.addEventListener('click', function() {
+                examTitle.value = '';
+                examDescription.value = '';
+                examDueDate.value = '';
+                questions = [];
+                questionsList.innerHTML = '';
+                questionCounter = 0;
+                updatePlaceholderVisibility();
+                showNotification('Exam has been reset.', 'success');
+            });
+            
+            // Update placeholder visibility initially
+            updatePlaceholderVisibility();
+            
+            // Store previous valid values for inputs
+            const previousValidValues = new Map();
+            
+            // --- GLOBAL DUPLICATE CHECK ON INPUT ---
+            document.addEventListener('input', (e) => {
+                if (e.target.classList.contains('option-text') ||
+                    e.target.classList.contains('multiple-answer')) {
+                    const input = e.target;
+                    const questionCard = input.closest('.question-card');
+                    
+                    // Store the previous valid value if this is the first time
+                    if (!previousValidValues.has(input)) {
+                        previousValidValues.set(input, '');
+                    }
+                    
+                    // Check for duplicates and handle accordingly
+                    const isValid = preventDuplicateEntry(input, questionCard);
+                    if (isValid) {
+                        // Store this as the new valid value
+                        previousValidValues.set(input, input.value);
+                    } else {
+                        // Restore the previous valid value
+                        const previousValue = previousValidValues.get(input) || '';
+                        input.value = previousValue;
+                        
+                        // Update the questions array with the previous valid value
+                        updateQuestionDataWithValue(input, questionCard, previousValue);
+                    }
+                }
+            });
             
             function addNewQuestion() {
                 questionCounter++;
@@ -444,6 +823,9 @@
                     correctAnswerList: [],
                     points: 1
                 });
+                
+                // Update placeholder visibility
+                updatePlaceholderVisibility();
             }
             
             function setupQuestionCardEvents(card) {
@@ -473,6 +855,14 @@
                         const questionIndex = questions.findIndex(q => q.id === questionId);
                         if (questionIndex !== -1) {
                             questions[questionIndex].type = type;
+                            // Reset allow-multiple toggle
+                            const multipleAnswersToggle = card.querySelector('.allow-multiple');
+                            multipleAnswersToggle.checked = false;
+                            questions[questionIndex].allowMultipleAnswers = false;
+                            // Trigger change event to update UI
+                            multipleAnswersToggle.dispatchEvent(new Event('change'));
+                            
+                            // No need to check for duplicates on type change since it's handled on input
                         }
                     });
                 });
@@ -500,10 +890,27 @@
                             if (isMultiple) {
                                 singleAnswer.classList.add('hidden');
                                 multipleAnswers.classList.remove('hidden');
+                                
+                                // Initialize correctAnswerList with empty string for the default field
+                                if (!Array.isArray(questions[questionIndex].correctAnswerList)) {
+                                    questions[questionIndex].correctAnswerList = [''];
+                                }
+                                
+                                // Add input event listener to the default field if it exists
+                                const defaultAnswerInput = multipleAnswers.querySelector('.multiple-answer');
+                                if (defaultAnswerInput) {
+                                    defaultAnswerInput.addEventListener('input', () => {
+                                        questions[questionIndex].correctAnswerList[0] = defaultAnswerInput.value;
+                                    });
+                                }
                             } else {
                                 singleAnswer.classList.remove('hidden');
                                 multipleAnswers.classList.add('hidden');
+                                // Clear the correctAnswerList when switching back to single answer
+                                questions[questionIndex].correctAnswerList = [];
                             }
+                            
+                            // No need to check for duplicates on toggle change since it's handled on input
                         }
                     }
                 });
@@ -581,6 +988,9 @@
                         
                         // Update question numbers
                         updateQuestionNumbers();
+                        
+                        // Update placeholder visibility
+                        updatePlaceholderVisibility();
                     }
                 });
             }
@@ -785,6 +1195,84 @@
                 questionCounter = questionCards.length;
             }
             
+            function updatePlaceholderVisibility() {
+                const questionCards = questionsList.querySelectorAll('.question-card');
+                if (questionCards.length === 0) {
+                    noQuestionsPlaceholder.classList.remove('hidden');
+                } else {
+                    noQuestionsPlaceholder.classList.add('hidden');
+                }
+            }
+            
+            // Toast notification system
+            function showToast(message, type = 'error') {
+                const toastContainer = document.getElementById('toastContainer');
+                const toast = document.createElement('div');
+                toast.className = `toast ${type}`;
+                toast.textContent = message;
+                
+                toastContainer.appendChild(toast);
+                
+                // Auto remove after 3 seconds
+                setTimeout(() => {
+                    if (toast.parentNode) {
+                        toast.parentNode.removeChild(toast);
+                    }
+                }, 3000);
+            }
+            
+            // Helper function to update question data with a specific value
+            function updateQuestionDataWithValue(input, questionCard, value) {
+                const qid = questionCard?.dataset.id;
+                const qi = questions.findIndex(q => q.id === qid);
+                if (qi === -1) return;
+                
+                if (questions[qi].type === 'mcq') {
+                    const idx = Array.from(questionCard.querySelectorAll('.option-text')).indexOf(input);
+                    if (idx > -1) questions[qi].options[idx] = value;
+                } else if (questions[qi].type === 'identification' && questions[qi].allowMultipleAnswers) {
+                    const idx = Array.from(questionCard.querySelectorAll('.multiple-answer')).indexOf(input);
+                    if (idx > -1 && Array.isArray(questions[qi].correctAnswerList)) {
+                        questions[qi].correctAnswerList[idx] = value;
+                    }
+                }
+            }
+            
+            function preventDuplicateEntry(input, questionCard) {
+                const qid = questionCard?.dataset.id;
+                const qi = questions.findIndex(q => q.id === qid);
+                if (qi === -1) return true;
+
+                const val = input.value.trim(); // Removed .toLowerCase() to make it case-sensitive
+                if (!val) return true;
+
+                let others = [];
+                if (questions[qi].type === 'mcq') {
+                    others = Array.from(questionCard.querySelectorAll('.option-text'))
+                                   .filter(i => i !== input);
+                } else if (
+                    questions[qi].type === 'identification' &&
+                    questions[qi].allowMultipleAnswers
+                ) {
+                    others = Array.from(questionCard.querySelectorAll('.multiple-answer'))
+                                   .filter(i => i !== input);
+                }
+
+                if (others.some(o => o.value.trim() === val)) { // Removed .toLowerCase() for case-sensitive comparison
+                    // Show non-blocking toast notification instead of alert
+                    showToast(
+                        `This ${questions[qi].type === 'mcq' ? 'option' : 'answer'} already exists! ` +
+                        `Please enter a different ${questions[qi].type === 'mcq' ? 'option' : 'answer'}.`,
+                        'error'
+                    );
+                    
+                    // Return false to indicate the value should not be accepted
+                    // The calling code will restore the previous valid value
+                    return false;
+                }
+                return true;
+            }
+            
             function updateOptionNumbers(optionsList) {
                 const options = optionsList.querySelectorAll('.option-item');
                 options.forEach((option, index) => {
@@ -806,7 +1294,66 @@
                     return;
                 }
                 
-                // Prepare data for export
+                // Validate question content and correct answers
+                for (let i = 0; i < questions.length; i++) {
+                    const q = questions[i];
+                    const questionNum = i + 1;
+                    
+                    // Check if question text is empty
+                    if (!q.question || q.question.trim() === '') {
+                        showNotification(`Question ${questionNum}: Please enter question text before exporting`, 'error');
+                        return;
+                    }
+                    
+                    if (q.type === 'mcq') {
+                        // Check if all options are empty
+                        const hasEmptyOptions = q.options.some(option => !option || option.trim() === '');
+                        if (hasEmptyOptions) {
+                            showNotification(`Question ${questionNum}: Please fill in all option texts before exporting`, 'error');
+                            return;
+                        }
+                        
+                        // Check if no correct answer is selected
+                        if (q.allowMultipleAnswers) {
+                            if (!q.correctAnswerIndices || q.correctAnswerIndices.length === 0) {
+                                showNotification(`Question ${questionNum}: Please select at least one correct answer before exporting`, 'error');
+                                return;
+                            }
+                        } else {
+                            if (q.correctAnswerIndex === null || q.correctAnswerIndex === undefined) {
+                                showNotification(`Question ${questionNum}: Please select a correct answer before exporting`, 'error');
+                                return;
+                            }
+                        }
+                    } else if (q.type === 'identification') {
+                        // For identification questions
+                        if (q.allowMultipleAnswers) {
+                            if (!q.correctAnswerList || q.correctAnswerList.length === 0 || 
+                                q.correctAnswerList.every(answer => !answer || answer.trim() === '')) {
+                                showNotification(`Question ${questionNum}: Please provide at least one correct answer before exporting`, 'error');
+                                return;
+                            }
+                        } else {
+                            if (!q.correctAnswer || q.correctAnswer.trim() === '') {
+                                showNotification(`Question ${questionNum}: Please provide a correct answer before exporting`, 'error');
+                                return;
+                            }
+                        }
+                    }
+                }
+                
+                // Show warning confirmation
+                const confirmExport = confirm(
+                    `Warning: You are about to export the exam "${examTitle.value.trim()}" with ${questions.length} question(s).\n\n` +
+                    `This will download a JSON file to your device. Make sure all questions and answers are complete and correct before proceeding.\n\n` +
+                    `Do you want to continue with the export?`
+                );
+                
+                if (!confirmExport) {
+                    return;
+                }
+                
+                // Prepare data for export - match ExamBuilderComponent format
                 const exportData = {
                     version: '1.0',
                     exportDate: new Date().toISOString(),
@@ -815,7 +1362,7 @@
                         description: examDescription.value,
                         due_date: examDueDate.value ? new Date(examDueDate.value).toISOString() : null,
                         questions: questions.map(q => {
-                            // Format the question for export
+                            // Format the question for export - match ExamBuilderComponent format
                             let correctAnswer;
                             
                             if (q.type === 'mcq') {
@@ -855,7 +1402,7 @@
                 const url = URL.createObjectURL(blob);
                 const link = document.createElement('a');
                 
-                // Set download attributes
+                // Set download attributes - match ExamBuilderComponent format
                 link.href = url;
                 link.download = `exam_${examTitle.value.replace(/\s+/g, '_').toLowerCase()}.json`;
                 
@@ -881,8 +1428,11 @@
                 }
                 
                 // Check file type
-                if (file.type !== 'application/json' && !file.name.endsWith('.json')) {
-                    showNotification('Invalid file type. Please select a JSON file.', 'error');
+                const isJsonFile = file.type === 'application/json' || file.name.endsWith('.json');
+                const isHtmlFile = file.type === 'text/html' || file.name.endsWith('.html');
+                
+                if (!isJsonFile && !isHtmlFile) {
+                    showNotification('Invalid file type. Please select a JSON or HTML file.', 'error');
                     return;
                 }
                 
@@ -890,12 +1440,18 @@
                 
                 reader.onload = function(e) {
                     try {
-                        // Parse JSON
-                        const importData = JSON.parse(e.target.result);
-                        
-                        // Validate structure
-                        if (!importData.exam || !importData.version) {
-                            throw new Error('Invalid exam file format');
+                        // Parse JSON or HTML
+                        let importData;
+                        if (isJsonFile) {
+                            importData = JSON.parse(e.target.result);
+                            
+                            // Validate structure
+                            if (!importData.exam || !importData.version) {
+                                throw new Error('Invalid exam file format');
+                            }
+                        } else {
+                            // Parse HTML content
+                            importData = parseHtmlExam(e.target.result);
                         }
                         
                         // Clear current exam
@@ -905,6 +1461,7 @@
                         questions = [];
                         questionsList.innerHTML = '';
                         questionCounter = 0;
+                        updatePlaceholderVisibility();
                         
                         // Set exam details
                         examTitle.value = importData.exam.title || 'Imported Exam';
@@ -912,13 +1469,7 @@
                         
                         // Format and set date if available
                         if (importData.exam.due_date) {
-                            const dueDate = new Date(importData.exam.due_date);
-                            const year = dueDate.getFullYear();
-                            const month = String(dueDate.getMonth() + 1).padStart(2, '0');
-                            const day = String(dueDate.getDate()).padStart(2, '0');
-                            const hours = String(dueDate.getHours()).padStart(2, '0');
-                            const minutes = String(dueDate.getMinutes()).padStart(2, '0');
-                            examDueDate.value = `${year}-${month}-${day}T${hours}:${minutes}`;
+                            examDueDate.value = formatDateForLocalInput(importData.exam.due_date);
                         }
                         
                         // Process questions
@@ -1040,6 +1591,9 @@
                             });
                         }
                         
+                        // Update placeholder visibility after import
+                        updatePlaceholderVisibility();
+                        
                         showNotification(`Imported exam "${examTitle.value}" with ${importData.exam.questions.length} questions`, 'success');
                     } catch (error) {
                         console.error('Error importing exam:', error);
@@ -1057,17 +1611,99 @@
                 event.target.value = null;
             }
             
+            // Function to parse exam data from HTML content
+            function parseHtmlExam(htmlContent) {
+                try {
+                    // Create a temporary DOM element to parse HTML
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(htmlContent, 'text/html');
+                    
+                    // Extract exam title from the document title or a specific element
+                    const title = doc.querySelector('title')?.textContent || 
+                                doc.querySelector('h1')?.textContent || 
+                                'Imported HTML Exam';
+                                
+                    // Initialize empty exam structure
+                    const exam = {
+                        exam: {
+                            title: title,
+                            description: 'Imported from HTML file',
+                            questions: []
+                        },
+                        version: "1.0"
+                    };
+                    
+                    // Look for question containers
+                    const questionContainers = doc.querySelectorAll('.question, .exam-question, .test-question');
+                    
+                    questionContainers.forEach((container, index) => {
+                        // Extract question text
+                        const questionText = container.querySelector('.question-text, .question-content')?.textContent.trim() || 
+                                          container.textContent.trim();
+                        
+                        // Try to determine question type
+                        let type = 'mcq';
+                        if (container.classList.contains('identification') || 
+                            container.classList.contains('short-answer')) {
+                            type = 'identification';
+                        }
+                        
+                        // Extract options for MCQ
+                        const options = [];
+                        if (type === 'mcq') {
+                            container.querySelectorAll('.option, .answer-choice').forEach(opt => {
+                                options.push(opt.textContent.trim());
+                            });
+                        }
+                        
+                        // Extract correct answer(s)
+                        let correctAnswer = '';
+                        let allowMultipleAnswers = false;
+                        
+                        if (type === 'mcq') {
+                            const correctOptions = container.querySelectorAll('.correct, .right-answer');
+                            if (correctOptions.length > 1) {
+                                allowMultipleAnswers = true;
+                                correctAnswer = Array.from(correctOptions).map(opt => opt.textContent.trim());
+                            } else if (correctOptions.length === 1) {
+                                correctAnswer = correctOptions[0].textContent.trim();
+                            }
+                        } else {
+                            // For identification questions
+                            const answers = container.querySelectorAll('.answer, .correct-answer');
+                            if (answers.length > 1) {
+                                allowMultipleAnswers = true;
+                                correctAnswer = Array.from(answers).map(ans => ans.textContent.trim());
+                            } else if (answers.length === 1) {
+                                correctAnswer = answers[0].textContent.trim();
+                            }
+                        }
+                        
+                        // Extract points if available
+                        const pointsMatch = container.textContent.match(/points?:?\s*(\d+)/i);
+                        const points = pointsMatch ? parseInt(pointsMatch[1]) : 1;
+                        
+                        // Add question to exam
+                        exam.exam.questions.push({
+                            type,
+                            question_text: questionText,
+                            options: type === 'mcq' ? options : null,
+                            correct_answer: correctAnswer,
+                            points,
+                            allow_multiple_answers: allowMultipleAnswers
+                        });
+                    });
+                    
+                    return exam;
+                } catch (error) {
+                    console.error('Error parsing HTML exam:', error);
+                    throw new Error('Failed to parse HTML exam: ' + error.message);
+                }
+            }
+            
             function showNotification(message, type = 'success') {
-                const notification = document.createElement('div');
-                notification.className = `notification ${type}`;
-                notification.textContent = message;
-                
-                notificationsDiv.appendChild(notification);
-                
-                // Remove notification after 5 seconds
-                setTimeout(() => {
-                    notification.remove();
-                }, 5000);
+                // Use the same toast system for consistency
+                showToast(message, type);
             }
         });
     </script>

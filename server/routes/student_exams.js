@@ -600,12 +600,7 @@ router.post("/results/:examId/recheck-request", authorize, async (req, res) => {
             course_id: courseId,
             submission_id: submissionId,
             type: 'exam_recheck',
-            redirect_url: `/courses/${courseId}/exams`,
-            state: { 
-              activeTab: 'grading', 
-              examId: examId,
-              submissionId: submissionId
-            }
+            redirect_url: `/courses/${courseId}/exams?view=grading&examId=${examId}&submissionId=${submissionId}`
           }
         );
       }
@@ -663,6 +658,38 @@ router.get("/results/:examId/recheck-reason", authorize, async (req, res) => {
     return res.json({ reason: "No reason found" });
   } catch (err) {
     console.error("Get recheck reason error:", err.message);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
+// Get student's exam submissions for a specific course
+router.get("/submissions/:courseId", authorize, async (req, res) => {
+  try {
+    const { courseId } = req.params;
+    const studentId = req.user.id;
+
+    // Check if student is enrolled in this course
+    const enrollment = await pool.query(
+      "SELECT * FROM enrollment WHERE course_id = $1 AND student_id = $2",
+      [courseId, studentId]
+    );
+
+    if (enrollment.rows.length === 0) {
+      return res.status(403).json({ error: "You are not enrolled in this course." });
+    }
+
+    // Get all exam submissions for this student in this course
+    const submissions = await pool.query(
+      `SELECT es.* 
+       FROM exam_submission es
+       JOIN exam e ON es.exam_id = e.exam_id
+       WHERE e.course_id = $1 AND es.student_id = $2`,
+      [courseId, studentId]
+    );
+
+    res.json(submissions.rows);
+  } catch (err) {
+    console.error("Error fetching student exam submissions:", err.message);
     res.status(500).json({ error: "Server error" });
   }
 });

@@ -11,7 +11,8 @@ import {
     HiOutlineX,
     HiOutlineArrowLeft,
     HiOutlineArrowRight,
-    HiOutlineAcademicCap
+    HiOutlineAcademicCap,
+    HiOutlineClipboardList
 } from 'react-icons/hi';
 import './dashboard.css';
 
@@ -139,6 +140,18 @@ const Sidebar = ({
                         <HiOutlineHome className="nav-icon" size={isCollapsed ? 28 : 20} />
                         {!isCollapsed && <span>Dashboard</span>}
                     </Link>
+
+                    {/* To Do List Link - Only for students */}
+                    {userRole === 'student' && (
+                        <Link 
+                            to="/todo" 
+                            className={`nav-item ${activePath === '/todo' ? 'active' : ''}`}
+                            title="To Do List"
+                        >
+                            <HiOutlineClipboardList className="nav-icon" size={isCollapsed ? 28 : 20} />
+                            {!isCollapsed && <span>To Do List</span>}
+                        </Link>
+                    )}
 
                     {/* Courses Link with Submenu */}
                     {isCollapsed ? (

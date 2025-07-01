@@ -618,7 +618,40 @@ const Grading = ({ courseStatus = 'active', initialExamId = null, initialSubmiss
                 <div className="answer-content">
                   <div className="answer-column">
                     <div>
-                      <strong>Correct Answer:</strong> {answer.correct_answer}
+                      <strong>Correct Answer:</strong> {
+                        (() => {
+                          let correctAnswer = answer.correct_answer;
+                          
+                          // Handle array format
+                          if (Array.isArray(correctAnswer)) {
+                            return correctAnswer.map(item => 
+                              typeof item === 'string' ? item.replace(/"/g, '') : item
+                            ).join(', ');
+                          }
+                          
+                          // Handle string that looks like JSON array
+                          if (typeof correctAnswer === 'string') {
+                            try {
+                              // Try to parse as JSON if it looks like an array
+                              if (correctAnswer.startsWith('[') && correctAnswer.endsWith(']')) {
+                                const parsed = JSON.parse(correctAnswer);
+                                if (Array.isArray(parsed)) {
+                                  return parsed.map(item => 
+                                    typeof item === 'string' ? item.replace(/"/g, '') : item
+                                  ).join(', ');
+                                }
+                              }
+                              // Remove all quotes, brackets, braces, and clean up
+                              return correctAnswer.replace(/["'{}\[\]]/g, '').trim();
+                            } catch (e) {
+                              // If parsing fails, just clean up the string thoroughly
+                              return correctAnswer.replace(/["'{}\[\]]/g, '').trim();
+                            }
+                          }
+                          
+                          return correctAnswer;
+                        })()
+                      }
                     </div>
                   </div>
                   

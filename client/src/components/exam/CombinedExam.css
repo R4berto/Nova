@@ -211,10 +211,12 @@ p {
   margin-top: 0;
   box-shadow: var(--nova-card-shadow);
   flex: 1;
-  overflow-y: auto;
-  overflow-x: hidden;
   width: 100%;
   box-sizing: border-box;
+  /* Remove restrictive height/overflow */
+  height: auto;
+  min-height: 0;
+  overflow: visible;
 }
 
 /* Navigation Tabs */
@@ -273,7 +275,7 @@ p {
 .dashboard-container .course-main-area .exam-navbar {
   display: flex;
   gap: var(--nova-spacing-sm);
-  margin-bottom: var(--nova-spacing-xl);
+  margin-bottom: var(--nova-spacing-md);
   flex-wrap: wrap;
   border-bottom: var(--nova-border-width) solid var(--nova-color-gray-200);
   padding-bottom: var(--nova-spacing-md);
@@ -341,20 +343,55 @@ p {
 
 .exam-content {
   background-color: var(--nova-color-white);
-  border-radius: var(--nova-border-radius);
   padding: var(--nova-spacing-md);
   min-height: 300px;
-  border: var(--nova-border-width) solid var(--nova-color-black);
+  border-top: var(--nova-border-width) solid var(--nova-color-black);
+  border-right: none;
+  border-bottom: none;
+  border-left: none;
   display: flex;
   flex-direction: column;
   flex: 1;
-  overflow-y: auto;
-  overflow-x: hidden;
   width: 100%;
   box-sizing: border-box;
-  max-height: calc(100vh - 160px); /* Optimized for 1080p */
+  /* Remove max-height and overflow restrictions for dynamic growth */
+  max-height: none;
   height: auto;
-  position: relative; /* Ensure proper stacking */
+  overflow: visible;
+  position: relative;
+  /* Add margin-top to prevent border overlap with course-main-area */
+  margin-top: var(--nova-spacing-md);
+}
+
+@media (min-width: 769px) and (max-width: 1200px) {
+  .exam-content {
+    max-height: none;
+    height: auto;
+    overflow: visible;
+    margin-top: var(--nova-spacing-md);
+  }
+}
+
+@media (min-width: 1201px) {
+  .exam-content {
+    max-height: none;
+    height: auto;
+    overflow: visible;
+    margin-top: var(--nova-spacing-md);
+  }
+}
+
+@media (max-width: 480px) {
+  .exam-content {
+    padding: var(--nova-spacing-sm);
+    margin-top: var(--nova-spacing-sm);
+    margin-left: 0;
+    margin-right: 0;
+    margin-bottom: 0;
+    max-height: none;
+    height: auto;
+    overflow: visible;
+  }
 }
 
 /* ========== Exam Builder Styles ========== */
@@ -362,10 +399,10 @@ p {
   width: 100%;
   margin: 0;
   padding: 0;
-  height: auto; /* Changed from 100% to auto to accommodate content */
+  height: auto;
   display: flex;
   flex-direction: column;
-  overflow-y: auto; /* Changed from overflow: hidden to overflow-y: auto */
+  overflow: visible;
   box-sizing: border-box;
 }
 
@@ -385,44 +422,46 @@ p {
   display: flex;
   flex-direction: row;
   width: 100%;
-  height: auto; /* Auto height to accommodate content */
-  min-height: 600px; /* Taller minimum height for 1080p */
+  height: auto;
+  min-height: 100%;
   background-color: var(--nova-color-white);
   border-radius: var(--nova-border-radius);
   gap: var(--nova-spacing-lg);
-  overflow-y: auto;
+  overflow: visible;
   box-sizing: border-box;
   flex: 1;
+  align-items: stretch;
 }
 
 /* Left column for questions list */
 .questions-column {
   width: 35%;
-  border: var(--nova-border-width) solid var(--nova-color-black);
-  border-radius: var(--nova-border-radius);
-  overflow-y: auto;
+  border: none;
+  border-radius: 0;
   padding: var(--nova-spacing-lg);
   flex-shrink: 0;
   box-sizing: border-box;
   min-width: 0;
-  max-height: 800px; /* Increased max-height for 1080p */
+  min-height: 100%;
+  height: auto;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
 }
 
 /* Right column for exam form and question editor */
 .form-column {
   width: 65%;
+  border: none;
+  border-radius: 0;
   padding: var(--nova-spacing-lg);
-  padding-bottom: calc(var(--nova-spacing-lg) + 50px); /* Extra padding at bottom */
-  border: var(--nova-border-width) solid var(--nova-color-black);
-  border-radius: var(--nova-border-radius);
   display: flex;
   flex-direction: column;
-  position: relative;
-  overflow-y: auto;
   box-sizing: border-box;
   min-width: 0;
   flex: 1;
-  max-height: 800px; /* Increased max-height for 1080p */
+  height: auto;
+  gap: var(--nova-spacing-lg);
 }
 
 .questions-list {
@@ -551,11 +590,11 @@ p {
   background-color: var(--nova-color-white);
   padding: var(--nova-spacing-lg);
   border-radius: var(--nova-border-radius);
-  margin-bottom: var(--nova-spacing-lg);
   border: var(--nova-border-width) solid var(--nova-color-black);
-  position: relative;
   width: 100%;
   box-sizing: border-box;
+  margin: 0;
+  margin-bottom: var(--nova-spacing-md);
 }
 
 .question-form h3 {
@@ -750,13 +789,11 @@ p {
   background-color: var(--nova-color-white);
   padding: var(--nova-spacing-lg);
   border-radius: var(--nova-border-radius);
-  margin-bottom: var(--nova-spacing-md); /* Reduced from xl to md to save space */
   border: var(--nova-border-width) solid var(--nova-color-black);
   width: 100%;
-  position: relative;
-  overflow-y: visible;
   box-sizing: border-box;
-  padding-bottom: calc(var(--nova-spacing-lg) + 20px);
+  margin: 0;
+  margin-bottom: var(--nova-spacing-md);
 }
 
 .exam-details h3 {
@@ -2048,6 +2085,10 @@ input:checked + .toggle-slider:before {
   .course-main-area {
     padding: var(--nova-spacing-md);
   }
+  
+  .exam-content {
+    margin-top: var(--nova-spacing-md);
+  }
 
   .course-main-area .course-nav {
     overflow-x: auto;
@@ -2069,16 +2110,17 @@ input:checked + .toggle-slider:before {
 
   .exam-builder-container {
     height: auto;
-    overflow-y: visible;
+    overflow: visible;
     padding: var(--nova-spacing-sm);
   }
   
   .exam-builder-layout {
     flex-direction: column;
     height: auto;
-    min-height: auto;
+    min-height: 0;
     gap: var(--nova-spacing-md);
-    overflow-y: visible; /* Changed to ensure content is visible */
+    overflow: visible;
+    align-items: stretch;
   }
   
   .questions-column, 
@@ -2086,8 +2128,10 @@ input:checked + .toggle-slider:before {
     width: 100%;
     padding: var(--nova-spacing-md);
     min-height: 200px;
-    max-height: none; /* Remove max-height constraint on mobile */
-    overflow-y: visible;
+    max-height: none;
+    overflow: visible;
+    min-height: 0;
+    height: auto;
   }
   
   .questions-column {
@@ -2110,38 +2154,36 @@ input:checked + .toggle-slider:before {
   }
 }
 
-/* Additional breakpoint for medium screens to improve responsiveness */
 @media (min-width: 769px) and (max-width: 1200px) {
   .exam-builder-layout {
     min-height: 450px;
     height: auto;
-    overflow-y: auto;
+    overflow: visible;
+    align-items: stretch;
   }
-  
   .form-column,
   .questions-column {
-    max-height: 700px;
-    overflow-y: auto;
+    max-height: none;
+    overflow: visible;
+    min-height: 100%;
+    height: auto;
   }
-  
   .exam-content {
-    max-height: calc(100vh - 150px);
+    max-height: none;
   }
 }
 
-/* Adjustments for larger screens */
 @media (min-width: 1201px) {
   .exam-builder-layout {
     min-height: 600px;
+    align-items: stretch;
   }
-  
   .form-column,
   .questions-column {
-    max-height: 800px;
-  }
-  
-  .exam-content {
-    max-height: calc(100vh - 120px);
+    max-height: none;
+    min-height: 100%;
+    height: auto;
+    overflow: visible;
   }
 }
 
@@ -3348,10 +3390,35 @@ input:checked + .toggle-slider:before {
 
 .import-export-actions {
   display: flex;
-  gap: 15px;
+  gap: 10px;
   margin-bottom: 20px;
-  align-items: center;
   flex-wrap: wrap;
+  border-bottom: var(--nova-border-width) solid var(--nova-color-black);
+  padding-bottom: 30px;
+  align-items: center;
+}
+
+.left-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.right-actions {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+}
+
+.offline-creator-btn.rightmost {
+  background-color: #000000;
+  color: #ffffff;
+  border: none;
+  transition: background 0.2s, color 0.2s;
+}
+
+.offline-creator-btn.rightmost:hover:not(:disabled) {
+  background-color: #222222;
+  color: #ffffff;
 }
 
 .export-btn,
@@ -3419,17 +3486,12 @@ input:checked + .toggle-slider:before {
   width: 100%;
 }
 
-/* Add bottom margin to create space for the Create Exam button */
-.exam-details {
-  padding-bottom: var(--nova-spacing-xl);
-}
+/* Removed duplicate padding-bottom - consolidated with main .exam-details rule */
 
 /* Make sure create button is visible */
 .create-exam-btn {
   margin-top: var(--nova-spacing-md);
-  margin-bottom: var(--nova-spacing-md); /* Reduced from lg to md */
-  position: relative; /* Explicit positioning */
-  z-index: 1; /* Ensure it stays above other elements */
+  margin-bottom: var(--nova-spacing-md);
 }
 
 /* 1080p specific adjustments */
@@ -3440,11 +3502,13 @@ input:checked + .toggle-slider:before {
   
   .questions-column,
   .form-column {
-    max-height: 900px; /* Even taller for full 1080p */
+    height: auto; /* Allow natural height growth */
+    min-height: 0; /* Remove minimum height constraints */
   }
   
   .exam-content {
-    max-height: calc(100vh - 150px);
+    height: auto; /* Allow natural height growth */
+    max-height: none; /* Remove height constraints */
   }
 }
 
@@ -3456,11 +3520,13 @@ input:checked + .toggle-slider:before {
   
   .questions-column,
   .form-column {
-    max-height: 850px;
+    height: auto; /* Allow natural height growth */
+    min-height: 0; /* Remove minimum height constraints */
   }
   
   .exam-content {
-    max-height: calc(100vh - 160px);
+    height: auto; /* Allow natural height growth */
+    max-height: none; /* Remove height constraints */
   }
 }
 
@@ -3500,7 +3566,7 @@ input:checked + .toggle-slider:before {
 
 /* Ensure space at the bottom of the form area */
 .exam-details {
-  padding-bottom: calc(var(--nova-spacing-lg) + 20px);
+  padding-bottom: var(--nova-spacing-lg);
 }
 
 /* Space between form groups for better readability */
@@ -3511,7 +3577,8 @@ input:checked + .toggle-slider:before {
 /* 1080p specific form adjustments */
 @media screen and (min-height: 1080px) {
   .form-column {
-    max-height: 850px; /* Taller for 1080p */
+    height: auto; /* Allow natural height growth */
+    min-height: 0; /* Remove minimum height constraints */
   }
   
   .exam-details {
@@ -3558,4 +3625,31 @@ input:checked + .toggle-slider:before {
   background-color: #cccccc;
   color: #666666;
   cursor: not-allowed;
+}
+
+/* Add these styles at the end of the file */
+
+/* Required question indicator styles */
+.required-indicator {
+  display: inline-block;
+  margin-left: 8px;
+  color: #d32f2f;
+  font-size: 0.85em;
+  font-weight: 500;
+}
+
+/* Unanswered question card styles */
+.question-card.unanswered {
+  border-left: 4px solid #d32f2f;
+  background-color: rgba(211, 47, 47, 0.05);
+}
+
+/* Required notice styles */
+.required-notice {
+  margin-top: 12px;
+  padding: 12px;
+  background-color: rgba(211, 47, 47, 0.1);
+  border-radius: 4px;
+  color: #d32f2f;
+  font-weight: 500;
 }

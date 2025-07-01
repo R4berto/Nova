@@ -1,0 +1,624 @@
+/* ToDoList Component Styles */
+
+.todo-main-area {
+  padding: 24px;
+}
+
+.todo-header {
+  text-align: center;
+  margin-bottom: 32px;
+  padding: 24px 0;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.todo-header h1 {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin-bottom: 8px;
+}
+
+.todo-header p {
+  font-size: 1.1rem;
+  color: #666;
+  margin: 0;
+}
+
+.todo-loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 400px;
+}
+
+.todo-content {
+  margin-top: 24px;
+}
+
+/* Search and Sort Controls */
+.todo-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  margin-bottom: 24px;
+  padding: 16px 20px;
+  background: #f8f9fa;
+  border-radius: 8px;
+  border: 1px solid #e9ecef;
+  flex-wrap: wrap;
+}
+
+/* Search Controls */
+.search-container {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex: 1;
+  min-width: 250px;
+}
+
+.search-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.search-icon {
+  position: absolute;
+  left: 12px;
+  color: #6c757d;
+  font-size: 1.1rem;
+  z-index: 1;
+}
+
+.search-input {
+  width: 100%;
+  padding: 10px 12px 10px 40px;
+  border: 1px solid #dee2e6;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  background: white;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+}
+
+.search-input::placeholder {
+  color: #6c757d;
+}
+
+.clear-search-btn {
+  position: absolute;
+  right: 8px;
+  background: none;
+  border: none;
+  color: #6c757d;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  transition: color 0.2s ease, background-color 0.2s ease;
+}
+
+.clear-search-btn:hover {
+  color: #dc3545;
+  background: #f8f9fa;
+}
+
+.search-field-container {
+  position: relative;
+}
+
+.search-field-button {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 8px 12px;
+  background: white;
+  border: 1px solid #dee2e6;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  color: #495057;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.search-field-button:hover {
+  background: #f8f9fa;
+  border-color: #adb5bd;
+}
+
+.search-arrow {
+  transition: transform 0.2s ease;
+  font-size: 0.8rem;
+}
+
+.search-arrow.open {
+  transform: rotate(180deg);
+}
+
+.search-field-menu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: white;
+  border: 1px solid #dee2e6;
+  border-radius: 6px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  z-index: 1000;
+  margin-top: 4px;
+  overflow: hidden;
+}
+
+.search-field-option {
+  display: block;
+  width: 100%;
+  padding: 10px 12px;
+  background: none;
+  border: none;
+  text-align: left;
+  font-size: 0.8rem;
+  color: #495057;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.search-field-option:hover {
+  background: #f8f9fa;
+}
+
+.search-field-option.active {
+  background: #e3f2fd;
+  color: #1976d2;
+  font-weight: 500;
+}
+
+/* Sort Controls */
+.sort-container {
+  position: relative;
+}
+
+.sort-button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background: white;
+  border: 1px solid #dee2e6;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #495057;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.sort-button:hover {
+  background: #e9ecef;
+  border-color: #adb5bd;
+}
+
+.sort-button:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+}
+
+.sort-arrow {
+  transition: transform 0.2s ease;
+}
+
+.sort-arrow.open {
+  transform: rotate(180deg);
+}
+
+.sort-menu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: white;
+  border: 1px solid #dee2e6;
+  border-radius: 6px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  z-index: 1000;
+  margin-top: 4px;
+  overflow: hidden;
+}
+
+.sort-option {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 12px 16px;
+  background: none;
+  border: none;
+  text-align: left;
+  font-size: 0.9rem;
+  color: #495057;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.sort-option:hover {
+  background: #f8f9fa;
+}
+
+.sort-option.active {
+  background: #e3f2fd;
+  color: #1976d2;
+  font-weight: 500;
+}
+
+.sort-option svg {
+  color: #1976d2;
+  font-size: 1rem;
+}
+
+/* Results Info */
+.results-info {
+  font-size: 0.9rem;
+  color: #6c757d;
+  font-weight: 500;
+  white-space: nowrap;
+  margin-top: 12px;
+}
+
+/* No Search Results */
+.no-search-results {
+  text-align: center;
+  padding: 60px 24px;
+  background: #f8f9fa;
+  border-radius: 12px;
+  border: 2px dashed #dee2e6;
+}
+
+.no-results-icon {
+  color: #6c757d;
+  margin-bottom: 16px;
+}
+
+.no-search-results h3 {
+  font-size: 1.25rem;
+  color: #495057;
+  margin-bottom: 8px;
+}
+
+.no-search-results p {
+  color: #6c757d;
+  margin-bottom: 16px;
+}
+
+.clear-search-link {
+  background: none;
+  border: none;
+  color: #007bff;
+  text-decoration: underline;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: color 0.2s ease;
+}
+
+.clear-search-link:hover {
+  color: #0056b3;
+}
+
+.empty-todo-state {
+  text-align: center;
+  padding: 80px 24px;
+  background: #f8f9fa;
+  border-radius: 12px;
+  border: 2px dashed #dee2e6;
+}
+
+.empty-icon {
+  color: #6c757d;
+  margin-bottom: 24px;
+}
+
+.empty-todo-state h2 {
+  font-size: 1.5rem;
+  color: #495057;
+  margin-bottom: 12px;
+}
+
+.empty-todo-state p {
+  color: #6c757d;
+  font-size: 1rem;
+  margin: 0;
+}
+
+.todo-sections {
+  display: grid;
+  gap: 32px;
+}
+
+.todo-section {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+.section-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 20px 24px;
+  margin: 0;
+  background: #f8f9fa;
+  border-bottom: 1px solid #e9ecef;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #495057;
+}
+
+.section-icon {
+  color: #007bff;
+  font-size: 1.5rem;
+}
+
+.todo-items {
+  padding: 0;
+}
+
+.todo-item {
+  padding: 20px 24px;
+  border-bottom: 1px solid #f1f3f4;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.todo-item:last-child {
+  border-bottom: none;
+}
+
+.todo-item:hover {
+  background: #f8f9fa;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.todo-item[data-past-due="true"] {
+  background: #fff5f5;
+  border-left: 4px solid #dc3545;
+}
+
+.todo-item[data-past-due="true"]:hover {
+  background: #ffe6e6;
+}
+
+.todo-item-content {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.todo-item-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+.todo-item-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #1a1a1a;
+  flex: 1;
+  line-height: 1.4;
+}
+
+.todo-item-course {
+  font-size: 0.9rem;
+  color: #007bff;
+  font-weight: 500;
+  background: #e3f2fd;
+  padding: 4px 8px;
+  border-radius: 6px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.todo-item-due {
+  font-size: 0.9rem;
+  color: #666;
+  font-weight: 500;
+}
+
+.todo-item-due[data-past-due="true"] {
+  color: #dc3545;
+  font-weight: 600;
+}
+
+.todo-item-due[data-due-soon="true"] {
+  color: #fd7e14;
+  font-weight: 600;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .todo-main-area {
+    padding: 16px;
+  }
+  
+  .todo-header h1 {
+    font-size: 2rem;
+  }
+  
+  .todo-header p {
+    font-size: 1rem;
+  }
+  
+  .todo-controls {
+    flex-direction: column;
+    gap: 16px;
+    align-items: stretch;
+  }
+  
+  .search-container {
+    min-width: auto;
+  }
+  
+  .sort-container {
+    width: 100%;
+  }
+  
+  .sort-button {
+    width: 100%;
+    justify-content: space-between;
+  }
+  
+  .sort-menu {
+    width: 100%;
+  }
+  
+  .results-info {
+    align-self: flex-start;
+  }
+  
+  .section-title {
+    padding: 16px 20px;
+    font-size: 1.1rem;
+  }
+  
+  .todo-item {
+    padding: 16px 20px;
+  }
+  
+  .todo-item-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  
+  .todo-item-course {
+    align-self: flex-start;
+  }
+}
+
+@media (max-width: 480px) {
+  .todo-main-area {
+    padding: 12px;
+  }
+  
+  .todo-header {
+    margin-bottom: 24px;
+    padding: 16px 0;
+  }
+  
+  .todo-header h1 {
+    font-size: 1.75rem;
+  }
+  
+  .todo-controls {
+    padding: 12px 16px;
+    gap: 12px;
+  }
+  
+  .search-input {
+    font-size: 0.8rem;
+    padding: 8px 12px 8px 36px;
+  }
+  
+  .search-icon {
+    left: 10px;
+    font-size: 1rem;
+  }
+  
+  .search-field-button {
+    font-size: 0.75rem;
+    padding: 6px 10px;
+  }
+  
+  .sort-button {
+    font-size: 0.8rem;
+    padding: 6px 12px;
+  }
+  
+  .sort-option {
+    font-size: 0.8rem;
+    padding: 10px 12px;
+  }
+  
+  .results-info {
+    font-size: 0.8rem;
+  }
+  
+  .section-title {
+    padding: 12px 16px;
+    font-size: 1rem;
+  }
+  
+  .todo-item {
+    padding: 12px 16px;
+  }
+  
+  .todo-item-title {
+    font-size: 1rem;
+  }
+  
+  .todo-item-course {
+    font-size: 0.8rem;
+  }
+  
+  .todo-item-due {
+    font-size: 0.8rem;
+  }
+}
+
+/* Animation for loading states */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.todo-section {
+  animation: fadeIn 0.3s ease-out;
+}
+
+.todo-item {
+  animation: fadeIn 0.2s ease-out;
+}
+
+/* Hover effects for better UX */
+.todo-item::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, rgba(0, 123, 255, 0.05) 0%, rgba(0, 123, 255, 0.02) 100%);
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  pointer-events: none;
+}
+
+.todo-item:hover::after {
+  opacity: 1;
+}
+
+/* Focus states for accessibility */
+.todo-item:focus {
+  outline: 2px solid #007bff;
+  outline-offset: 2px;
+}
+
+.todo-item:focus:not(:focus-visible) {
+  outline: none;
+} 

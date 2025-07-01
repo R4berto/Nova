@@ -31,7 +31,7 @@
   text-transform: uppercase;
   font-size: 20px;
   position: relative;
-  margin-top: 20px;
+  margin-top: 50px;
 }
 
 .loader-text:after {

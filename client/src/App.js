@@ -13,10 +13,13 @@ import Messages from "./components/messages/Messages";
 import PrivateMessages from "./components/messages/PrivateMessages";
 import Assignments from "./components/assignments/Assignments";
 import People from "./components/people/People";
-import CourseSettings from "./components/settings/CourseSettings";
 import Settings from "./components/Settings";
 import CombinedExam from './components/exam/CombinedExam';
 import PrivateRoute from "./components/PrivateRoute";
+import ForgotPassword from "./components/ForgotPassword";
+import ResetPassword from "./components/ResetPassword";
+import Landing from "./pages/landing";
+import ToDoList from "./components/ToDoList";
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -49,12 +52,11 @@ function App() {
       <Router>
         <div className="container">
         <Routes>
-          {/* Root path redirects to login if not authenticated, or dashboard if authenticated */}
-          <Route path="/" element={
-            localStorage.getItem("token") ? 
-              <Navigate to="/dashboard" /> : 
-              <Navigate to="/login" />
-          } />
+          {/* Root path shows Landing page */}
+          <Route path="/" element={<Landing />} />
+          
+          {/* Landing page route (same as root) */}
+          <Route path="/landing" element={<Landing />} />
           
           {/* Public routes */}
           <Route path="/login" element={
@@ -63,11 +65,19 @@ function App() {
               <Login setAuth={setAuth} />
           } />
           <Route path="/register" element={<Register setAuth={setAuth} />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/reset-password" element={<ResetPassword />} />
           
           {/* Protected routes using PrivateRoute */}
           <Route path="/dashboard" element={
             <PrivateRoute>
               <Dashboard setAuth={setAuth} />
+            </PrivateRoute>
+          } />
+          
+          <Route path="/todo" element={
+            <PrivateRoute>
+              <ToDoList setAuth={setAuth} />
             </PrivateRoute>
           } />
           
@@ -124,12 +134,6 @@ function App() {
           <Route path="/courses/:courseId/people" element={
             <PrivateRoute>
               <People setAuth={setAuth} />
-            </PrivateRoute>
-          } />
-          
-          <Route path="/courses/:courseId/settings" element={
-            <PrivateRoute>
-              <CourseSettings setAuth={setAuth} />
             </PrivateRoute>
           } />
           

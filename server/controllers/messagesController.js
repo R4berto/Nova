@@ -151,8 +151,11 @@ exports.createConversation = async (req, res) => {
   const client = await pool.connect();
   
   try {
-    const { name, participants, conversationType, courseId } = req.body;
+    const { name, participants } = req.body;
+    const conversationType = req.body.conversationType || req.body.conversation_type;
+    const courseId = req.body.courseId || req.body.course_id;
     const userId = req.user.id;
+    const userRole = req.user.role;
     
     // Add debugging logs
     console.log("Creating conversation with:", {
@@ -161,58 +164,36 @@ exports.createConversation = async (req, res) => {
       participants: participants,
       participantTypes: participants ? participants.map(p => typeof p) : []
     });
-    
-    // Validate participants
-    if (!participants || !Array.isArray(participants) || participants.length === 0) {
-      return res.status(400).json({ error: "Participants array is required" });
-    }
-    
-    // For private conversations, ensure there are exactly 2 participants
-    if (conversationType === 'private' && participants.length !== 1) {
-      return res.status(400).json({ error: "Private conversations must have exactly 1 other participant" });
-    }
 
-    // Parse courseId to integer if it exists
     const courseIdInt = courseId ? parseInt(courseId, 10) : null;
 
     // If this is a course group chat, check if one already exists
-    if (conversationType === 'group' && courseId) {
-      console.log(`Checking for existing group chat for course ${courseId} (${typeof courseId})`);
-      
-      const courseIdStr = courseId.toString();
-      
-      const courseGroupChatQuery = `
-        SELECT c.* 
-        FROM conversation c
-        WHERE c.conversation_type = 'group' 
-        AND c.course_id::text = $1
-        LIMIT 1
+    if (conversationType === 'group' && courseIdInt) {
+      const existingChatQuery = `
+        SELECT * 
+        FROM conversation 
+        WHERE course_id = $1 AND conversation_type = 'group'
       `;
+      const existingChatResult = await client.query(existingChatQuery, [courseIdInt]);
       
-      const existingCourseChat = await client.query(courseGroupChatQuery, [courseIdStr]);
-      console.log(`Found ${existingCourseChat.rows.length} existing chats for course ${courseIdStr}`);
-      
-      if (existingCourseChat.rows.length > 0) {
-        // A course group chat already exists
-        const existingChat = existingCourseChat.rows[0];
-        console.log(`Using existing group chat: ${JSON.stringify(existingChat)}`);
+      if (existingChatResult.rows.length > 0) {
+        // If chat exists, just add the user to it and return the conversation
+        const existingChat = existingChatResult.rows[0];
         
-        // Check if the current user is already a participant
+        // Check if user is already a participant
         const participantCheck = await client.query(
-          "SELECT * FROM conversation_participant WHERE conversation_id = $1 AND user_id = $2",
+          `SELECT 1 FROM conversation_participant WHERE conversation_id = $1 AND user_id = $2`,
           [existingChat.conversation_id, userId.toString()]
         );
         
         // Only add the user if they're not already a participant
         if (participantCheck.rows.length === 0) {
-          // Add the current user as a participant
           await client.query(
             `INSERT INTO conversation_participant (conversation_id, user_id, joined_at)
              VALUES ($1, $2, NOW())`,
             [existingChat.conversation_id, userId.toString()]
           );
           
-          // Add system message about the new user
           const userInfo = await client.query(
             "SELECT first_name, last_name FROM users WHERE user_id = $1",
             [userId.toString()]
@@ -225,12 +206,11 @@ exports.createConversation = async (req, res) => {
             await client.query(
               `INSERT INTO message (conversation_id, sender_id, content, sent_at, updated_at)
                VALUES ($1, $2, $3, NOW(), NOW())`,
-              [existingChat.conversation_id, userId.toString(), systemMessage]
+              [existingChat.conversation_id, 'f0000000-0000-0000-0000-000000000000', systemMessage] // Using a system user ID
             );
           }
         }
         
-        // Get the full conversation details with participants
         const conversationQuery = `
           SELECT 
             c.*,
@@ -256,12 +236,29 @@ exports.createConversation = async (req, res) => {
           message: "Joined existing course chat",
           conversation: conversation.rows[0]
         });
+      } else {
+        // No existing chat, only a professor can create it
+        if (userRole !== 'professor') {
+          return res.status(403).json({ error: 'Forbidden: Only professors can create a course group chat.' });
+        }
+        // Professor can proceed to create the chat
+      }
+    }
+    
+    // For non-course chats, validate participants
+    if (!courseIdInt) {
+      if (!participants || !Array.isArray(participants) || participants.length === 0) {
+        return res.status(400).json({ error: "Participants array is required for this type of conversation." });
       }
     }
 
+    // For private conversations, ensure there are exactly 2 participants
+    if (conversationType === 'private' && participants.length !== 1) {
+      return res.status(400).json({ error: "Private conversations must have exactly one other participant." });
+    }
+    
     // Check if private conversation already exists between these users
     if (conversationType === 'private') {
-      // Make sure the participant ID is properly formatted for UUID comparison
       const safeParticipantId = participants[0].toString();
       
       const existingConversationQuery = `
@@ -280,10 +277,8 @@ exports.createConversation = async (req, res) => {
       const existingConversation = await client.query(existingConversationQuery, [userId.toString(), safeParticipantId]);
       
       if (existingConversation.rows.length > 0) {
-        // Return the existing conversation
         const conversationId = existingConversation.rows[0].conversation_id;
         
-        // Get conversation details
         const conversationDetails = await client.query(
           `SELECT * FROM conversation WHERE conversation_id = $1`,
           [conversationId]
@@ -310,7 +305,7 @@ exports.createConversation = async (req, res) => {
     
     const conversationId = conversationResult.rows[0].conversation_id;
     
-    // Add the creator as a participant - ensure UUID format
+    // Add the creator as a participant
     await client.query(
       `INSERT INTO conversation_participant (conversation_id, user_id, joined_at)
        VALUES ($1, $2, NOW())
@@ -318,20 +313,20 @@ exports.createConversation = async (req, res) => {
       [conversationId, userId.toString()]
     );
     
-    // Add other participants - ensure UUID format for each
-    for (const participantId of participants) {
-      console.log(`Adding participant ${participantId} (${typeof participantId}) to conversation ${conversationId}`);
-      await client.query(
-        `INSERT INTO conversation_participant (conversation_id, user_id, joined_at)
-         VALUES ($1, $2, NOW())
-         ON CONFLICT (conversation_id, user_id) DO NOTHING`,
-        [conversationId, participantId.toString()]
-      );
+    // Add other participants if any
+    if (participants && Array.isArray(participants)) {
+      for (const participantId of participants) {
+        await client.query(
+          `INSERT INTO conversation_participant (conversation_id, user_id, joined_at)
+           VALUES ($1, $2, NOW())
+           ON CONFLICT (conversation_id, user_id) DO NOTHING`,
+          [conversationId, participantId.toString()]
+        );
+      }
     }
     
     // If this is a course group chat, we need to send an initial system message
-    if (conversationType === 'group' && courseId) {
-      // Get the creator's name for personalized welcome message
+    if (conversationType === 'group' && courseIdInt) {
       const userInfo = await client.query(
         "SELECT first_name, last_name FROM users WHERE user_id = $1",
         [userId.toString()]
@@ -339,16 +334,15 @@ exports.createConversation = async (req, res) => {
       
       let welcomeMessage = "Welcome to the course chat! Use this space to discuss course-related topics.";
       
-      // Add the creator's name to the welcome message if available
       if (userInfo.rows.length > 0) {
         const userName = `${userInfo.rows[0].first_name} ${userInfo.rows[0].last_name}`;
-        welcomeMessage = `Welcome to the course chat, ${userName}! This space is for course-related discussions. More participants will join as they enroll in the course.`;
+        welcomeMessage = `${userName} created the course chat.`;
       }
       
       await client.query(
         `INSERT INTO message (conversation_id, sender_id, content, sent_at, updated_at)
          VALUES ($1, $2, $3, NOW(), NOW())`,
-        [conversationId, userId.toString(), welcomeMessage]
+        [conversationId, 'f0000000-0000-0000-0000-000000000000', welcomeMessage] // System user
       );
     }
     
@@ -558,23 +552,15 @@ exports.markMessagesAsRead = async (req, res) => {
       return res.status(403).json({ error: "You are not a participant in this conversation" });
     }
     
-    // Mark all unread messages as read
-    const updateResult = await pool.query(
-      `UPDATE message_read_status
-       SET read_at = NOW()
-       WHERE message_id IN (
-         SELECT m.message_id
-         FROM message m
-         JOIN message_read_status mrs ON m.message_id = mrs.message_id
-         WHERE m.conversation_id = $1 AND mrs.user_id = $2 AND mrs.read_at IS NULL
-       )
-       RETURNING *`,
+    // Use our new stored procedure to mark messages as read and update conversation unread status
+    await pool.query(
+      `CALL mark_conversation_as_read($1, $2)`,
       [conversationId, userId]
     );
     
     return res.json({ 
       message: "Messages marked as read", 
-      count: updateResult.rowCount 
+      success: true
     });
   } catch (err) {
     console.error("Error marking messages as read:", err);
@@ -1038,7 +1024,7 @@ exports.getPrivateConversations = async (req, res) => {
   try {
     const userId = req.user.id;
 
-    // Query to get private conversations with latest message and unread count
+    // Query to get private conversations with latest message and unread status
     const conversationsQuery = `
       WITH latest_messages AS (
         SELECT DISTINCT ON (m.conversation_id) 
@@ -1107,6 +1093,7 @@ exports.getPrivateConversations = async (req, res) => {
         lm.sender_name AS latest_message_sender_name,
         lm.content AS latest_message_content,
         lm.sent_at AS latest_message_sent_at,
+        cp.has_unread AS unread_messages,
         (
           SELECT json_agg(json_build_object(
             'user_id', u.user_id,
@@ -1115,19 +1102,18 @@ exports.getPrivateConversations = async (req, res) => {
             'profile_picture_url', up.profile_picture_url,
             'role', u.role
           ))
-          FROM conversation_participant cp
-          JOIN users u ON cp.user_id = u.user_id
+          FROM conversation_participant cp2
+          JOIN users u ON cp2.user_id = u.user_id
           LEFT JOIN user_profile up ON u.user_id = up.user_id
-          WHERE cp.conversation_id = c.conversation_id
+          WHERE cp2.conversation_id = c.conversation_id
         ) AS participants,
         COALESCE(cm.messages, '[]'::json) as messages
       FROM conversation c
-      JOIN conversation_participant cp ON c.conversation_id = cp.conversation_id
+      JOIN conversation_participant cp ON c.conversation_id = cp.conversation_id AND cp.user_id = $1
       LEFT JOIN latest_messages lm ON c.conversation_id = lm.conversation_id
       LEFT JOIN unread_counts uc ON c.conversation_id = uc.conversation_id
       LEFT JOIN conversation_messages cm ON c.conversation_id = cm.conversation_id
-      WHERE cp.user_id = $1
-      AND c.conversation_type = 'private'
+      WHERE c.conversation_type = 'private'
       ORDER BY c.updated_at DESC
     `;
 

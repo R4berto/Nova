@@ -298,16 +298,9 @@ const initializeWebSocket = (server) => {
           return; // Silently fail if not a participant
         }
         
-        // Mark all unread messages as read
+        // Use our new stored procedure to mark messages as read and update conversation unread status
         await pool.query(
-          `UPDATE message_read_status
-           SET read_at = NOW()
-           WHERE message_id IN (
-             SELECT m.message_id
-             FROM message m
-             JOIN message_read_status mrs ON m.message_id = mrs.message_id
-             WHERE m.conversation_id = $1 AND mrs.user_id = $2 AND mrs.read_at IS NULL
-           )`,
+          `CALL mark_conversation_as_read($1, $2)`,
           [conversation_id, userId]
         );
         

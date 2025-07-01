@@ -1049,4 +1049,83 @@ router.put("/:examId/submissions/:submissionId/status", authorize, async (req, r
   }
 });
 
+// Add a new route to get upcoming exams for a specific course
+router.get("/upcoming/:courseId", authorize, async (req, res) => {
+  try {
+    const { courseId } = req.params;
+    
+    // Get current date for comparison
+    const currentDate = new Date();
+    
+    // Query to fetch upcoming exams (due date is in the future, today, or no due date)
+    // Sort by due date ascending (closest due date first), with no due date items at the end
+    const upcomingExams = await pool.query(
+      `SELECT exam_id, course_id, title, due_date
+       FROM exam
+       WHERE course_id = $1
+       AND (due_date >= $2 OR due_date IS NULL)
+       AND is_published = true
+       ORDER BY 
+         CASE 
+           WHEN due_date IS NULL THEN 1 
+           ELSE 0 
+         END,
+         due_date ASC
+       LIMIT 5`, // Limit to 5 most imminent exams
+      [courseId, currentDate.toISOString()]
+    );
+    
+    return res.json(upcomingExams.rows);
+  } catch (err) {
+    console.error("Error fetching upcoming exams:", err.message);
+    return res.status(500).json("Server Error");
+  }
+});
+
+// Add a new route to get overdue exams for a specific course
+router.get("/overdue/:courseId", authorize, async (req, res) => {
+  try {
+    const { courseId } = req.params;
+    const userId = req.user.id;
+    const userRole = req.user.role;
+
+    let overdueExamsQuery;
+    let queryParams;
+
+    if (userRole === 'professor') {
+      // Professors: all overdue exams in the course
+      overdueExamsQuery = `
+        SELECT exam_id, course_id, title, due_date
+        FROM exam
+        WHERE course_id = $1
+          AND due_date < NOW()
+          AND is_published = true
+        ORDER BY due_date ASC
+      `;
+      queryParams = [courseId];
+    } else {
+      // Students: only overdue exams not yet submitted
+      overdueExamsQuery = `
+        SELECT e.exam_id, e.course_id, e.title, e.due_date
+        FROM exam e
+        WHERE e.course_id = $1
+          AND e.due_date < NOW()
+          AND e.is_published = true
+          AND NOT EXISTS (
+            SELECT 1 FROM exam_submission s
+            WHERE s.exam_id = e.exam_id AND s.student_id = $2
+          )
+        ORDER BY e.due_date ASC
+      `;
+      queryParams = [courseId, userId];
+    }
+
+    const overdueExams = await pool.query(overdueExamsQuery, queryParams);
+    return res.json(overdueExams.rows);
+  } catch (err) {
+    console.error("Error fetching overdue exams:", err.message);
+    return res.status(500).json("Server Error");
+  }
+});
+
 module.exports = router; 

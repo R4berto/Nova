@@ -1233,14 +1233,21 @@ const ExamBuilderComponent = ({ courseId, examId: propExamId, courseStatus = 'ac
     
     reader.onload = async (e) => {
       try {
-        // Fully reset the exam content first before importing
-        setExamTitle('');
-        setExamDescription('');
-        setExamDueDate('');
-        setQuestions([]);
-        setSelectedQuestionId(null);
-        setLoadedExamId(null);
-        setIsPublished(false);
+        // If we already have a loaded exam, ask the user what they want to do
+        let shouldReplace = false;
+        let shouldCreateNew = true;
+        
+        if (loadedExamId) {
+          // Ask user if they want to replace the current exam or create a new one
+          const userChoice = window.confirm(
+            'You are currently editing an exam. Would you like to:\n\n' +
+            '- Click OK to update the current exam with the imported data\n' +
+            '- Click Cancel to create a new exam from the imported data'
+          );
+          
+          shouldReplace = userChoice;
+          shouldCreateNew = !userChoice;
+        }
         
         let importData;
         
@@ -1258,10 +1265,27 @@ const ExamBuilderComponent = ({ courseId, examId: propExamId, courseStatus = 'ac
           importData = parseHtmlExam(htmlContent);
         }
         
+        // If replacing, keep the current exam ID
+        const currentExamId = shouldReplace ? loadedExamId : null;
+        
+        if (!shouldReplace) {
+          // Only reset everything if we're creating a new exam
+          setExamTitle('');
+          setExamDescription('');
+          setExamDueDate('');
+          setQuestions([]);
+          setSelectedQuestionId(null);
+          setLoadedExamId(null);
+          setIsPublished(false);
+        }
+        
         // Set exam details
         setExamTitle(importData.exam.title || 'Imported Exam');
         setExamDescription(importData.exam.description || '');
-        setExamDueDate(importData.exam.due_date ? formatDateForLocalInput(importData.exam.due_date) : '');
+        // Only update due date if creating a new exam, keep existing due date when replacing
+        if (!shouldReplace) {
+          setExamDueDate(importData.exam.due_date ? formatDateForLocalInput(importData.exam.due_date) : '');
+        }
         
         // Process questions
         if (importData.exam.questions && Array.isArray(importData.exam.questions)) {
@@ -1314,7 +1338,48 @@ const ExamBuilderComponent = ({ courseId, examId: propExamId, courseStatus = 'ac
             setSelectedQuestionId(formattedQuestions[0].id);
           }
           
-          toast.success(`Imported exam with ${formattedQuestions.length} questions`);
+          // If replacing the current exam, save changes to the database
+          if (shouldReplace && currentExamId) {
+            // First update the exam details
+            setSaving(true);
+            try {
+              await apiRequest(
+                `${API_BASE_URL}/exams/${currentExamId}`,
+                'PUT',
+                {
+                  title: importData.exam.title || 'Imported Exam',
+                  description: importData.exam.description || ''
+                  // Intentionally not updating the due_date to preserve the existing one
+                }
+              );
+              
+              // Delete existing questions from the exam
+              const { data: existingExam } = await apiRequest(`${API_BASE_URL}/exams/single/${currentExamId}`);
+              if (existingExam.questions && existingExam.questions.length > 0) {
+                for (const q of existingExam.questions) {
+                  await apiRequest(
+                    `${API_BASE_URL}/exams/${currentExamId}/questions/${q.question_id}`,
+                    'DELETE'
+                  );
+                }
+              }
+              
+              // Save the imported questions to the exam
+              await saveQuestionsToExam(formattedQuestions, currentExamId);
+              
+              // Reload the exam to get proper question IDs from the server
+              await loadExam(currentExamId);
+              
+              toast.success(`Exam updated with imported data (${formattedQuestions.length} questions)`);
+            } catch (error) {
+              console.error('Error saving imported exam:', error);
+              toast.error(`Failed to save imported exam: ${error.message}`);
+            } finally {
+              setSaving(false);
+            }
+          } else {
+            toast.success(`Imported exam with ${formattedQuestions.length} questions`);
+          }
         } else {
           toast.warning('No questions found in the imported exam');
         }
@@ -1334,41 +1399,46 @@ const ExamBuilderComponent = ({ courseId, examId: propExamId, courseStatus = 'ac
     
     // Reset the file input
     event.target.value = null;
-  }, []);
+  }, [loadedExamId, apiRequest, saveQuestionsToExam, loadExam, formatDateForLocalInput]);
 
-  // Reset exam function - clears all content and starts fresh
+  // Reset exam function - clears form without deleting from database
   const resetExam = useCallback(async () => {
     // Ask for confirmation before resetting
-    if (!window.confirm('Are you sure you want to reset the exam? This will clear all content and cannot be undone.')) {
+    if (!window.confirm('Are you sure you want to reset the exam form? This will clear all content from the form but won\'t delete the exam from the database.')) {
       return;
     }
     
     // Show a loading toast while resetting
-    toast.loading('Resetting exam...');
+    toast.loading('Resetting exam form...');
     
     // Set resetting state to disable UI elements
     setSaving(true);
     
     try {
-      // If we have a loadedExamId, it means the exam exists in the database
-      // and we need to delete it from there
-      if (loadedExamId) {
-        await apiRequest(
-          `${API_BASE_URL}/exams/${loadedExamId}`,
-          'DELETE'
-        );
-        
-        // After successfully deleting, refresh the exams list
-        await fetchExams();
-      }
-      
-      // Clear all exam data
+      // Clear all exam data from the form
       setExamTitle('');
       setExamDescription('');
       setExamDueDate('');
       setQuestions([]);
       setSelectedQuestionId(null);
+      
+      // Only clear loadedExamId and URL parameters if we're not editing an existing exam
+      // This way we start fresh rather than editing the previous exam
+      if (!loadedExamId) {
       setLoadedExamId(null);
+        
+        // Clear URL parameters for examId if we're not editing
+        const params = new URLSearchParams(location.search);
+        if (params.has('examId')) {
+          params.delete('examId');
+          navigate(`${location.pathname}?${params.toString()}`, { replace: true });
+        }
+      } else {
+        // If we're editing an existing exam, refresh exams list but don't clear the ID
+        await fetchExams();
+      }
+      
+      // Reset published state to false in the UI (doesn't affect database)
       setIsPublished(false);
       
       // Reset the question form
@@ -1383,18 +1453,8 @@ const ExamBuilderComponent = ({ courseId, examId: propExamId, courseStatus = 'ac
         points: 1
       });
       
-      // Clear URL parameters for examId
-      const params = new URLSearchParams(location.search);
-      if (params.has('examId')) {
-        params.delete('examId');
-        navigate(`${location.pathname}?${params.toString()}`, { replace: true });
-      }
-      
       // Force a re-render after state updates with a slight delay
       setTimeout(() => {
-        // This additional state update helps ensure the UI refreshes
-        setQuestions([]); // Redundant set to trigger re-render
-        
         // Increment the reset key to force a complete component re-render
         setResetKey(prevKey => prevKey + 1);
         
@@ -1402,19 +1462,21 @@ const ExamBuilderComponent = ({ courseId, examId: propExamId, courseStatus = 'ac
         toast.dismiss();
         
         // Show success message
-        toast.success('Exam has been reset and deleted from the database');
+        toast.success(loadedExamId 
+          ? 'Exam form has been reset. You can now create new content for this exam.' 
+          : 'Exam form has been reset. You can now create a new exam.');
         
         // Re-enable UI elements
         setSaving(false);
       }, 100);
     } catch (error) {
-      console.error('Error resetting exam:', error);
+      console.error('Error resetting exam form:', error);
       
       // Dismiss the loading toast
       toast.dismiss();
       
       // Show error message
-      toast.error(`Failed to reset exam: ${error.message}`);
+      toast.error(`Failed to reset exam form: ${error.message}`);
       
       // Re-enable UI elements
       setSaving(false);
@@ -1651,41 +1713,41 @@ const ExamBuilderComponent = ({ courseId, examId: propExamId, courseStatus = 'ac
       
       {/* Import/Export Actions */}
       <div className="import-export-actions">
-        <button 
-          className="export-btn"
-          onClick={exportExam}
-          disabled={!loadedExamId && questions.length === 0}
-          title={!loadedExamId && questions.length === 0 ? 'Save exam first to enable export' : 'Export exam as JSON file'}
-        >
-          <FaDownload /> Export Exam
-        </button>
-        
-        <button 
-          className="import-btn"
-          onClick={triggerImportFileInput}
-          disabled={saving}
-          title="Import exam from JSON or HTML file"
-        >
-          <FaUpload /> Import Exam
-        </button>
-
-        <button 
-          className="offline-creator-btn"
-          onClick={handleDownloadOfflineCreator}
-          title="Download offline exam creator"
-        >
-          <FaFileDownload /> Download Offline Creator
-        </button>
-        
-        <button 
-          className="exam-reset-btn"
-          onClick={resetExam}
-          disabled={saving || (!loadedExamId && questions.length === 0 && !examTitle)}
-          title="Reset and clear all exam content"
-        >
-          <FaTrash /> Reset Exam
-        </button>
-        
+        <div className="left-actions" style={{ display: 'flex', gap: '10px' }}>
+          <button 
+            className="export-btn"
+            onClick={exportExam}
+            disabled={questions.length === 0}
+            title={questions.length === 0 ? 'Add questions to enable export' : 'Export exam as JSON file'}
+          >
+            <FaDownload /> Export Exam
+          </button>
+          <button 
+            className="import-btn"
+            onClick={triggerImportFileInput}
+            disabled={saving || !isModificationAllowed}
+            title={!isModificationAllowed ? `Import is disabled in ${courseStatus} courses` : "Import exam from JSON or HTML file"}
+          >
+            <FaUpload /> Import Exam
+          </button>
+          <button 
+            className="exam-reset-btn"
+            onClick={resetExam}
+            disabled={saving || isPublished || (!loadedExamId && questions.length === 0 && !examTitle) || !isModificationAllowed}
+            title={!isModificationAllowed ? `Reset is disabled in ${courseStatus} courses` : isPublished ? "Cannot reset a published exam" : "Reset and clear all exam form content without deleting the exam"}
+          >
+            <FaTrash /> Reset Form
+          </button>
+        </div>
+        <div className="right-actions" style={{ marginLeft: 'auto' }}>
+          <button 
+            className="offline-creator-btn rightmost"
+            onClick={handleDownloadOfflineCreator}
+            title="Download offline exam creator"
+          >
+            <FaFileDownload /> Download Offline Creator
+          </button>
+        </div>
         {/* Hidden file input for JSON and HTML import */}
         <input
           type="file"
@@ -1694,7 +1756,6 @@ const ExamBuilderComponent = ({ courseId, examId: propExamId, courseStatus = 'ac
           onChange={handleFileSelect}
           style={{ display: 'none' }}
         />
-        
         {importError && (
           <div className="import-error">
             <p>{importError}</p>
@@ -1733,7 +1794,7 @@ const ExamBuilderComponent = ({ courseId, examId: propExamId, courseStatus = 'ac
         }
 
         .import-btn {
-          background-color: #2196F3;
+          background-color: #000;
           color: white;
         }
 
@@ -1750,6 +1811,9 @@ const ExamBuilderComponent = ({ courseId, examId: propExamId, courseStatus = 'ac
         .import-export-actions button:hover:not(:disabled) {
           opacity: 0.9;
           transform: translateY(-1px);
+          background-color: #fff;
+          color: #000;
+          border: 1px solid #000;
         }
 
         .import-export-actions button svg {
@@ -1811,13 +1875,6 @@ const ExamBuilderComponent = ({ courseId, examId: propExamId, courseStatus = 'ac
                   title={!isModificationAllowed ? `Publishing is disabled in ${courseStatus} courses` : ''}
                 >
                   {saving ? 'Processing...' : isPublished ? 'Unpublish' : 'Publish'}
-                </button>
-                <button
-                  className="btn btn-secondary"
-                  onClick={handleDownloadOfflineCreator}
-                  title="Download offline exam creator"
-                >
-                  <i className="fas fa-download"></i> Download Offline Creator
                 </button>
               </div>
             )}

@@ -170,13 +170,20 @@ B2B8BE/* Stream.css - Modernized */
 /* Main Content Layout */
 .course-main-area .stream-content {
   display: grid;
-  grid-template-columns: 300px 1fr;
-  gap: var(--nova-spacing-xl);
-  /* margin-top: var(--nova-spacing-xl); */ /* REMOVE margin-top */
+  grid-template-columns: 280px 1fr;
+  gap: 24px;
+  padding: 24px;
+  align-items: start;
   overflow-y: auto; /* Enable vertical scrolling */
   max-height: 100%; /* Ensure it takes available height */
   scrollbar-width: thin; /* Firefox */
   scrollbar-color: transparent transparent; /* Firefox */
+}
+
+.stream-left-column {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
 }
 
 /* Hide scrollbar when not in use for Chrome/Safari/Edge */
@@ -242,7 +249,6 @@ B2B8BE/* Stream.css - Modernized */
 
 /* Enrollment Code Box */
 .enrollment-code-box {
-  margin-top: var(--nova-spacing-xl);
   padding: var(--nova-spacing-lg);
   background: var(--nova-bg-primary); /* White bg */
   border-radius: var(--nova-border-radius);
@@ -742,9 +748,8 @@ B2B8BE/* Stream.css - Modernized */
 .link-url-modal .cancel-btn:hover,
 .file-preview-modal .cancel-btn:hover,
 .attachment-removal-modal .cancel-btn:hover {
-  background-color: #000000; /* Black background */
-  color: #ffffff; /* White text */
-  border-color: #000000; /* Black border */
+  background-color: #333333;
+  transform: translateY(-2px);
 }
 
 .post-btn {
@@ -1233,49 +1238,9 @@ B2B8BE/* Stream.css - Modernized */
 /* --- End Edit Modal Button Style --- */
 
 /* Responsive styles */
-@media (max-width: 768px) {
+@media (max-width: 1024px) {
   .stream-content {
     grid-template-columns: 1fr;
-  }
-
-  .course-info-panel {
-    order: -1;
-  }
-
-  .editor-toolbar {
-    overflow-x: auto;
-    padding: var(--nova-spacing-sm);
-  }
-
-  .editor-actions {
-    flex-direction: column;
-    gap: var(--nova-spacing-sm);
-  }
-
-  .stream-container .cancel-btn,
-  .course-main-area .cancel-btn,
-  .stream-edit-modal .cancel-btn,
-  .link-confirmation-modal .cancel-btn,
-  .link-url-modal .cancel-btn,
-  .file-preview-modal .cancel-btn,
-  .attachment-removal-modal .cancel-btn,
-  .post-btn {
-    width: 100%;
-  }
-
-  /* Modal adjustments for mobile */
-  .modal-content, 
-  .modal-content.stream-edit-modal {
-    width: 98%;
-    max-width: 100%;
-    margin: 0;
-    border-radius: var(--nova-border-radius-sm);
-  }
-  
-  /* Adjust padding for overlay on mobile */
-  .modal-overlay.stream-modal-overlay,
-  .stream-modal-overlay {
-    padding: 10px;
   }
 }
 
@@ -1815,7 +1780,7 @@ B2B8BE/* Stream.css - Modernized */
 .download-btn {
   display: inline-block;
   padding: 10px 20px;
-  background-color: #1a73e8;
+  background-color: black;
   color: white;
   border-radius: 4px;
   text-decoration: none;
@@ -1826,7 +1791,7 @@ B2B8BE/* Stream.css - Modernized */
 }
 
 .download-btn:hover {
-  background-color: #1557b0;
+  background-color: #333333;
   text-decoration: none;
   color: white;
 }
@@ -2053,4 +2018,189 @@ B2B8BE/* Stream.css - Modernized */
 .options-toggle:focus-visible {
     outline: none !important;
     box-shadow: none; /* Remove any focus ring */
+}
+
+/* Upcoming Panel Styles - Redesigned to match enrollment-code-box */
+.upcoming-panel {
+  padding: var(--nova-spacing-lg);
+  background: var(--nova-bg-primary); /* White bg */
+  border-radius: var(--nova-border-radius);
+  border: 1px solid var(--nova-border-strong); /* Black border */
+}
+
+/* When using both classes, ensure enrollment-code-box styles take precedence */
+.upcoming-panel.enrollment-code-box {
+  /* Already inherits from both classes */
+  margin-bottom: var(--nova-spacing-xl);
+}
+
+.upcoming-header, 
+.upcoming-panel .enrollment-code-header h3 {
+  margin: 0 0 var(--nova-spacing-sm) 0;
+  font-size: var(--nova-font-size-sm);
+  font-weight: 500;
+  color: var(--nova-text-secondary);
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+}
+
+.upcoming-icon {
+  margin-right: 8px;
+  color: var(--nova-text-secondary);
+}
+
+.upcoming-loading {
+  display: flex;
+  justify-content: center;
+  padding: 20px 0;
+}
+
+.upcoming-content {
+  display: flex;
+  flex-direction: column;
+}
+
+.no-upcoming, 
+.upcoming-panel .code {
+  font-family: monospace;
+  font-size: var(--nova-font-size-lg);
+  color: var(--nova-text-primary);
+  font-weight: 600;
+  text-align: justify;
+  padding: var(--nova-spacing-md) 0;
+  display: flex;
+  align-items: center;
+  gap: var(--nova-spacing-sm);
+}
+
+.status-icon {
+  color: var(--nova-text-secondary);
+  font-size: 1.2em;
+  flex-shrink: 0;
+}
+
+.upcoming-section {
+  margin-bottom: var(--nova-spacing-lg);
+}
+
+.upcoming-section-title {
+  display: flex;
+  align-items: center;
+  font-size: var(--nova-font-size-base);
+  font-weight: 500;
+  color: var(--nova-text-primary);
+  margin-bottom: var(--nova-spacing-sm);
+  padding-top: var(--nova-spacing-md);
+  border-top: 1px solid var(--nova-border-color-light);
+}
+
+.section-icon {
+  margin-right: var(--nova-spacing-sm);
+  color: var(--nova-text-primary);
+}
+
+.upcoming-list {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
+.upcoming-item {
+  display: flex;
+  padding: var(--nova-spacing-sm) 0;
+  border-bottom: 1px solid var(--nova-border-color-light);
+}
+
+.upcoming-item:last-child {
+  border-bottom: none;
+}
+
+.upcoming-item-content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--nova-spacing-xs);
+  width: 100%;
+}
+
+.upcoming-item-title {
+  font-weight: 500;
+  cursor: pointer;
+  color: var(--nova-text-primary);
+}
+
+.upcoming-item-title:hover {
+  color: var(--nova-primary);
+  text-decoration: underline;
+}
+
+.upcoming-item-due {
+  color: var(--nova-text-secondary);
+  font-size: var(--nova-font-size-sm);
+}
+
+/* Style for past due dates */
+.upcoming-item-due[data-past-due="true"] {
+  color: red;
+  font-weight: 500;
+}
+
+/* Add a more specific style for the past due value */
+.upcoming-item[data-past-due="true"] {
+  background-color: var(--nova-bg-error);
+  border-left: 3px solid var(--nova-border-error);
+  padding-left: var(--nova-spacing-sm);
+  margin-left: calc(-1 * var(--nova-spacing-sm));
+}
+
+/* Style for due soon indicators */
+.upcoming-item-due[data-due-soon="true"] {
+  color: #ff9800; /* Orange for warning */
+  font-weight: 500;
+}
+
+/* Style for items due soon */
+.upcoming-item:has(.upcoming-item-due[data-due-soon="true"]) {
+  background-color: #fff8e1; /* Light orange/yellow background */
+  border-left: 3px solid #ff9800; /* Orange border */
+  padding-left: var(--nova-spacing-sm);
+  margin-left: calc(-1 * var(--nova-spacing-sm));
+}
+
+.upcoming-footer {
+  display: flex;
+  justify-content: space-between;
+  margin-top: var(--nova-spacing-lg);
+  padding-top: var(--nova-spacing-lg);
+  border-top: 1px solid var(--nova-border-color);
+}
+
+.view-all-btn {
+  background: none;
+  border: none;
+  color: var(--nova-primary);
+  cursor: pointer;
+  font-size: var(--nova-font-size-base);
+  padding: 0;
+  text-decoration: underline;
+  font-weight: 500;
+}
+
+.view-all-btn:hover {
+  color: var(--nova-primary-dark);
+}
+
+@media (max-width: 768px) {
+  .upcoming-item {
+    padding: 12px 0;
+  }
+  
+  .upcoming-item-content {
+    gap: 6px;
+  }
+  
+  .upcoming-footer {
+    flex-direction: column;
+    gap: 8px;
+  }
 } 

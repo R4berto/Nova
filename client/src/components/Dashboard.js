@@ -162,7 +162,8 @@ export default function Dashboard({ setAuth }) {
   const handleEnroll = async (e) => {
     e.preventDefault();
     if (!enrollmentCode.trim()) {
-      setError("Please enter an enrollment code");
+      setError("Please enter a valid enrollment code");
+      setEnrollmentCode(""); // Clear the input
       return;
     }
 
@@ -181,7 +182,8 @@ export default function Dashboard({ setAuth }) {
         return;
       }
 
-      const response = await fetch("http://localhost:5000/enrollment/enroll", {
+      // Use the new enrollment approval endpoint
+      const response = await fetch("http://localhost:5000/enrollment-approval/request-enrollment", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -190,59 +192,80 @@ export default function Dashboard({ setAuth }) {
         body: JSON.stringify({ enrollment_code: enrollmentCode })
       });
 
+      const data = await response.json();
+
       if (!response.ok) {
-        const errorData = await response.json();
-        if (errorData.error?.includes("already enrolled")) {
+        // Clear the input for any error
+        setEnrollmentCode("");
+        
+        if (data.error?.includes("already enrolled")) {
           setError("You are already enrolled in this course. Please enter a different enrollment code.");
-          setEnrollmentCode(""); // Clear the input for new code
+        } else if (data.error?.includes("not found") || data.error?.includes("invalid")) {
+          setError("Invalid enrollment code. Please check the code and try again.");
+        } else if (data.error?.includes("expired")) {
+          setError("This enrollment code has expired. Please contact your instructor for a new code.");
+        } else if (data.error?.includes("course is full")) {
+          setError("This course is full and cannot accept new enrollments.");
+        } else if (data.error?.includes("course is inactive")) {
+          setError("This course is currently inactive and not accepting enrollments.");
         } else {
-          setError(errorData.error || "Failed to enroll in course");
-          setEnrollmentCode(""); // Clear the input after any error
+          setError(data.error || "Failed to enroll in course. Please try again.");
         }
         return;
       }
 
-      const data = await response.json();
-      // Add the new course
-      const newCourse = {
-        ...data.course,
-        progress: 0
-      };
-      
-      setCourses([...courses, newCourse]);
-      setEnrollmentCode("");
-      setShowEnrollModal(false);
-      setError(null);
-      toast.success("Successfully enrolled in course");
-      
-      // Refresh courses to show the newly added course
-      await fetchCourses();
-      
-      // Automatically create or join the course chat
-      try {
-        // Get user profile to pass to createCourseChat
-        const profileResponse = await fetch("http://localhost:5000/dashboard/", {
-          method: "GET",
-          headers: { jwt_token: token }
-        });
+      // Handle the response based on whether approval is required
+      if (data.requires_approval) {
+        // Course requires approval - show pending message
+        setEnrollmentCode("");
+        setShowEnrollModal(false);
+        setError(null);
+        toast.success("Enrollment request submitted! Waiting for professor approval.");
         
-        if (profileResponse.ok) {
-          const profileData = await profileResponse.json();
-          const userProfile = {
-            user_id: profileData.user_id || profileData.id,
-            first_name: profileData.first_name,
-            last_name: profileData.last_name,
-            role: profileData.role,
-            profile_picture_url: profileData.profile_picture_url || null
-          };
+        // Don't add to courses list yet - wait for approval
+        // Don't create chat yet - wait for approval
+      } else {
+        // Direct enrollment (no approval required) - existing behavior
+        const newCourse = {
+          ...data.course,
+          progress: 0
+        };
+        
+        setCourses([...courses, newCourse]);
+        setEnrollmentCode("");
+        setShowEnrollModal(false);
+        setError(null);
+        toast.success("Successfully enrolled in course");
+        
+        // Refresh courses to show the newly added course
+        await fetchCourses();
+        
+        // Automatically create or join the course chat
+        try {
+          // Get user profile to pass to createCourseChat
+          const profileResponse = await fetch("http://localhost:5000/dashboard/", {
+            method: "GET",
+            headers: { jwt_token: token }
+          });
           
-          // Call helper function to create or join course chat
-          await createCourseChat(newCourse.course_id, userProfile, newCourse.course_name);
-          console.log(`Course chat for ${newCourse.course_name} automatically created/joined`);
+          if (profileResponse.ok) {
+            const profileData = await profileResponse.json();
+            const userProfile = {
+              user_id: profileData.user_id || profileData.id,
+              first_name: profileData.first_name,
+              last_name: profileData.last_name,
+              role: profileData.role,
+              profile_picture_url: profileData.profile_picture_url || null
+            };
+            
+            // Call helper function to create or join course chat
+            await createCourseChat(newCourse.course_id, userProfile, newCourse.course_name);
+            console.log(`Course chat for ${newCourse.course_name} automatically created/joined`);
+          }
+        } catch (chatError) {
+          console.error("Could not automatically create/join course chat:", chatError);
+          // Don't show error to user, as this is a background operation
         }
-      } catch (chatError) {
-        console.error("Could not automatically create/join course chat:", chatError);
-        // Don't show error to user, as this is a background operation
       }
       
       // Redirect to dashboard
@@ -251,6 +274,7 @@ export default function Dashboard({ setAuth }) {
     catch (err) {
       console.error(err.message);
       setError("Server error. Please try again later.");
+      setEnrollmentCode(""); // Clear the input on server error
     }
   };
 
@@ -359,35 +383,64 @@ export default function Dashboard({ setAuth }) {
     // Handle navigation based on notification type and metadata
     if (notification.metadata) {
       try {
-        // Log the raw metadata for debugging
+        // Enhanced debugging information
+        console.log("Notification clicked:", notification);
+        console.log("Notification type:", notification.type);
+        console.log("User role:", userRole);
         console.log("Raw notification metadata:", notification.metadata);
         
         const metadata = typeof notification.metadata === 'string' 
           ? JSON.parse(notification.metadata) 
           : notification.metadata;
         
-        // Log parsed metadata for debugging
         console.log("Parsed notification metadata:", metadata);
+        
+        // Check specific properties for debugging
+        console.log("Metadata type:", metadata.type);
+        console.log("Exam ID in metadata:", metadata.exam_id);
 
-        if (metadata.redirect_url) {
-          console.log("Navigating to redirect URL:", metadata.redirect_url);
-          // If there's state in the metadata, use it for navigation
-          if (metadata.state) {
-            console.log("Using state for navigation:", metadata.state);
-            navigate(metadata.redirect_url, { state: metadata.state });
-          } else {
-            navigate(metadata.redirect_url);
+                  // Direct handling for recheck and new exam notifications based on message content
+          if (notification.message && notification.message.toLowerCase().includes('grade recheck') && 
+              metadata.exam_id && userRole === 'student') {
+            console.log("This is a grade recheck notification detected by message content.");
+            navigate(`/courses/${metadata.course_id}/exams/${metadata.exam_id}?tab=completed`);
+            setShowNotificationPanel(false);
+            return;
           }
-        } else if (metadata.type === 'course_chat') {
+          
+          // Handle new exam published notifications
+          if (notification.message && notification.message.toLowerCase().includes('new exam') && 
+              notification.message.toLowerCase().includes('published') && 
+              metadata.exam_id) {
+            console.log("This is a new exam published notification detected by message content.");
+            navigate(`/courses/${metadata.course_id}/exams/${metadata.exam_id}`);
+            setShowNotificationPanel(false);
+            return;
+          }
+
+          if (metadata.redirect_url) {
+            console.log("Navigating to redirect URL:", metadata.redirect_url);
+            // If there's state in the metadata, use it for navigation
+            if (metadata.state) {
+              console.log("Using state for navigation:", metadata.state);
+              navigate(metadata.redirect_url, { state: metadata.state });
+            } else {
+              navigate(metadata.redirect_url);
+            }
+          } else if (metadata.type === 'course_chat') {
           // Course chat messages should have priority
           console.log("This is a course chat message. Navigating to course messages:", metadata.course_id);
           navigate(`/courses/${metadata.course_id}/messages`);
-        } else if (metadata.message_id && metadata.sender_id) {
-          // Private messages from a specific sender
+        } else if (notification.type === 'message' && metadata.course_id) {
+          // Course chat messages - check for course_id in message notifications
+          console.log("This is a course chat message. Navigating to course messages:", metadata.course_id);
+          navigate(`/courses/${metadata.course_id}/messages`);
+        } else if (metadata.message_id && metadata.sender_id && !metadata.course_id) {
+          // Private messages from a specific sender (only if no course_id)
           console.log("Navigating to message from sender:", metadata.sender_id, "Message ID:", metadata.message_id);
           navigate(`/messages/${metadata.sender_id}`);
-        } else if (metadata.conversation_id) {
-          // Regular group chats without course context
+        } else if (metadata.conversation_id && !metadata.course_id) {
+          // Regular group chats without course context (only if no course_id)
           console.log("Navigating to conversation:", metadata.conversation_id);
           navigate(`/messages`);
         } else if (metadata.course_id) {
@@ -397,7 +450,55 @@ export default function Dashboard({ setAuth }) {
             navigate(`/courses/${metadata.course_id}/stream`);
           } else if (metadata.assignment_id) {
             console.log("Navigating to course assignment:", metadata.course_id, metadata.assignment_id);
-            navigate(`/courses/${metadata.course_id}/assignments?assignmentId=${metadata.assignment_id}`);
+            
+            // For assignment submission notifications, navigate to student-work tab
+            if (metadata.type === 'assignment_submission' && userRole === 'professor') {
+              console.log("This is a submission notification. Navigating to student work tab.");
+              navigate(`/courses/${metadata.course_id}/assignments?assignmentId=${metadata.assignment_id}&tab=student-work`);
+            } else {
+              // For regular assignment navigation
+              navigate(`/courses/${metadata.course_id}/assignments?assignmentId=${metadata.assignment_id}`);
+            }
+          } else if (metadata.exam_id) {
+            console.log("Navigating to exam:", metadata.course_id, metadata.exam_id);
+            
+            // Enhanced logging to understand the branching logic
+            console.log("Notification details: ", 
+              "metadata.type:", metadata.type, 
+              "notification.type:", notification.type,
+              "userRole:", userRole, 
+              "submission_id:", metadata.submission_id,
+              "notification message:", notification.message);
+            
+            // Check for different notification types
+            const isRecheckRequest = metadata.type === 'exam_recheck' || 
+                                   notification.type === 'exam_recheck' || 
+                                   metadata.type === 'grade_recheck' || 
+                                   notification.type === 'grade_recheck' ||
+                                   (notification.message && notification.message.toLowerCase().includes('recheck'));
+                                   
+            const isNewExamPublished = (metadata.type === 'exam_published' || 
+                                     notification.type === 'exam_published' ||
+                                     (notification.message && notification.message.toLowerCase().includes('new exam') && 
+                                      notification.message.toLowerCase().includes('published')));
+            
+            // For exam recheck requests, navigate to grading view
+            if (isRecheckRequest && userRole === 'professor' && metadata.submission_id) {
+              console.log("This is a professor exam recheck request. Navigating to grading view.");
+              navigate(`/courses/${metadata.course_id}/exams?view=grading&examId=${metadata.exam_id}&submissionId=${metadata.submission_id}`);
+            } else if (isRecheckRequest && userRole === 'student') {
+              // For student's own grade recheck request notification
+              console.log("This is a student grade recheck notification. Navigating to completed exam view.");
+              navigate(`/courses/${metadata.course_id}/exams/${metadata.exam_id}?tab=completed`);
+            } else if (isNewExamPublished) {
+              // For new exam published notifications
+              console.log("This is a new exam published notification. Navigating to exam page.");
+              navigate(`/courses/${metadata.course_id}/exams/${metadata.exam_id}`);
+            } else {
+              // For regular exam navigation
+              console.log("This is a regular exam navigation.");
+              navigate(`/courses/${metadata.course_id}/exams`);
+            }
           } else {
             console.log("Navigating to course stream:", metadata.course_id);
             navigate(`/courses/${metadata.course_id}/stream`);
@@ -496,7 +597,9 @@ export default function Dashboard({ setAuth }) {
 
   // Add WebSocket connection
   useEffect(() => {
-    const socket = io('http://localhost:5000', {
+    // Initialize socket connection
+    console.log("Initializing WebSocket connection...");
+    socketRef.current = io('http://localhost:5000', {
       withCredentials: true,
       transportOptions: {
         polling: {
@@ -507,37 +610,56 @@ export default function Dashboard({ setAuth }) {
       }
     });
 
-    // Only set up notifications if we have a userId available
-    if (userId) {
-      console.log(`Attempting to connect to WebSocket with user_id: ${userId}`);
-      
-      socket.on('connect', () => {
-        console.log('WebSocket connected successfully');
-        // Join a room specific to this user
-        socket.emit('join', `user:${userId}`);
-      });
+    socketRef.current.on('connect', () => {
+      console.log('WebSocket connected successfully');
+      // If userId is already available, join the room
+      if (userId) {
+        socketRef.current.emit('join', `user:${userId}`);
+        console.log(`Joined room user:${userId} on connect`);
+      }
+    });
 
-      socket.on('notification', (notification) => {
-        console.log('Received notification:', notification);
-        // Update your notifications state
-        setNotifications(prev => [notification, ...prev]);
-        setUnreadCount(prev => prev + 1);
-      });
+    socketRef.current.on('notification', (notification) => {
+      console.log('Received notification:', notification);
+      setNotifications(prev => [notification, ...prev]);
+      setUnreadCount(prev => prev + 1);
+      toast(notification.message); // Show a toast for new notifications
+    });
 
-      socket.on('error', (error) => {
-        console.error('WebSocket error:', error);
-      });
+    socketRef.current.on('error', (error) => {
+      console.error('WebSocket error:', error);
+    });
 
-      socket.on('disconnect', () => {
-        console.log('WebSocket disconnected');
-      });
-    } else {
-      console.log('User ID not available yet, WebSocket connection deferred');
-    }
+    socketRef.current.on('disconnect', () => {
+      console.log('WebSocket disconnected');
+    });
 
+    socketRef.current.on('connect_error', (error) => {
+      console.error('WebSocket connection error:', error);
+    });
+
+    // Cleanup on component unmount
     return () => {
-      socket.disconnect();
+      if (socketRef.current) {
+        console.log("Disconnecting WebSocket...");
+        socketRef.current.disconnect();
+      }
     };
+  }, []); // Run only once on mount
+
+  // When userId changes, join the user-specific room
+  useEffect(() => {
+    if (userId && socketRef.current) {
+      console.log(`User ID changed to ${userId}, attempting to join room...`);
+      if (socketRef.current.connected) {
+        socketRef.current.emit('join', `user:${userId}`);
+        console.log(`Joined room user:${userId} after userId was set`);
+      } else {
+        console.log("Socket not connected yet, will join room when connected");
+        // Try to reconnect if not connected
+        socketRef.current.connect();
+      }
+    }
   }, [userId]);
 
   // Add notification preferences fetch
@@ -650,7 +772,6 @@ export default function Dashboard({ setAuth }) {
           <div className="top-bar">
             <div className="search-container">
               <div className="search-bar">
-                <HiOutlineSearch className="search-icon" />
                 <input
                   type="text"
                   className="search-input"
@@ -710,10 +831,12 @@ export default function Dashboard({ setAuth }) {
                       </div>
                     ) : (
                       <div className="notification-list">
-                        {notifications.map((notification) => (
+                        {notifications.map((notification) => {
+                          console.log("Notification:", notification.id || notification.notification_id, "Read status:", notification.read, "is_read:", notification.is_read);
+                          return (
                           <div
-                            key={notification.notification_id}
-                            className={`notification-item ${!notification.is_read ? "unread" : ""}`}
+                            key={notification.notification_id || notification.id}
+                            className={`notification-item ${notification.read === false ? "unread" : ""}`}
                             onClick={() => handleNotificationClick(notification)}
                           >
                             <div className="notification-content">
@@ -723,7 +846,7 @@ export default function Dashboard({ setAuth }) {
                               </span>
                             </div>
                           </div>
-                        ))}
+                        )})}
                       </div>
                     )}
                   </div>
@@ -767,22 +890,22 @@ export default function Dashboard({ setAuth }) {
             </div>
 
             <div className="stats-card">
-              <div className="stats-icon icon-archived"> 
+              <div className="stats-icon icon-inactive"> 
                 <FaArchive />
               </div>
               <div className="stats-info">
-                <h3>Archive Courses</h3> 
-                <p className="stats-value">{courses.filter(course => course.status === 'archived').length}</p>
+                <h3>Inactive Courses</h3> 
+                <p className="stats-value">{courses.filter(course => course.status === 'inactive').length}</p>
               </div>
             </div>
             
             <div className="stats-card">
-              <div className="stats-icon icon-inactive"> 
+              <div className="stats-icon icon-archived"> 
                 <FaBan />
               </div>
               <div className="stats-info">
-                <h3>Inactive Courses</h3>
-                <p className="stats-value">{courses.filter(course => course.status === 'inactive').length}</p>
+                <h3>Archive Courses</h3>
+                <p className="stats-value">{courses.filter(course => course.status === 'archived').length}</p>
               </div>
             </div>
           </div>
@@ -920,19 +1043,34 @@ export default function Dashboard({ setAuth }) {
                 <input
                   type="text"
                   id="enrollment_code"
+                  placeholder="Enter course enrollment code"
                   value={enrollmentCode}
                   onChange={(e) => {
                     setEnrollmentCode(e.target.value);
                     setError(null); // Clear error when typing
                   }}
-                  placeholder="Enter course enrollment code"
                   required
                   autoFocus
+                  className={error ? "error-input" : ""}
                 />
                 <p className="help-text">Enter the enrollment code provided by your instructor.</p>
+                
+                {/* Error Display */}
                 {error && (
                   <div className="error-container">
-                    <p className="error-message-text">{error}</p>
+                    <div className="error-message-text">
+                      <strong>⚠️ Warning:</strong> {error}
+                    </div>
+                    <button 
+                      type="button" 
+                      className="try-new-code-btn"
+                      onClick={() => {
+                        setEnrollmentCode("");
+                        setError(null);
+                      }}
+                    >
+                      Try a different code
+                    </button>
                   </div>
                 )}
               </div>
@@ -940,7 +1078,7 @@ export default function Dashboard({ setAuth }) {
               <div className="modal-actions">
                 <button 
                   type="button" 
-                  className="btn cancel-btn"
+                  className="cancel-btn"
                   onClick={() => {
                     setShowEnrollModal(false);
                     setEnrollmentCode("");
@@ -949,8 +1087,12 @@ export default function Dashboard({ setAuth }) {
                 >
                   Cancel
                 </button>
-                <button type="submit" className="btn submit-btn">
-                  Enroll
+                <button 
+                  type="submit" 
+                  className="submit-btn"
+                  disabled={loading}
+                >
+                  {loading ? "Enrolling..." : "Enroll"}
                 </button>
               </div>
             </form>

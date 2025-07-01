@@ -731,8 +731,8 @@ const Messages = ({ setAuth }) => {
         },
         body: JSON.stringify({
           name: courseDetails?.name ? `${courseDetails.name} Chat` : `Course ${courseId} Chat`,
-          course_id: courseId,
-          conversation_type: 'group'
+          courseId: courseId,
+          conversationType: 'group'
         })
       });
 
@@ -3113,7 +3113,11 @@ const Messages = ({ setAuth }) => {
                           <div className="conversation-participants">
                             {conversations.find(c => c.conversation_id === activeConversation)?.conversation_type === 'group' && 
                               conversations.find(c => c.conversation_id === activeConversation)?.participants && 
-                              `${conversations.find(c => c.conversation_id === activeConversation).participants.length} participants`
+                              `${conversations.find(c => c.conversation_id === activeConversation).participants
+                                .filter(participant => 
+                                  participant.role === 'professor' || 
+                                  courseStudents.some(student => student.user_id === participant.user_id)
+                                ).length} participants`
                             }
                           </div>
                         </div>

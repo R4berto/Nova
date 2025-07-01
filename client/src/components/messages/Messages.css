@@ -79,9 +79,8 @@ svg.newconv-icon{
 }
 
 .new-conversation-button:hover {
-  background-color: white;
-  color: black;
-  border: 2px solid black;
+  background-color: #333333;
+  transform: translateY(-2px);
 }
 
 .new-conversation-button .nav-icon {
@@ -100,7 +99,7 @@ svg.newconv-icon{
 
 .start-conversation-button {
   margin-top: 12px;
-  background-color: var(--primary-color);
+  background-color: black;
   color: white;
   border: none;
   border-radius: 4px;
@@ -110,7 +109,8 @@ svg.newconv-icon{
 }
 
 .start-conversation-button:hover {
-  background-color: var(--primary-color-dark);
+  background-color: #333333;
+  transform: translateY(-2px);
 }
 
 .conversations {
@@ -499,14 +499,19 @@ svg.newconv-icon{
   color: var(--text-muted);
   text-align: center;
   padding: 20px;
+  width: 100%;
 }
 
 .empty-state {
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
   padding: 40px;
-  max-width: 400px;
+  width: 100%;
+  height: 100%;
+  min-height: 400px;
+  max-width: none;
 }
 
 .empty-state .icon {
@@ -1644,7 +1649,6 @@ button.scroll-to-bottom-button .scroll-arrow-svg {
   flex: 1;
   display: flex;
   flex-direction: column;
-  border: 2px solid #000 !important; /* Increase border width for visibility */
   border-radius: 4px;
   overflow: visible !important; 
   position: relative;

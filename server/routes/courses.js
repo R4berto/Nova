@@ -27,8 +27,8 @@ router.post("/", checkAuth, async (req, res) => {
 
     // Insert new course
     const newCourse = await client.query(
-      `INSERT INTO course (course_name, description, professor_id, semester, academic_year, status, section)
-       VALUES ($1, $2, $3, $4, $5, $6, $7)
+      `INSERT INTO course (course_name, description, professor_id, semester, academic_year, status, section, approval_required)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, TRUE)
        RETURNING *`,
       [course_name, description, professor_id, semester, academic_year, status, section]
     );
@@ -116,6 +116,57 @@ router.get("/student", checkAuth, async (req, res) => {
     res.json(courses.rows);
   } catch (err) {
     console.error("Error fetching courses:", err);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
+// Get a single course by ID (for both professors and students)
+router.get("/:id", checkAuth, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const userId = req.user.id;
+    const userRole = req.user.role;
+
+    let courseQuery;
+    let queryParams;
+
+    if (userRole === 'professor') {
+      // For professors, check if they own the course
+      courseQuery = `
+        SELECT c.*, 
+               COALESCE(c.approval_required, FALSE) as approval_required,
+               COALESCE(c.enrollment_code_enabled, TRUE) as enrollment_code_enabled,
+               COUNT(e.enrollment_id) as enrollment_count
+        FROM course c
+        LEFT JOIN enrollment e ON c.course_id = e.course_id
+        WHERE c.course_id = $1 AND c.professor_id = $2
+        GROUP BY c.course_id, c.course_name, c.description, c.professor_id, 
+                 c.enrollment_code, c.semester, c.academic_year, c.status, c.section, 
+                 c.created_at, c.approval_required, c.enrollment_code_enabled
+      `;
+      queryParams = [id, userId];
+    } else {
+      // For students, check if they are enrolled in the course
+      courseQuery = `
+        SELECT c.*, 
+               COALESCE(c.approval_required, FALSE) as approval_required,
+               COALESCE(c.enrollment_code_enabled, TRUE) as enrollment_code_enabled
+        FROM course c
+        JOIN enrollment e ON c.course_id = e.course_id
+        WHERE c.course_id = $1 AND e.student_id = $2
+      `;
+      queryParams = [id, userId];
+    }
+
+    const course = await pool.query(courseQuery, queryParams);
+
+    if (course.rows.length === 0) {
+      return res.status(404).json({ error: "Course not found or access denied" });
+    }
+
+    res.json(course.rows[0]);
+  } catch (err) {
+    console.error("Error fetching course:", err);
     res.status(500).json({ error: "Server error" });
   }
 });
@@ -373,44 +424,6 @@ router.post("/:id/enrollment-code/regenerate", checkAuth, async (req, res) => {
     });
   } catch (err) {
     console.error("Error regenerating enrollment code:", err);
-    res.status(500).json({ error: "Server error" });
-  }
-});
-
-// Get a course by ID
-router.get("/:id", checkAuth, async (req, res) => {
-  try {
-    const { id } = req.params;
-    const userId = req.user.id;
-
-    // First try to get the course details if user is the professor
-    let courseQuery = await pool.query(
-      "SELECT * FROM course WHERE course_id = $1 AND professor_id = $2",
-      [id, userId]
-    );
-
-    // If user is not the professor, check if they're enrolled
-    if (courseQuery.rows.length === 0) {
-      const enrollmentCheck = await pool.query(
-        `SELECT c.* FROM course c
-         JOIN enrollment e ON c.course_id = e.course_id
-         WHERE c.course_id = $1 AND e.student_id = $2`,
-        [id, userId]
-      );
-
-      if (enrollmentCheck.rows.length > 0) {
-        courseQuery = enrollmentCheck;
-      }
-    }
-
-    // Return the course if found
-    if (courseQuery.rows.length > 0) {
-      res.json(courseQuery.rows[0]);
-    } else {
-      res.status(404).json({ error: "Course not found or you don't have access to it" });
-    }
-  } catch (err) {
-    console.error("Error fetching course details:", err);
     res.status(500).json({ error: "Server error" });
   }
 });

@@ -3,6 +3,7 @@ import { Link, useNavigate, useLocation } from "react-router-dom";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import toast from "react-hot-toast";
 import './login.css';
+import NovaLogo from '../assets/NovaLogo.png';
 
 const Login = ({ setAuth }) => {
   const [inputs, setInputs] = useState({ email: "", password: "" });
@@ -165,7 +166,18 @@ const Login = ({ setAuth }) => {
   return (
     <div className="container">
       <div className="info-section">
-        <h1>Welcome to Nova</h1>
+        <div className="solar">
+          <i className="mercury"></i>
+          <i className="venus"></i>
+          <i className="earth"></i>
+          <i className="mars"></i>
+          <i className="belt"></i>
+          <i className="jupiter"></i>
+          <i className="saturn"></i>
+          <i className="uranus"></i>
+          <i className="neptune"></i>
+        </div>
+        <h1>Nova</h1>
         <p className="subtitle">Your path to excellence in learning</p>
         
         <div className="carousel-container">
@@ -173,7 +185,7 @@ const Login = ({ setAuth }) => {
             {carouselContent.map((slide, index) => (
               <div key={index} className="carousel-slide">
                 <div className="image-wrapper">
-                  <img src={slide.image} alt={slide.title} />
+                  {/* Image removed */}
                 </div>
                 <div className="text-wrapper">
                   <h3>{slide.title}</h3>
@@ -182,22 +194,13 @@ const Login = ({ setAuth }) => {
               </div>
             ))}
           </div>
-          
-          <div className="carousel-dots-container">
-            <div className="carousel-dots">
-              {carouselContent.map((_, index) => (
-                <span 
-                  key={index} 
-                  className={`carousel-dot ${index === currentSlide ? "active" : ""}`}
-                  onClick={() => setCurrentSlide(index)}
-                ></span>
-              ))}
-            </div>
-          </div>
         </div>
       </div>
       <div className="form-section">
         <div className="form-container">
+          <div className="form-logo-container">
+            <img src={NovaLogo} alt="Nova Logo" className="form-logo" />
+          </div>
           <h2>Welcome</h2>
           <form onSubmit={onSubmitForm}>
             <div className={`form-group ${formErrors.email ? 'error' : ''}`}>
@@ -231,6 +234,11 @@ const Login = ({ setAuth }) => {
                 {showPassword ? <FaEyeSlash /> : <FaEye />}
               </span>
               {formErrors.password && <div className="error-message">{formErrors.password}</div>}
+            </div>
+            <div className="forgot-password-container">
+              <Link to="/forgot-password" className="link forgot-password-link">
+                Forgot password?
+              </Link>
             </div>
             <button type="submit" className="submit-button" disabled={loading}>
               Sign in

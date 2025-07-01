@@ -23,7 +23,7 @@ const ExamAnalytics = () => {
   const [sortColumn, setSortColumn] = useState('rank');
   const [sortDirection, setSortDirection] = useState('asc');
   const [activeTab, setActiveTab] = useState('rankings'); // 'rankings' or 'difficulty'
-  const [includeNonParticipants, setIncludeNonParticipants] = useState(false);
+  const [includeNonParticipants, setIncludeNonParticipants] = useState(true);
 
   // Fetch available exams
   useEffect(() => {
@@ -71,7 +71,7 @@ const ExamAnalytics = () => {
         
         const endpoint = examId === 'all' 
           ? `http://localhost:5000/dss/exams/analytics/aggregate/${courseId}?includeNonParticipants=${includeNonParticipants}` 
-          : `http://localhost:5000/dss/exams/analytics/${examId}?includeNonParticipants=${includeNonParticipants}`;
+          : `http://localhost:5000/dss/exams/analytics/${examId}?includeNonParticipants=${includeNonParticipants}&forceShow=true`;
         
         console.log('Fetching from endpoint:', endpoint);
         
@@ -230,11 +230,6 @@ const ExamAnalytics = () => {
                   <h3>{examId === 'all' ? 'Total Students' : 'Submissions'}</h3>
                   <p className="stats-value">
                     {analyticsData.statistics?.total_submissions || 0}
-                    {includeNonParticipants && analyticsData.statistics?.non_participants > 0 && (
-                      <span style={{ fontSize: '0.875rem', color: '#666666', display: 'block', marginTop: '4px' }}>
-                        {analyticsData.statistics.participants || 0} participants + {analyticsData.statistics.non_participants || 0} non-participants
-                      </span>
-                    )}
                   </p>
                 </div>
               </div>
@@ -338,14 +333,18 @@ const ExamAnalytics = () => {
                       {includeNonParticipants && examId !== 'all' && (
                         <td>
                           {student.non_participant ? (
-                            student.is_due_over && (
+                            student.is_due_over ? (
                               <span className="non-participant-badge">
-                                <FaExclamationTriangle style={{ fontSize: '0.9rem', marginRight: '4px' }} /> Due Over - Not Submitted
+                                <FaExclamationTriangle style={{ fontSize: '0.9rem', marginRight: '4px' }} /> Missed Deadline
+                              </span>
+                            ) : (
+                              <span className="pending-badge">
+                                <FaUserSlash style={{ fontSize: '0.9rem', marginRight: '4px' }} /> Pending Submission
                               </span>
                             )
                           ) : (
                             <span className="participant-badge">
-                              <FaUserGraduate style={{ fontSize: '0.9rem', marginRight: '4px' }} /> Submitted
+                              <FaUserGraduate style={{ fontSize: '0.9rem', marginRight: '4px' }} /> Completed
                             </span>
                           )}
                         </td>
@@ -425,8 +424,8 @@ const ExamAnalytics = () => {
   };
 
   return (
-    <div className="exam-analytics-container">
-      <div className="analytics-content">
+    <div className="exam-analytics-container auto-height">
+      <div className="analytics-content auto-height">
         {renderRankings()}
       </div>
     </div>

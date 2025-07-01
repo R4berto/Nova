@@ -535,14 +535,26 @@ class NotificationService {
   // Notify instructor about new submission
   async notifyStudentsAboutNewSubmission(assignmentId, studentId) {
     try {
-      // Get assignment and course details
+      // First get student information
+      const studentResult = await pool.query(
+        `SELECT first_name, last_name FROM users WHERE user_id = $1`,
+        [studentId]
+      );
+      
+      if (studentResult.rows.length === 0) {
+        console.error(`Student ${studentId} not found for submission notification`);
+        return;
+      }
+      
+      const { first_name, last_name } = studentResult.rows[0];
+      
+      // Get assignment and course details (including professor_id)
       const assignmentResult = await pool.query(
-        `SELECT a.course_id, a.title, c.instructor_id, u.first_name, u.last_name
+        `SELECT a.course_id, a.title, c.professor_id
          FROM assignment a
          JOIN course c ON a.course_id = c.course_id
-         JOIN users u ON u.user_id = $2
          WHERE a.assignment_id = $1`,
-        [assignmentId, studentId]
+        [assignmentId]
       );
       
       if (assignmentResult.rows.length === 0) {
@@ -550,14 +562,14 @@ class NotificationService {
         return;
       }
       
-      const { course_id, title, instructor_id, first_name, last_name } = assignmentResult.rows[0];
+      const { course_id, title, professor_id } = assignmentResult.rows[0];
       
-      // Only notify the instructor
-      if (instructor_id) {
+      // Only notify the professor
+      if (professor_id) {
         const notificationMessage = `New submission: ${first_name} ${last_name} has submitted "${title}"`;
         
         await this.createNotification(
-          instructor_id,
+          professor_id,
           'new_content',
           notificationMessage,
           {
@@ -565,7 +577,7 @@ class NotificationService {
             assignment_id: assignmentId,
             student_id: studentId,
             type: 'assignment_submission',
-            redirect_url: `/courses/${course_id}/assignments?assignmentId=${assignmentId}`
+            redirect_url: `/courses/${course_id}/assignments?assignmentId=${assignmentId}&tab=student-work`
           }
         );
       }

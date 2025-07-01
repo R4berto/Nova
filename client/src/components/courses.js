@@ -27,9 +27,10 @@ import {
     HiOutlineChat,
     HiOutlineSearch,
     HiOutlineViewGrid,
-    HiOutlineExclamationCircle
+    HiOutlineExclamationCircle,
+    HiOutlineClock
 } from "react-icons/hi"
-import "./classroom.css"
+import "./course.css"
 import { toast } from 'react-hot-toast'
 import Sidebar from './Sidebar'
 import LoadingIndicator from './common/LoadingIndicator'
@@ -79,6 +80,10 @@ export default function Classroom({ setAuth }) {
   const [showReactivateModal, setShowReactivateModal] = useState(false);
   const [selectedCourse, setSelectedCourse] = useState(null);
   const [userId, setUserId] = useState(null);
+
+  // Add state for pending enrollments
+  const [pendingEnrollments, setPendingEnrollments] = useState([]);
+  const [loadingPending, setLoadingPending] = useState(false);
 
   const {first_name, last_name} = inputs;
 
@@ -187,6 +192,35 @@ export default function Classroom({ setAuth }) {
     }
   }, [userRole, navigate]);
 
+  // Fetch pending enrollments for students
+  const fetchPendingEnrollments = useCallback(async () => {
+    if (userRole !== 'student') return;
+    
+    try {
+      setLoadingPending(true);
+      const token = localStorage.getItem("token");
+      if (!token) return;
+
+      const response = await fetch("http://localhost:5000/enrollment-approval/student-pending", {
+        headers: {
+          jwt_token: token
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch pending enrollments');
+      }
+
+      const data = await response.json();
+      setPendingEnrollments(Array.isArray(data) ? data : []);
+    } catch (err) {
+      console.error('Error fetching pending enrollments:', err);
+      setPendingEnrollments([]);
+    } finally {
+      setLoadingPending(false);
+    }
+  }, [userRole]);
+
   useEffect(() => {
     fetchUserRole()
   }, [fetchUserRole])
@@ -194,8 +228,36 @@ export default function Classroom({ setAuth }) {
   useEffect(() => {
     if (userRole) {
       fetchCourses()
+      fetchPendingEnrollments()
     }
-  }, [userRole, fetchCourses])
+  }, [userRole, fetchCourses, fetchPendingEnrollments])
+
+  // Add effect to refetch data when tab becomes visible or window is focused
+  useEffect(() => {
+    const refetchData = () => {
+      if (userRole) {
+        // This function will be called on focus or visibility change
+        fetchCourses();
+        fetchPendingEnrollments();
+      }
+    };
+
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        refetchData();
+      }
+    };
+
+    // Add event listeners for both focus and visibility change
+    window.addEventListener('focus', refetchData);
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    // Cleanup listeners when the component unmounts
+    return () => {
+      window.removeEventListener('focus', refetchData);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, [userRole, fetchCourses, fetchPendingEnrollments]);
 
   // Get profile information
   useEffect(() => {
@@ -912,8 +974,8 @@ export default function Classroom({ setAuth }) {
     return (
       <div className="course-list-table">
         <div className="course-list-header-row">
-          <div className="course-column">Course Name</div>
-          <div className="description-column">Description</div>
+          <div className="course-column">Course Code</div>
+          <div className="description-column">Course Name</div>
           <div className="section-column">Section</div>
           <div className="semester-column">Semester</div>
           <div className="year-column">Academic Year</div>
@@ -1005,6 +1067,177 @@ export default function Classroom({ setAuth }) {
     setCoursesSubmenuOpen(!coursesSubmenuOpen);
   };
 
+  // Add handleEnrollment function after other similar functions
+  const handleEnrollment = async (e) => {
+    e.preventDefault();
+    
+    if (!enrollmentCode.trim()) {
+      setError("Please enter a valid enrollment code");
+      setEnrollmentCode(""); // Clear the input
+      return;
+    }
+
+    try {
+      setLoading(true);
+      const token = localStorage.getItem("token");
+      if (!token) {
+        navigate("/login");
+        return;
+      }
+
+      // Use the new enrollment approval endpoint
+      const response = await fetch("http://localhost:5000/enrollment-approval/request-enrollment", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          jwt_token: token
+        },
+        body: JSON.stringify({ enrollment_code: enrollmentCode })
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        // Clear the input for any error
+        setEnrollmentCode("");
+        
+        if (data.error?.includes("already enrolled")) {
+          setError("You are already enrolled in this course. Please enter a different enrollment code.");
+        } else if (data.error?.includes("not found") || data.error?.includes("invalid")) {
+          setError("Invalid enrollment code. Please check the code and try again.");
+        } else if (data.error?.includes("expired")) {
+          setError("This enrollment code has expired. Please contact your instructor for a new code.");
+        } else if (data.error?.includes("course is full")) {
+          setError("This course is full and cannot accept new enrollments.");
+        } else if (data.error?.includes("course is inactive")) {
+          setError("This course is currently inactive and not accepting enrollments.");
+        } else {
+          setError(data.error || "Failed to enroll in course. Please try again.");
+        }
+        return;
+      }
+
+      // Handle the response based on whether approval is required
+      if (data.requires_approval) {
+        // Course requires approval - show pending message
+        setShowEnrollModal(false);
+        setEnrollmentCode("");
+        setError(null);
+        toast.success("Enrollment request submitted! Waiting for professor approval.");
+        
+        // Refresh pending enrollments to show the new request
+        await fetchPendingEnrollments();
+      } else {
+        // Direct enrollment (no approval required) - existing behavior
+        // Refresh courses to include the newly enrolled course
+        await fetchCourses();
+        
+        setShowEnrollModal(false);
+        setEnrollmentCode("");
+        setError(null);
+        toast.success("Successfully enrolled in course!");
+      }
+    } catch (err) {
+      console.error("Error enrolling in course:", err);
+      setError("Server error. Please try again later.");
+      setEnrollmentCode(""); // Clear the input on server error
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Handle canceling pending enrollment request
+  const handleCancelPendingEnrollment = async (pendingId, courseName) => {
+    const confirmed = window.confirm(
+      `Are you sure you want to cancel your enrollment request for "${courseName}"?`
+    );
+    
+    if (!confirmed) return;
+
+    // Optimistic UI update
+    const originalPendingEnrollments = [...pendingEnrollments];
+    setPendingEnrollments(prev => prev.filter(p => p.pending_id !== pendingId));
+
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        navigate("/login");
+        return;
+      }
+
+      const response = await fetch(`http://localhost:5000/enrollment-approval/cancel/${pendingId}`, {
+        method: "DELETE",
+        headers: {
+          jwt_token: token
+        }
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || "Failed to cancel enrollment request");
+      }
+
+      toast.success("Enrollment request cancelled successfully");
+    } catch (err) {
+      console.error("Error cancelling enrollment request:", err);
+      toast.error(err.message || "Failed to cancel enrollment request");
+      // Revert on failure
+      setPendingEnrollments(originalPendingEnrollments);
+    }
+  };
+
+  // Function to render pending course cards for students
+  const renderPendingCourseCards = () => {
+    if (loadingPending) {
+      return <LoadingIndicator text="Loading pending enrollments" />;
+    }
+
+    if (pendingEnrollments.length === 0) {
+      return (
+        <div className="no-courses-message">
+          <HiOutlineClock size={48} className="mb-4" />
+          <h3>No pending enrollments</h3>
+          <p>You don't have any pending course enrollment requests.</p>
+        </div>
+      );
+    }
+
+    return (
+      <div className="course-grid">
+        {pendingEnrollments.map(pending => (
+          <div key={pending.pending_id} className="course-card shadow-md fade-in pending-card">
+            <div className="course-card-content">
+              <div className="pending-status-badge">
+                <HiOutlineClock size={16} />
+                <span>Pending Approval</span>
+              </div>
+              <h3 className="course-title">
+                {pending.course_name}
+              </h3>
+              <p className="course-description">Waiting for professor approval</p>
+              
+              <div className="course-meta">
+                <span>Professor: {pending.professor_name}</span>
+                <span>Requested: {new Date(pending.requested_at).toLocaleDateString()}</span>
+              </div>
+              
+              <div className="course-actions">
+                <button 
+                  className="action-btn cancel-btn"
+                  onClick={() => handleCancelPendingEnrollment(pending.pending_id, pending.course_name)}
+                  title="Cancel enrollment request"
+                >
+                  <HiOutlineX />
+                  <span>Cancel Request</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    );
+  };
+
   return (
     <div className="dashboard-container classroom-page">
       <Sidebar 
@@ -1038,7 +1271,6 @@ export default function Classroom({ setAuth }) {
           <div className="top-bar">
             <div className="search-container">
               <div className="search-bar">
-                <HiOutlineSearch className="search-icon" />
                 <input
                   type="text"
                   className="search-input"
@@ -1107,6 +1339,17 @@ export default function Classroom({ setAuth }) {
                 >
                   Archived Courses
                 </button>
+                {userRole === 'student' && (
+                  <button 
+                    className={`tab-btn ${activeTab === "pending" ? "active" : ""}`}
+                    onClick={() => setActiveTab("pending")}
+                  >
+                    Pending Courses
+                    {pendingEnrollments.length > 0 && (
+                      <span className="pending-badge">{pendingEnrollments.length}</span>
+                    )}
+                  </button>
+                )}
               </div>
               
               <div className="view-controls">
@@ -1127,7 +1370,10 @@ export default function Classroom({ setAuth }) {
               </div>
             </div>
             
-            {viewMode === 'grid' ? renderCourseCards() : renderCourseTable()}
+            {activeTab === "pending" && userRole === "student" 
+              ? renderPendingCourseCards() 
+              : (viewMode === 'grid' ? renderCourseCards() : renderCourseTable())
+            }
           </div>
         </div>
       </div>
@@ -1159,7 +1405,7 @@ export default function Classroom({ setAuth }) {
                 <input
                   id="course_name"
                   type="text"
-                  placeholder="Enter course name"
+                  placeholder="Enter Course Code"
                   value={isEditing ? editingCourse.course_name : newCourse.course_name}
                   onChange={(e) => {
                     if (isEditing) {
@@ -1174,7 +1420,7 @@ export default function Classroom({ setAuth }) {
                 <label htmlFor="description">Course Name</label>
                 <textarea
                   id="description"
-                  placeholder="Enter course description"
+                  placeholder="Enter Course Name"
                   value={isEditing ? editingCourse.description : newCourse.description}
                   onChange={(e) => {
                     if (isEditing) {
@@ -1386,6 +1632,7 @@ export default function Classroom({ setAuth }) {
                 className="close-modal"
                 onClick={() => {
                   setShowEnrollModal(false);
+                  setEnrollmentCode("");
                   setError(null);
                 }}
               >
@@ -1393,22 +1640,42 @@ export default function Classroom({ setAuth }) {
               </button>
             </div>
             
-            <form className="modal-form" onSubmit={(e) => {
-              e.preventDefault();
-              // Handle enrollment - just close the modal for now 
-              setShowEnrollModal(false);
-              toast.success("This feature will be implemented soon.");
-            }}>
+            <form className="modal-form" onSubmit={handleEnrollment}>
               <div className="form-group">
                 <label htmlFor="enrollment_code">Course Enrollment Code</label>
                 <input
                   type="text"
                   id="enrollment_code"
                   placeholder="Enter course enrollment code"
+                  value={enrollmentCode}
+                  onChange={(e) => {
+                    setEnrollmentCode(e.target.value);
+                    setError(null); // Clear error when typing
+                  }}
                   required
                   autoFocus
+                  className={error ? "error-input" : ""}
                 />
                 <p className="help-text">Enter the enrollment code provided by your instructor.</p>
+                
+                {/* Error Display */}
+                {error && (
+                  <div className="error-container">
+                    <div className="error-message-text">
+                      <strong>⚠️ Warning:</strong> {error}
+                    </div>
+                    <button 
+                      type="button" 
+                      className="try-new-code-btn"
+                      onClick={() => {
+                        setEnrollmentCode("");
+                        setError(null);
+                      }}
+                    >
+                      Try a different code
+                    </button>
+                  </div>
+                )}
               </div>
               
               <div className="modal-actions">
@@ -1417,13 +1684,18 @@ export default function Classroom({ setAuth }) {
                   className="cancel-btn"
                   onClick={() => {
                     setShowEnrollModal(false);
+                    setEnrollmentCode("");
                     setError(null);
                   }}
                 >
                   Cancel
                 </button>
-                <button type="submit" className="submit-btn">
-                  Enroll
+                <button 
+                  type="submit" 
+                  className="submit-btn"
+                  disabled={loading}
+                >
+                  {loading ? "Enrolling..." : "Enroll"}
                 </button>
               </div>
             </form>

@@ -928,6 +928,12 @@ const TestInterfaceComponent = ({
     
     return Math.round((answeredQuestions / totalQuestions) * 100);
   };
+  
+  // New function to check if all questions are answered
+  const areAllQuestionsAnswered = () => {
+    if (!selectedExam || !selectedExam.questions) return false;
+    return calculateCompletion() === 100;
+  };
 
   const handleRequestRecheck = async (e) => {
     e.preventDefault();
@@ -1362,81 +1368,96 @@ const TestInterfaceComponent = ({
         {examStarted && (
           <>
             <div className="questions-container">
-              {selectedExam.questions && selectedExam.questions.map((question, index) => (
-                <div key={question.question_id} className="question-card">
-                  <div className="question-number">Question {index + 1}</div>
-                  <div className="question-text">{question.question_text}</div>
-                  <div className="question-points">Points: {question.points}</div>
-                  
-                  {/* Check if this is a multiple-answer MCQ question */}
-                  {question.type === 'mcq' && question.options && (
-                    <>
-                      {/* Show a notice if multiple answers are allowed */}
-                      {isMultipleAnswerQuestion(question.question_id) && (
-                        <div className="multi-answer-notice">
-                          <p>This question required selecting all correct options and no incorrect options to be considered correct.</p>
-                        </div>
-                      )}
-                      
-                      <div className="options-list">
-                        {question.options.map((option, optIndex) => {
-                          // Determine if this is a multiple-answer question
-                          const isMultiple = isMultipleAnswerQuestion(question.question_id);
-                          
-                          // Check if this option is selected
-                          const isSelected = isMultiple
-                            ? Array.isArray(answers[question.question_id]) && 
-                              answers[question.question_id].includes(optIndex.toString())
-                            : answers[question.question_id] === optIndex.toString();
-                          
-                          return (
-                            <div 
-                              key={optIndex}
-                              className={`option-item ${isMultiple ? 'multiple-answers' : ''} ${isSelected ? 'selected' : ''}`}
-                              onClick={() => isMultiple 
-                                ? handleMultipleOptionToggle(question.question_id, optIndex)
-                                : handleOptionSelect(question.question_id, optIndex)
-                              }
-                            >
-                              <div className="option-marker">
-                                {isSelected && <FaCheck />}
-                              </div>
-                              <div className="option-text">{option}</div>
-                            </div>
-                          );
-                        })}
-                      </div>
-                    </>
-                  )}
-                  
-                  {question.type === 'identification' && (
-                    <div className="identification-input">
-                      {/* Show a notice if multiple answers are allowed */}
-                      {isMultipleAnswerQuestion(question.question_id) && (
-                        <div className="multi-answer-notice">
-                          <p>This question allows multiple correct answers. You only need to provide one of the acceptable answers to receive full credit.</p>
-                        </div>
-                      )}
-                      <input
-                        type="text"
-                        placeholder="Your answer"
-                        value={answers[question.question_id] || ''}
-                        onChange={(e) => handleAnswerChange(question.question_id, e.target.value)}
-                      />
+              {selectedExam.questions && selectedExam.questions.map((question, index) => {
+                // Check if this question has been answered
+                const isAnswered = question.type === 'mcq' && isMultipleAnswerQuestion(question.question_id)
+                  ? Array.isArray(answers[question.question_id]) && answers[question.question_id].length > 0
+                  : answers[question.question_id] !== '';
+                
+                return (
+                  <div key={question.question_id} className={`question-card ${!isAnswered ? 'unanswered' : ''}`}>
+                    <div className="question-number">
+                      Question {index + 1}
+                      {!isAnswered && <span className="required-indicator">* Required</span>}
                     </div>
-                  )}
-                </div>
-              ))}
+                    <div className="question-text">{question.question_text}</div>
+                    <div className="question-points">Points: {question.points}</div>
+                  
+                    {/* Check if this is a multiple-answer MCQ question */}
+                    {question.type === 'mcq' && question.options && (
+                      <>
+                        {/* Show a notice if multiple answers are allowed */}
+                        {isMultipleAnswerQuestion(question.question_id) && (
+                          <div className="multi-answer-notice">
+                            <p>This question required selecting all correct options and no incorrect options to be considered correct.</p>
+                          </div>
+                        )}
+                      
+                        <div className="options-list">
+                          {question.options.map((option, optIndex) => {
+                            // Determine if this is a multiple-answer question
+                            const isMultiple = isMultipleAnswerQuestion(question.question_id);
+                          
+                            // Check if this option is selected
+                            const isSelected = isMultiple
+                              ? Array.isArray(answers[question.question_id]) && 
+                                answers[question.question_id].includes(optIndex.toString())
+                              : answers[question.question_id] === optIndex.toString();
+                          
+                            return (
+                              <div 
+                                key={optIndex}
+                                className={`option-item ${isMultiple ? 'multiple-answers' : ''} ${isSelected ? 'selected' : ''}`}
+                                onClick={() => isMultiple 
+                                  ? handleMultipleOptionToggle(question.question_id, optIndex)
+                                  : handleOptionSelect(question.question_id, optIndex)
+                                }
+                              >
+                                <div className="option-marker">
+                                  {isSelected && <FaCheck />}
+                                </div>
+                                <div className="option-text">{option}</div>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </>
+                    )}
+                  
+                    {question.type === 'identification' && (
+                      <div className="identification-input">
+                        {/* Show a notice if multiple answers are allowed */}
+                        {isMultipleAnswerQuestion(question.question_id) && (
+                          <div className="multi-answer-notice">
+                            <p>This question allows multiple correct answers. You only need to provide one of the acceptable answers to receive full credit.</p>
+                          </div>
+                        )}
+                        <input
+                          type="text"
+                          placeholder="Your answer"
+                          value={answers[question.question_id] || ''}
+                          onChange={(e) => handleAnswerChange(question.question_id, e.target.value)}
+                        />
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
             </div>
             
             <div className="exam-actions">
               <button 
                 className="submit-exam-btn"
                 onClick={handleSubmitExam}
-                disabled={submitting || calculateCompletion() === 0}
+                disabled={submitting || !areAllQuestionsAnswered()}
               >
                 {submitting ? 'Submitting...' : 'Submit Exam'}
               </button>
+              {calculateCompletion() > 0 && !areAllQuestionsAnswered() && (
+                <div className="required-notice">
+                  <p>All questions must be answered before submission. ({calculateCompletion()}% complete)</p>
+                </div>
+              )}
             </div>
           </>
         )}
@@ -1528,26 +1549,41 @@ const TestInterfaceComponent = ({
               {examStarted && (
                 <>
                   <div className="questions-container">
-                    {selectedExam.questions && selectedExam.questions.map((question, index) => (
-                      <div key={question.question_id} className="question-card">
-                        <div className="question-number">Question {index + 1}</div>
-                        <div className="question-text">{question.question_text}</div>
-                        <div className="question-points">Points: {question.points}</div>
-                        
-                        {/* Question type specific content */}
-                        {/* ... existing question rendering ... */}
-                      </div>
-                    ))}
+                    {selectedExam.questions && selectedExam.questions.map((question, index) => {
+                      // Check if this question has been answered
+                      const isAnswered = question.type === 'mcq' && isMultipleAnswerQuestion(question.question_id)
+                        ? Array.isArray(answers[question.question_id]) && answers[question.question_id].length > 0
+                        : answers[question.question_id] !== '';
+                      
+                      return (
+                        <div key={question.question_id} className={`question-card ${!isAnswered ? 'unanswered' : ''}`}>
+                          <div className="question-number">
+                            Question {index + 1}
+                            {!isAnswered && <span className="required-indicator">* Required</span>}
+                          </div>
+                          <div className="question-text">{question.question_text}</div>
+                          <div className="question-points">Points: {question.points}</div>
+                          
+                          {/* Question type specific content */}
+                          {/* ... existing question rendering ... */}
+                        </div>
+                      );
+                    })}
                   </div>
                   
                   <div className="exam-actions">
                     <button 
                       className="submit-exam-btn"
                       onClick={handleSubmitExam}
-                      disabled={submitting || calculateCompletion() === 0}
+                      disabled={submitting || !areAllQuestionsAnswered()}
                     >
                       {submitting ? 'Submitting...' : 'Submit Exam'}
                     </button>
+                    {calculateCompletion() > 0 && !areAllQuestionsAnswered() && (
+                      <div className="required-notice">
+                        <p>All questions must be answered before submission. ({calculateCompletion()}% complete)</p>
+                      </div>
+                    )}
                   </div>
                 </>
               )}

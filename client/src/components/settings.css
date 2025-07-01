@@ -102,8 +102,8 @@
   gap: 8px;
   padding: 8px 16px;
   border-radius: 6px;
-  background-color: #e0f2fe;
-  color: #0369a1;
+  background-color: black;
+  color: white;
   border: none;
   font-weight: 500;
   cursor: pointer;
@@ -111,7 +111,8 @@
 }
 
 .edit-toggle-btn:hover {
-  background-color: #bae6fd;
+  background-color: #333333;
+  transform: translateY(-2px);
 }
 
 /* Profile Avatar Section */
@@ -295,7 +296,7 @@ div.form-group + .l-name{
   align-items: center;
   gap: 8px;
   padding: 10px 20px;
-  background-color: #3b82f6;
+  background-color: black;
   color: white;
   border: none;
   border-radius: 6px;
@@ -306,7 +307,8 @@ div.form-group + .l-name{
 
 .save-profile-btn:hover,
 .save-password-btn:hover {
-  background-color: #2563eb;
+  background-color: #333333;
+  transform: translateY(-2px);
 }
 
 .cancel-edit-btn {
@@ -412,6 +414,7 @@ div.form-group + .l-name{
   gap: 8px;
   font-size: 14px;
   color: #6b7280;
+  margin-top: 5px;
 }
 
 .course-dates span {
@@ -435,7 +438,7 @@ div.form-group + .l-name{
   display: inline-block;
   margin-top: 16px;
   padding: 10px 20px;
-  background-color: #3b82f6;
+  background-color: black;
   color: white;
   border-radius: 6px;
   text-decoration: none;
@@ -444,7 +447,7 @@ div.form-group + .l-name{
 }
 
 .no-courses-message .btn-primary:hover {
-  background-color: #2563eb;
+  background-color: black;
 }
 
 /* Loading spinner */
@@ -624,7 +627,7 @@ div.form-group + .l-name{
   width: 16px;
   height: 16px;
   border-radius: 50%;
-  background: #ffffff;
+  background: #000000;
   cursor: pointer;
   border: none;
 }
@@ -673,7 +676,8 @@ div.form-group + .l-name{
 }
 
 .cancel-btn:hover {
-  text-decoration: underline;
+  background-color: #333333;
+  transform: translateY(-2px);
 }
 
 .save-btn {

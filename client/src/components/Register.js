@@ -12,10 +12,15 @@ const Register = ({ setAuth }) => {
     last_name: "",
     role: "",
   });
+  const [verificationCode, setVerificationCode] = useState("");
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [formErrors, setFormErrors] = useState({});
   const [currentSlide, setCurrentSlide] = useState(0);
+  const [registrationStep, setRegistrationStep] = useState(1); // 1: form, 2: verification
+  const [userData, setUserData] = useState(null); // Store user data between steps
+  const [timeLeft, setTimeLeft] = useState(300); // 5 minutes in seconds
+  const [resendCooldown, setResendCooldown] = useState(0); // Cooldown for resend button
   const navigate = useNavigate();
 
   // Carousel content
@@ -47,6 +52,38 @@ const Register = ({ setAuth }) => {
 
     return () => clearInterval(interval);
   }, [carouselContent.length]);
+
+  // Countdown timer for verification code
+  useEffect(() => {
+    let timer;
+    if (registrationStep === 2 && timeLeft > 0) {
+      timer = setInterval(() => {
+        setTimeLeft((prev) => {
+          if (prev <= 1) {
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+    }
+    return () => clearInterval(timer);
+  }, [registrationStep, timeLeft]);
+
+  // Resend cooldown timer
+  useEffect(() => {
+    let cooldownTimer;
+    if (resendCooldown > 0) {
+      cooldownTimer = setInterval(() => {
+        setResendCooldown((prev) => {
+          if (prev <= 1) {
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+    }
+    return () => clearInterval(cooldownTimer);
+  }, [resendCooldown]);
 
   const nextSlide = () => {
     setCurrentSlide((prev) => (prev === carouselContent.length - 1 ? 0 : prev + 1));
@@ -86,10 +123,7 @@ const Register = ({ setAuth }) => {
     return regex.test(password);
   };
 
-  const onSubmitForm = async (e) => {
-    e.preventDefault();
-    
-    // Final validation before submission
+  const validateForm = () => {
     let hasErrors = false;
     let updatedInputs = { ...inputs };
     
@@ -141,7 +175,19 @@ const Register = ({ setAuth }) => {
     // Update inputs with cleared values
     setInputs(updatedInputs);
     
-    if (hasErrors) {
+    return !hasErrors;
+  };
+
+  const formatTime = (seconds) => {
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = seconds % 60;
+    return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
+  };
+
+  const onSubmitForm = async (e) => {
+    e.preventDefault();
+    
+    if (!validateForm()) {
       toast.error("Please fix the errors before submitting.");
       return;
     }
@@ -157,14 +203,13 @@ const Register = ({ setAuth }) => {
 
       const parseRes = await response.json();
 
-      if (parseRes.jwtToken) {
-        localStorage.setItem("token", parseRes.jwtToken);
-        setAuth(true);
-        toast.success("Registered Successfully! 🎉");
-        // Navigate to dashboard after successful registration
-        navigate("/dashboard", { replace: true });
+      if (response.ok) {
+        setUserData(parseRes);
+        setRegistrationStep(2);
+        setTimeLeft(300); // Reset timer to 5 minutes
+        setResendCooldown(0);
+        toast.success("Verification code sent to your email! 📧");
       } else {
-        setAuth(false);
         toast.error(parseRes.error || "Registration failed. Try again.");
       }
     } catch (err) {
@@ -175,9 +220,198 @@ const Register = ({ setAuth }) => {
     }
   };
 
+  const onSubmitVerification = async (e) => {
+    e.preventDefault();
+    
+    if (!verificationCode.trim()) {
+      toast.error("Please enter the verification code");
+      return;
+    }
+
+    if (timeLeft === 0) {
+      toast.error("Verification code has expired. Please request a new one.");
+      return;
+    }
+    
+    setLoading(true);
+    try {
+      const body = {
+        email: userData.email,
+        verificationCode: verificationCode,
+        first_name: userData.first_name,
+        last_name: userData.last_name,
+        role: userData.role,
+        password: userData.password
+      };
+      
+      const response = await fetch("http://localhost:5000/auth/verify-email", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      });
+
+      const parseRes = await response.json();
+
+      if (parseRes.jwtToken) {
+        localStorage.setItem("token", parseRes.jwtToken);
+        setAuth(true);
+        toast.success("Email verified and account created successfully! 🎉");
+        navigate("/dashboard", { replace: true });
+      } else {
+        toast.error(parseRes.error || "Verification failed. Try again.");
+      }
+    } catch (err) {
+      console.error(err.message);
+      toast.error("Something went wrong! ❌");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleResendCode = async () => {
+    if (!userData || resendCooldown > 0) return;
+    
+    setLoading(true);
+    try {
+      const response = await fetch("http://localhost:5000/auth/resend-verification", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: userData.email,
+          first_name: userData.first_name
+        }),
+      });
+
+      const parseRes = await response.json();
+
+      if (response.ok) {
+        setTimeLeft(300); // Reset timer to 5 minutes
+        setResendCooldown(30); // 30 second cooldown
+        setVerificationCode(""); // Clear the input
+        toast.success("New verification code sent! 📧");
+      } else {
+        toast.error(parseRes.error || "Failed to resend code. Try again.");
+      }
+    } catch (err) {
+      console.error(err.message);
+      toast.error("Something went wrong! ❌");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const goBackToForm = () => {
+    setRegistrationStep(1);
+    setVerificationCode("");
+    setUserData(null);
+    setTimeLeft(300);
+    setResendCooldown(0);
+  };
+
+  // Render verification step
+  if (registrationStep === 2) {
+    return (
+      <div className="container">
+        <div className="info-section">
+          <div className="solar">
+            <i className="mercury"></i>
+            <i className="venus"></i>
+            <i className="earth"></i>
+            <i className="mars"></i>
+            <i className="belt"></i>
+            <i className="jupiter"></i>
+            <i className="saturn"></i>
+            <i className="uranus"></i>
+            <i className="neptune"></i>
+          </div>
+          <h1>Verify Your Email</h1>
+          <p className="subtitle">Almost there! Check your email for the verification code</p>
+        </div>
+        <div className="form-section">
+          <div className="form-container">
+            <h2>Enter Verification Code</h2>
+            <p className="verification-info">
+              We've sent a 6-digit verification code to <strong>{userData?.email}</strong>
+            </p>
+            
+            {/* Countdown Timer */}
+            <div className="countdown-timer">
+              <div className={`timer-display ${timeLeft <= 60 ? 'warning' : ''} ${timeLeft === 0 ? 'expired' : ''}`}>
+                <span className="timer-label">Code expires in:</span>
+                <span className="timer-value">{formatTime(timeLeft)}</span>
+              </div>
+              {timeLeft === 0 && (
+                <div className="expired-warning">
+                  ⚠️ Code has expired. Please request a new one.
+                </div>
+              )}
+            </div>
+
+            <form onSubmit={onSubmitVerification}>
+              <div className="form-group">
+                <label htmlFor="verificationCode">Verification Code</label>
+                <input
+                  type="text"
+                  id="verificationCode"
+                  className="verification-code-input"
+                  value={verificationCode}
+                  onChange={(e) => setVerificationCode(e.target.value)}
+                  placeholder="000000"
+                  maxLength="6"
+                  disabled={timeLeft === 0}
+                  required
+                />
+              </div>
+              <button type="submit" className="submit-button" disabled={loading || timeLeft === 0}>
+                {loading ? "Verifying..." : "Verify & Create Account"}
+              </button>
+            </form>
+            
+            <div className="verification-actions">
+              <p>
+                Didn't receive the code?
+              </p>
+              <button 
+                onClick={handleResendCode} 
+                disabled={loading || resendCooldown > 0}
+                className="resend-code-btn"
+              >
+                {resendCooldown > 0 
+                  ? `Resend in ${resendCooldown}s` 
+                  : "Resend Code"
+                }
+              </button>
+            </div>
+            
+            <div className="verification-actions">
+              <button 
+                onClick={goBackToForm}
+                className="back-btn"
+              >
+                ← Back to registration form
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Render registration form (step 1)
   return (
     <div className="container">
       <div className="info-section">
+        <div className="solar">
+          <i className="mercury"></i>
+          <i className="venus"></i>
+          <i className="earth"></i>
+          <i className="mars"></i>
+          <i className="belt"></i>
+          <i className="jupiter"></i>
+          <i className="saturn"></i>
+          <i className="uranus"></i>
+          <i className="neptune"></i>
+        </div>
         <h1>Join Nova</h1>
         <p className="subtitle">Start your journey to academic excellence</p>
 
@@ -186,7 +420,7 @@ const Register = ({ setAuth }) => {
             {carouselContent.map((slide, index) => (
               <div key={index} className="carousel-slide">
                 <div className="image-wrapper">
-                  <img src={slide.image} alt={slide.title} />
+                  {/* Image removed */}
                 </div>
                 <div className="text-wrapper">
                   <h3>{slide.title}</h3>
@@ -194,18 +428,6 @@ const Register = ({ setAuth }) => {
                 </div>
               </div>
             ))}
-          </div>
-          
-          <div className="carousel-dots-container">
-            <div className="carousel-dots">
-              {carouselContent.map((_, index) => (
-                <span 
-                  key={index} 
-                  className={`carousel-dot ${index === currentSlide ? "active" : ""}`}
-                  onClick={() => setCurrentSlide(index)}
-                ></span>
-              ))}
-            </div>
           </div>
         </div>
       </div>
@@ -295,7 +517,7 @@ const Register = ({ setAuth }) => {
               {formErrors.role && <div className="error-message">{formErrors.role}</div>}
             </div>
             <button type="submit" className="submit-button" disabled={loading}>
-              {loading ? "Creating Account..." : "Create Account"}
+              {loading ? "Sending Verification Code..." : "Continue to Verification"}
             </button>
           </form>
           <p className="reg-footer">

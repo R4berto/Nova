@@ -58,6 +58,7 @@ import {
 import './Assignments.css';
 import '../dashboard.css';
 import Sidebar from '../Sidebar';
+import LoadingIndicator from '../common/LoadingIndicator';
 
 // Add a simple toast debounce mechanism to prevent duplicate toasts
 // Add this near the top of your component
@@ -1041,6 +1042,7 @@ const Assignments = ({ setAuth }) => {
         
         // Close the details modal after successful submission
         setShowDetails(false);
+        setSelectedAssignment(null); // Reset selected assignment state
         
         // Also refresh submissions to get the actual server data
         await fetchSubmissions(assignmentId);
@@ -2863,7 +2865,7 @@ const Assignments = ({ setAuth }) => {
       );
       return submission && submission.grade ? Number(submission.grade) : -1;
     };
-    const getName = (student) => `${student.first_name} ${student.last_name}`.toLowerCase();
+    const getName = (student) => student.last_name.toLowerCase(); // Sort by last name only, case insensitive
     let sorted = [...students];
     if (sortOption === 'score-asc') {
       sorted.sort((a, b) => getScore(a) - getScore(b));
@@ -3171,9 +3173,15 @@ const Assignments = ({ setAuth }) => {
   }, [selectedAssignment?.assignment_id]); // Only trigger when assignment ID changes
 
   if (loading) {
-      return (
-    <div className="dashboard-container dashboard-page assignments-container">
-        <div className="loading">Loading assignments...</div>
+    return (
+      <div className="dashboard-container dashboard-page assignments-container">
+        <div className={`sidebar ${sidebarOpen ? 'open' : ''}`} style={{width: '280px', borderRight: '1px solid #e0e0e0'}}></div>
+        <div className="main-content" style={{marginLeft: '280px'}}>
+          <div className="content-wrapper">
+            <div className="top-bar" style={{height: '60px', borderBottom: '1px solid #e0e0e0', marginBottom:'24px'}}></div>
+            <LoadingIndicator text="Loading Assignments" />
+          </div>
+        </div>
       </div>
     );
   }
@@ -3602,7 +3610,7 @@ const Assignments = ({ setAuth }) => {
 
 
                       
-                      <div className="form-group" >
+                      <div className="form-group" id="points-create">
                         
                         <label htmlFor="points">Points</label>
                         <input
@@ -3668,14 +3676,19 @@ const Assignments = ({ setAuth }) => {
                                   </svg>
                                 )}
                               </span>
-                              <span className="attachment-file">
-                                {attachment.isLink || attachment.type === 'link' || attachment.file_type === 'link' || attachment.mime_type === 'link' ? (
-                                  <a href={attachment.name || attachment.file_name} target="_blank" rel="noopener noreferrer">
-                                    {attachment.name || attachment.file_name}
-                                  </a>
-                                ) : (
-                                  attachment.name || attachment.file_name
-                                )}
+                              <span
+                                className={`attachment-file${!(attachment.isLink || attachment.type === 'link' || attachment.file_type === 'link' || attachment.mime_type === 'link') ? ' file-preview-link' : ''}`}
+                                style={!(attachment.isLink || attachment.type === 'link' || attachment.file_type === 'link' || attachment.mime_type === 'link') ? { cursor: 'pointer' } : {}}
+                                onClick={() => {
+                                  if (attachment.isLink || attachment.type === 'link' || attachment.file_type === 'link' || attachment.mime_type === 'link') {
+                                    window.open(attachment.name || attachment.file_name, '_blank', 'noopener,noreferrer');
+                                  } else {
+                                    previewLocalFile(attachment);
+                                  }
+                                }}
+                                title={attachment.isLink || attachment.type === 'link' || attachment.file_type === 'link' || attachment.mime_type === 'link' ? "Open link" : "Click to preview file"}
+                              >
+                                {attachment.name || attachment.file_name}
                               </span>
                               <span className="file-size">
                                 {!(attachment.isLink || attachment.type === 'link' || attachment.file_type === 'link' || attachment.mime_type === 'link') && `(${formatFileSize(attachment.size || attachment.file_size || 0)})`}
@@ -4210,6 +4223,7 @@ const Assignments = ({ setAuth }) => {
               <h3>{selectedAssignment.title || 'Assignment Details'}</h3>
               <button onClick={() => {
                 setShowDetails(false);
+                setSelectedAssignment(null); // Reset selected assignment state
                 // Remove assignmentId and tab from URL when closing modal
                 const newSearchParams = new URLSearchParams(searchParams);
                 newSearchParams.delete('assignmentId');

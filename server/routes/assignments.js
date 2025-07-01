@@ -1485,4 +1485,108 @@ router.post('/submissions/batch-grade', authorize, async (req, res) => {
   }
 });
 
+// Add a new route to get upcoming assignments for a specific course
+router.get("/upcoming/:courseId", authorize, async (req, res) => {
+  try {
+    const { courseId } = req.params;
+    
+    // Get current date for comparison
+    const currentDate = new Date();
+    
+    // Query to fetch upcoming assignments (due date is in the future, today, or no due date)
+    // Sort by due date ascending (closest due date first), with no due date items at the end
+    const upcomingAssignments = await pool.query(
+      `SELECT assignment_id, course_id, title, due_date, points
+       FROM assignment
+       WHERE course_id = $1
+       AND (due_date >= $2 OR due_date IS NULL)
+       ORDER BY 
+         CASE 
+           WHEN due_date IS NULL THEN 1 
+           ELSE 0 
+         END,
+         due_date ASC
+       LIMIT 5`, // Limit to 5 most imminent assignments
+      [courseId, currentDate.toISOString()]
+    );
+    
+    return res.json(upcomingAssignments.rows);
+  } catch (err) {
+    console.error("Error fetching upcoming assignments:", err.message);
+    return res.status(500).json("Server Error");
+  }
+});
+
+// Add a new route to get overdue assignments for a specific course
+router.get("/overdue/:courseId", authorize, async (req, res) => {
+  try {
+    const { courseId } = req.params;
+    const userId = req.user.id;
+    
+    // Get current date for comparison
+    const currentDate = new Date();
+    
+    // Query to fetch overdue assignments (due date is in the past)
+    // Only for the current user (if student) and not submitted
+    // For professors, find all overdue assignments in their course
+    const userRole = req.user.role;
+    
+    let overdueAssignmentsQuery;
+    let queryParams;
+    
+    if (userRole === 'professor') {
+      // For professors, show all overdue assignments in the course
+      overdueAssignmentsQuery = `
+        SELECT a.assignment_id, a.course_id, a.title, a.due_date, a.points
+        FROM assignment a
+        WHERE a.course_id = $1
+        AND a.due_date < $2
+        ORDER BY a.due_date DESC
+        LIMIT 5`;
+      queryParams = [courseId, currentDate.toISOString()];
+    } else {
+      // For students, show only their overdue assignments
+      overdueAssignmentsQuery = `
+        SELECT a.assignment_id, a.course_id, a.title, a.due_date, a.points
+        FROM assignment a
+        LEFT JOIN assignment_submission s ON a.assignment_id = s.assignment_id AND s.student_id = $1
+        WHERE a.course_id = $2
+        AND a.due_date < $3
+        AND s.submission_id IS NULL
+        ORDER BY a.due_date DESC
+        LIMIT 5`;
+      queryParams = [userId, courseId, currentDate.toISOString()];
+    }
+    
+    const overdueAssignments = await pool.query(overdueAssignmentsQuery, queryParams);
+    
+    return res.json(overdueAssignments.rows);
+  } catch (err) {
+    console.error("Error fetching overdue assignments:", err.message);
+    return res.status(500).json("Server Error");
+  }
+});
+
+// Add a new route to get a student's assignment submissions for a specific course
+router.get("/:courseId/student-submissions", authorize, async (req, res) => {
+  try {
+    const { courseId } = req.params;
+    const studentId = req.user.id;
+    
+    // Query to fetch all submissions by this student for assignments in this course
+    const studentSubmissions = await pool.query(
+      `SELECT s.submission_id, s.assignment_id, s.student_id, s.submitted_at, s.grade, s.returned
+       FROM assignment_submission s
+       JOIN assignment a ON s.assignment_id = a.assignment_id
+       WHERE a.course_id = $1 AND s.student_id = $2`,
+      [courseId, studentId]
+    );
+    
+    return res.json(studentSubmissions.rows);
+  } catch (err) {
+    console.error("Error fetching student assignment submissions:", err.message);
+    return res.status(500).json("Server Error");
+  }
+});
+
 module.exports = router; 

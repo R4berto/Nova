@@ -1,7 +1,3 @@
-/* Add specific page class */
-.people-page {
-  /* Potential page-specific overrides if needed */
-}
 
 /* Adjust main content when sidebar is collapsed */
 .people-page .main-content.sidebar-collapsed {
@@ -9,14 +5,6 @@
   width: calc(100% - var(--sidebar-collapsed-width));
   transition: margin-left 0.3s ease, width 0.3s ease;
 }
-
-/* Remove old container styles if dashboard layout handles it */
-/* .people-container { ... } */
-
-/* Remove old top bar styles if handled by dashboard.css */
-/* .top-bar { ... } */
-/* .top-bar-right { ... } */
-/* ... other top bar elements ... */
 
 /* --- Scoped Dashboard Layout Styles --- */
 
@@ -77,8 +65,6 @@
   background-color: var(--nova-bg-primary, #ffffff);
   border-radius: var(--nova-border-radius-sm, 8px); /* Slightly smaller radius inside */
   border: 1px solid var(--nova-border-strong, #000000); /* Black border */
-  /* overflow: hidden; */ /* Removed - was clipping dropdown */
-  /* Remove padding here, apply to sections instead */
 }
 
 /* Adjust self-unenroll container */
@@ -128,9 +114,7 @@
   align-items: center;
   justify-content: space-between; /* Title left, group right */
   margin-bottom: var(--nova-spacing-lg, 16px);
-  padding-bottom: var(--nova-spacing-md, 12px); /* Space before list */
-  /* Add bottom border if needed visually, image doesn't show strong one here */
-  /* border-bottom: 1px solid var(--nova-border-color, #e0e0e0); */ 
+  padding-bottom: var(--nova-spacing-md, 12px); /* Space before list */ 
 }
 
 .people-page .section-header h2 {
@@ -235,7 +219,6 @@
 
 /* More Options Button & Container */
 .people-page .more-options {
-  /* position: relative; */ /* REMOVE: No longer needed for positioning context */
   margin-left: auto; /* Keep pushing button to the right */
 }
 
@@ -446,47 +429,6 @@
   font-weight: 500;
 }
 
-/* REMOVE Conflicting Sidebar Submenu Styles from People.css */
-/* 
-// Add styles for submenu trigger and open state 
-.sidebar-nav .submenu-trigger {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    width: 100%;
-}
-
-.sidebar-nav .submenu-toggle {
-    transition: transform 0.2s ease-in-out;
-}
-
-.sidebar-nav .submenu-toggle.open {
-    transform: rotate(180deg);
-}
-
-.sidebar-nav .submenu {
-    max-height: 0;
-    overflow: hidden;
-    transition: max-height 0.3s ease-in-out;
-    padding-left: var(--nova-spacing-lg, 16px); // Indent submenu items 
-}
-
-.sidebar-nav .submenu.open {
-    max-height: 500px; // Adjust as needed for content 
-} 
-*/ 
-
-/* --- Banned Section Styles --- */
-.people-page .banned-section {
-  /* Remove padding/border as it's handled by tab content */
-  /* padding: var(--nova-spacing-xl, 24px); */
-  /* border-top: 1px solid var(--nova-border-strong, #000000); */
-}
-
-.people-page .banned-section .section-header {
-  /* Uses existing .section-header styles */
-}
-
 .people-page .banned-count {
   /* Similar to student-count */
   font-size: var(--nova-font-size-base, 14px);
@@ -600,7 +542,193 @@
   border-top: none; /* Remove top border */
 }
 
-/* Optional: Add padding directly to the content container if sections lose theirs */
-.people-page .people-tab-content {
-   /* padding: var(--nova-spacing-xl, 24px); */
+/* Pending Enrollment Styles */
+
+.pending-section {
+  margin-top: 1rem;
+}
+
+.pending-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 1rem;
+  text-align: center;
+  color: var(--nova-text-secondary);
+}
+
+.pending-empty-state svg {
+  margin-bottom: 1rem;
+  opacity: 0.5;
+}
+
+.pending-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.pending-item {
+  display: flex;
+  align-items: center;
+  padding: 1rem;
+  background: var(--nova-bg-primary);
+  border: 1px solid var(--nova-border-color);
+  border-radius: var(--nova-border-radius);
+  transition: all 0.2s ease;
+}
+
+.pending-item:hover {
+  border-color: var(--nova-border-strong);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.pending-item .person-info {
+  flex: 1;
+  margin-left: 1rem;
+}
+
+.pending-item .person-name {
+  font-weight: 600;
+  color: var(--nova-text-primary);
+  margin-bottom: 0.25rem;
+}
+
+.pending-item .person-email {
+  font-size: 0.875rem;
+  color: var(--nova-text-secondary);
+  margin-bottom: 0.25rem;
+}
+
+.pending-item .request-date {
+  font-size: 0.75rem;
+  color: var(--nova-text-tertiary);
+}
+
+.pending-actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-left: 1rem;
+}
+
+.approve-btn, .reject-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: var(--nova-border-radius-sm);
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.approve-btn {
+  background-color: #10b981;
+  color: white;
+}
+
+.approve-btn:hover {
+  background-color: #059669;
+  transform: translateY(-1px);
+}
+
+.reject-btn {
+  background-color: #ef4444;
+  color: white;
+}
+
+.reject-btn:hover {
+  background-color: #dc2626;
+  transform: translateY(-1px);
+}
+
+.approve-btn:disabled, .reject-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Loading and error states for pending section */
+.pending-section .loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  color: var(--nova-text-secondary);
+}
+
+.pending-section .loading-spinner {
+  width: 2rem;
+  height: 2rem;
+  border: 2px solid var(--nova-border-color);
+  border-top: 2px solid var(--nova-primary);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 1rem;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.pending-section .error-message {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  color: #ef4444;
+  text-align: center;
+}
+
+.pending-section .error-message svg {
+  margin-bottom: 0.5rem;
+}
+
+.pending-section .retry-button {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 1rem;
+  padding: 0.5rem 1rem;
+  background-color: var(--nova-primary);
+  color: white;
+  border: none;
+  border-radius: var(--nova-border-radius-sm);
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.pending-section .retry-button:hover {
+  background-color: var(--nova-primary-dark);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .pending-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+  
+  .pending-item .person-info {
+    margin-left: 0;
+    width: 100%;
+  }
+  
+  .pending-actions {
+    margin-left: 0;
+    width: 100%;
+    justify-content: flex-end;
+  }
+  
+  .approve-btn, .reject-btn {
+    flex: 1;
+    justify-content: center;
+  }
 } 

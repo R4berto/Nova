@@ -30,6 +30,7 @@ body {
 }
 
 .container {
+    --bs-gutter-x: 0;
     display: flex;
     min-height: 100vh;
     min-width: 100vw;
@@ -39,12 +40,61 @@ body {
 .info-section {
     flex: 1;
     padding: 48px;
-    background: linear-gradient(180deg, #212529 0%, #343a40 50%, #495057 100%);
+    background-color: #000;
+    position: relative;
+    overflow: hidden;
     color: white;
     display: flex;
     flex-direction: column;
     justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+
+.info-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: 
+        radial-gradient(white, rgba(255,255,255,.5) 2px, transparent 3px),
+        radial-gradient(white, rgba(255,255,255,.4) 1px, transparent 2px),
+        radial-gradient(white, rgba(255,255,255,.3) 2px, transparent 3px),
+        radial-gradient(rgba(255,255,255,.9), rgba(255,255,255,.3) 1px, transparent 2px);
+    background-size: 550px 550px, 350px 350px, 250px 250px, 150px 150px;
+    background-position: 0 0, 40px 60px, 130px 270px, 70px 150px;
+    animation: stars-move 60s linear infinite;
+    z-index: 1;
+}
+
+@keyframes stars-move {
+    0% {
+        background-position: 0 0, 40px 60px, 130px 270px, 70px 150px;
+        opacity: 0.5;
+    }
+    25% {
+        opacity: 0.8;
+    }
+    50% {
+        background-position: 275px 275px, 215px 235px, 255px 145px, 150px 150px;
+        opacity: 1;
+    }
+    75% {
+        opacity: 0.8;
+    }
+    100% {
+        background-position: 550px 550px, 390px 410px, 380px 20px, 250px 250px;
+        opacity: 0.5;
+    }
+}
+
+.info-section h1,
+.info-section p,
+.info-section .carousel-container {
     position: relative;
+    z-index: 2;
 }
 
 .info-section h1 {
@@ -103,15 +153,31 @@ body {
     align-items: center;
     justify-content: center;
     padding: 48px;
-    background-color: white;
     position: relative;
+    background-color: #e5e5f7;
+    background-image: linear-gradient(#0d0f31 1px, transparent 1px), linear-gradient(to right, #0d0f31 1px, #e5e5f7 1px);
+    background-size: 30px 30px;
+}
+
+/* Add a pseudo-element to control the opacity without affecting child elements */
+.form-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(255, 255, 255, 0.8); /* This creates the opacity effect */
+    z-index: 1;
 }
 
 .form-container {
+    position: relative;
+    z-index: 2; /* Ensure form is above the semi-transparent overlay */
     width: 100%;
-    max-width: 600px;
-    min-height: 600px;
-    padding: 40px;
+    max-width: 60dvh;
+    min-height: auto; /* Remove fixed height */
+    padding: 30px; /* Reduce padding */
     background: white;
     border-radius: var(--radius-md);
     box-shadow: none;
@@ -122,15 +188,15 @@ body {
 }
 
 .form-container h2 {
-    font-size: 24px;
+    font-size: 22px; /* Slightly smaller heading */
     color: var(--text-color);
-    margin-bottom: 32px;
+    margin-bottom: 20px; /* Reduce margin */
     text-align: center;
     font-weight: 600;
 }
 
 .form-group {
-    margin-bottom: 24px;
+    margin-bottom: 16px; /* Reduce spacing between form groups */
 }
 
 .form-group label {
@@ -151,16 +217,16 @@ body {
 
 .submit-button {
     width: 100%;
-    padding: 12px;
+    padding: 10px; /* Reduce padding */
     background-color: black;
     color: white;
     border: none;
     border-radius: 50px;
-    font-size: 16px;
+    font-size: 15px; /* Smaller font size */
     font-weight: 500;
     cursor: pointer;
     transition: all 0.2s ease;
-    margin-top: 8px;
+    margin-top: 6px; /* Reduce margin */
     box-shadow: none;
 }
 
@@ -177,7 +243,7 @@ body {
 }
 
 .reg-footer {
-    margin-top: 24px;
+    margin-top: 16px; /* Reduce margin */
     text-align: center;
     color: var(--text-secondary);
     font-weight: 500;
@@ -222,19 +288,20 @@ body {
 }
 
 .password-requirements {
-  font-size: 0.85rem;
-  color: #666;
-  margin-top: 5px;
+    font-size: 12px; /* Smaller font for requirements */
+    color: var(--text-secondary);
+    margin-top: -12px;
+    margin-bottom: 12px;
 }
 
 .password-requirements ul {
-  margin-top: 5px;
-  margin-bottom: 0;
-  padding-left: 20px;
+    padding-left: 20px;
+    margin-top: 4px;
+    margin-bottom: 0;
 }
 
 .password-requirements li {
-  margin-bottom: 3px;
+    margin-bottom: 2px;
 }
 
 /* Carousel Styles */
@@ -262,16 +329,14 @@ body {
 }
 
 .image-wrapper {
-    width: 100%;
-    max-width: 240px;
-    height: 180px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    background: transparent;
+    border-radius: 12px;
+    overflow: hidden;
     margin-bottom: 20px;
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: 20px;
-    padding: 20px;
+    height: 150px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .image-wrapper img {
@@ -325,11 +390,6 @@ body {
 .carousel-btn:hover {
     background: rgba(255, 255, 255, 0.3);
     transform: scale(1.05);
-}
-
-.carousel-dots {
-    display: flex;
-    gap: 8px;
 }
 
 .carousel-dot {
@@ -394,20 +454,6 @@ body {
 }
 
 /* Carousel styling */
-.carousel-dots-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin-top: 30px;
-    width: 100%;
-}
-
-.carousel-dots {
-    display: flex;
-    gap: 8px;
-    justify-content: center;
-}
-
 .form-group.error input,
 .form-group.error select {
   border-color: var(--error-color);
@@ -443,22 +489,20 @@ body {
 
 .form-section .form-container .form-group label {
     display: block;
-    font-size: 14px;
+    font-size: 13px; /* Smaller font size */
     font-weight: 600;
     color: var(--text-color);
-    margin-bottom: 8px;
+    margin-bottom: 4px; /* Reduce margin */
 }
 
 .form-section .form-container .form-group input,
 .form-section .form-container .form-group select {
     width: 100%;
-    padding: 12px 16px;
-    border: 1px solid black;
-    border-radius: 50px;
-    font-size: 16px;
+    padding: 10px 12px; /* Reduce padding */
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    font-size: 14px; /* Smaller font size */
     transition: all 0.2s ease;
-    background-color: white;
-    color: var(--text-color);
 }
 
 .form-section .form-container .form-group input:focus,
@@ -474,4 +518,400 @@ body {
     background-repeat: no-repeat;
     background-position: right 16px center;
     padding-right: 40px;
+}
+
+/* Solar System */
+.solar {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(1.5);
+  height: 50px;
+  width: 50px;
+  background: orange;
+  border-radius: 25px;
+  z-index: 0;
+  opacity: 0.8;
+  animation: glow 1.5s linear infinite;
+}
+
+.solar i {
+  border-radius: 250px;
+  display: block;
+  position: absolute;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-sizing: border-box;
+  transform-origin: 50% 50%;
+}
+
+.solar i:before {
+  content: "";
+  border-radius: 25px;
+  display: block;
+  position: absolute;
+  top: -5px;
+  right: 45%;
+}
+
+.solar i.mercury {
+  width: 80px;
+  height: 80px;
+  margin-left: -40px;
+  left: 50%;
+  top: 50%;
+  margin-top: -40px;
+  animation: orbit 0.5s linear infinite;
+}
+
+.solar i.mercury:before {
+  background: #6f5f5f;
+  height: 7px;
+  width: 7px;
+}
+
+.solar i.venus {
+  width: 110px;
+  height: 110px;
+  margin-left: -55px;
+  left: 50%;
+  top: 50%;
+  margin-top: -55px;
+  animation: orbit 1s linear infinite;
+}
+
+.solar i.venus:before {
+  background: #e7a71f;
+  height: 10px;
+  width: 10px;
+}
+
+.solar i.earth {
+  width: 140px;
+  height: 140px;
+  margin-left: -70px;
+  left: 50%;
+  top: 50%;
+  margin-top: -70px;
+  animation: orbit 1.5s linear infinite;
+}
+
+.solar i.earth:before {
+  background: #63bee2;
+  height: 10px;
+  width: 10px;
+}
+
+.solar i.mars {
+  width: 170px;
+  height: 170px;
+  margin-left: -85px;
+  left: 50%;
+  top: 50%;
+  margin-top: -85px;
+  animation: orbit 2s linear infinite;
+}
+
+.solar i.mars:before {
+  background: red;
+  height: 10px;
+  width: 10px;
+}
+
+.solar i.belt {
+  box-sizing: border-box;
+  border-width: 5px;
+  width: 240px;
+  height: 240px;
+  margin-left: -120px;
+  border-color: rgba(255, 255, 255, 0.1);
+  left: 50%;
+  top: 50%;
+  margin-top: -120px;
+}
+
+.solar i.jupiter {
+  width: 260px;
+  height: 260px;
+  margin-left: -130px;
+  left: 50%;
+  top: 50%;
+  margin-top: -130px;
+  animation: orbit 2.5s linear infinite;
+}
+
+.solar i.jupiter:before {
+  background: #cf9b2b;
+  top: -15px;
+  height: 30px;
+  width: 30px;
+}
+
+.solar i.saturn {
+  width: 320px;
+  height: 320px;
+  margin-left: -160px;
+  left: 50%;
+  top: 50%;
+  margin-top: -160px;
+  animation: orbit 3s linear infinite;
+}
+
+.solar i.saturn:before {
+  background: #cf7a2b;
+  top: -10px;
+  height: 20px;
+  width: 20px;
+}
+
+.solar i.saturn:after {
+  background: rgba(255, 255, 255, 0.3);
+  width: 30px;
+  height: 1px;
+  content: "";
+  position: absolute;
+  display: block;
+  width: 30px;
+  height: 1px;
+  right: 43.5%;
+  transform: rotate(20deg);
+}
+
+.solar i.uranus {
+  width: 360px;
+  height: 360px;
+  margin-left: -180px;
+  left: 50%;
+  top: 50%;
+  margin-top: -180px;
+  animation: orbit 3.5s linear infinite;
+}
+
+.solar i.uranus:before {
+  background: #10c593;
+  top: -8px;
+  height: 15px;
+  width: 15px;
+}
+
+.solar i.neptune {
+  width: 400px;
+  height: 400px;
+  margin-left: -200px;
+  left: 50%;
+  top: 50%;
+  margin-top: -200px;
+  animation: orbit 4s linear infinite;
+}
+
+.solar i.neptune:before {
+  background: #1470e4;
+  top: -8px;
+  height: 15px;
+  width: 15px;
+}
+
+@keyframes orbit {
+  0% {
+    transform: rotate(0deg);
+  }
+  50% {
+    transform: rotate(-180deg);
+  }
+  100% {
+    transform: rotate(-360deg);
+  }
+}
+
+@keyframes glow {
+  0% {
+    box-shadow: none;
+  }
+  50% {
+    background: #ffeb00;
+    box-shadow: 0 0 20px orange;
+  }
+  100% {
+    box-shadow: none;
+  }
+}
+
+/* Verification code specific styles */
+.verification-code-input {
+  text-align: center !important;
+  letter-spacing: 8px !important;
+  font-size: 24px !important;
+  font-weight: 600 !important;
+  color: var(--text-color) !important;
+  background-color: #f8f9fa !important;
+  border: 2px solid var(--border-color) !important;
+  border-radius: 8px !important;
+  padding: 15px 10px !important;
+  transition: all 0.3s ease !important;
+}
+
+.verification-code-input:focus {
+  border-color: var(--primary-color) !important;
+  background-color: white !important;
+  box-shadow: 0 0 0 3px rgba(79, 209, 220, 0.1) !important;
+}
+
+.verification-code-input::placeholder {
+  letter-spacing: 2px !important;
+  color: var(--text-secondary) !important;
+}
+
+/* Resend code button styles */
+.resend-code-btn {
+  background: none !important;
+  border: none !important;
+  color: var(--primary-color) !important;
+  text-decoration: underline !important;
+  cursor: pointer !important;
+  font-size: 14px !important;
+  transition: color 0.3s ease !important;
+}
+
+.resend-code-btn:hover {
+  color: var(--primary-hover) !important;
+}
+
+.resend-code-btn:disabled {
+  color: var(--text-secondary) !important;
+  cursor: not-allowed !important;
+  text-decoration: none !important;
+}
+
+/* Back button styles */
+.back-btn {
+  background: none !important;
+  border: none !important;
+  color: var(--text-secondary) !important;
+  text-decoration: underline !important;
+  cursor: pointer !important;
+  font-size: 14px !important;
+  transition: color 0.3s ease !important;
+}
+
+.back-btn:hover {
+  color: var(--text-color) !important;
+}
+
+/* Verification step specific styles */
+.verification-info {
+  text-align: center;
+  margin-bottom: 20px;
+  color: var(--text-secondary);
+}
+
+.verification-info strong {
+  color: var(--text-color);
+  font-weight: 600;
+}
+
+.verification-actions {
+  text-align: center;
+  margin-top: 20px;
+}
+
+.verification-actions p {
+  color: var(--text-secondary);
+  margin-bottom: 10px;
+}
+
+/* Countdown Timer Styles */
+.countdown-timer {
+  text-align: center;
+  margin-bottom: 20px;
+  padding: 15px;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+}
+
+.timer-display {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+}
+
+.timer-label {
+  font-size: 14px;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.timer-value {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--text-color);
+  font-family: 'Courier New', monospace;
+  letter-spacing: 2px;
+}
+
+/* Warning state (last minute) */
+.timer-display.warning .timer-value {
+  color: #ff9800;
+  animation: pulse 1s infinite;
+}
+
+/* Expired state */
+.timer-display.expired .timer-value {
+  color: var(--error-color);
+}
+
+.expired-warning {
+  margin-top: 10px;
+  padding: 10px;
+  background-color: #fff3cd;
+  border: 1px solid #ffeaa7;
+  border-radius: 5px;
+  color: #856404;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+@keyframes pulse {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+/* Enhanced Resend Button */
+.resend-code-btn {
+  background: none !important;
+  border: none !important;
+  color: var(--primary-color) !important;
+  text-decoration: underline !important;
+  cursor: pointer !important;
+  font-size: 14px !important;
+  transition: all 0.3s ease !important;
+  padding: 5px 10px !important;
+  border-radius: 4px !important;
+}
+
+.resend-code-btn:hover:not(:disabled) {
+  color: var(--primary-hover) !important;
+  background-color: rgba(79, 209, 220, 0.1) !important;
+}
+
+.resend-code-btn:disabled {
+  color: var(--text-secondary) !important;
+  cursor: not-allowed !important;
+  text-decoration: none !important;
+  background-color: transparent !important;
+}
+
+/* Disabled verification input */
+.verification-code-input:disabled {
+  background-color: #f5f5f5 !important;
+  color: var(--text-secondary) !important;
+  cursor: not-allowed !important;
+  border-color: #ddd !important;
 } 

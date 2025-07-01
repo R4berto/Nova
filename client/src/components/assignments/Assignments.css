@@ -237,7 +237,6 @@
 }
 
 /* --- Assignment Creation Form Styles --- */
-/* Specificity: Target the creation form container within the assignments content area */
 .assignments-content .assignment-form-container {
   background-color: #ffffff;
   border: 1px solid #e0e0e0;
@@ -545,10 +544,6 @@
   align-self: stretch; /* Make it fill the height of the toolbar */
 }
 
-/* --- End Text Formatting Toolbar Styles --- */
-
-/* --- End Assignment Creation Form Styles --- */
-
 /* Adjust existing styles if needed to accommodate new form */
 /* Example: Ensure add button has spacing */
 .assignment-header-section {
@@ -695,6 +690,11 @@
   text-align: right;
   min-width: 100px;
 }
+
+#points-create{
+  margin-top: 0px;
+}
+
 
 /* Add specific style for no-due-date */
 .assignment-meta .no-due-date {
@@ -1170,7 +1170,7 @@
 .attachment-file, .file-name {
   flex-grow: 1;
   font-size: 14px;
-  color: #1a73e8; /* Change to blue to indicate clickability */
+  color: black;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -1179,7 +1179,7 @@
 }
 
 .attachment-file:hover {
-  color: #174ea6;
+  color: #333333;
   text-decoration: underline; /* Add underline to indicate it's clickable */
 }
 
@@ -1276,7 +1276,7 @@
 .view-instructions-btn {
   background: none;
   border: none;
-  color: #1a73e8;
+  color: black;
   font-size: 14px;
   font-weight: 500;
   padding: 0;
@@ -1287,7 +1287,7 @@
 }
 
 .view-instructions-btn:hover {
-  color: #174ea6;
+  color: #333333;
 }
 
 /* Instructions Modal Styling */
@@ -1367,6 +1367,8 @@
   flex-wrap: wrap;
   border-bottom: 1px solid #e0e0e0;
   padding-bottom: 16px;
+  margin-top: 10px;
+  padding: 10px;
 }
 
 .tab-button {
@@ -2562,14 +2564,14 @@
   flex-grow: 1;
   margin-right: 8px;
   font-size: 14px;
-  color: #1a73e8; /* Changed to blue for better indication of clickability */
+  color: black;
   display: flex;
   align-items: center;
   transition: color 0.2s;
 }
 
 .selected-file .file-name:hover {
-  color: #174ea6;
+  color: #333333;
   text-decoration: underline; /* Add underline on hover to indicate it's clickable */
 }
 
@@ -2602,7 +2604,7 @@
   align-items: center;
   gap: 8px;
   padding: 10px 20px;
-  background-color: #1a73e8;
+  background-color: black;
   color: white;
   border: none;
   border-radius: 4px;
@@ -2613,8 +2615,8 @@
 }
 
 .submit-assignment-btn:hover {
-  background-color: #185abc;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  background-color: #333333;
+  transform: translateY(-2px);
 }
 
 /* Submitted Files */
@@ -3040,6 +3042,7 @@
   align-items: center;
   border-bottom: 1px solid #e0e0e0;
   padding-bottom: 15px;
+  margin-top: 10px;
 }
 
 .grading-student-info {
@@ -3080,15 +3083,9 @@
 
 .grading-file-preview .submission-files-list {
   padding: 12px 16px;
-  border: 2px solid #000000; /* Add solid black border to modal-body */
 }
 
-.grading-file-preview .file-attachment {
-  display: flex;
-  align-items: center;
-  padding: 8px 0;
-  border-bottom: 1px solid #f1f3f4;
-}
+
 
 .grading-file-preview .file-attachment:last-child {
   border-bottom: none;
@@ -3564,21 +3561,6 @@
   text-decoration: none;
 }
 
-.grading-file-item .file-size {
-  color: #ffffff !important; /* Force white text to override any duplicate rules */
-  font-size: 0.85rem;
-  margin-left: 12px;
-  background-color: #000000 !important; /* Ensure black background */
-  width: 80px;
-  height: 36px;
-  margin-right: 12px;
-  border-radius: 4px;
-  text-align: center;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
 .grading-file-item .attachment-download-link {
   flex: 1;
   font-weight: 500;
@@ -3677,7 +3659,10 @@
   font-size: 14px;
   font-weight: 500;
   transition: background-color 0.2s, border-color 0.2s;
-  margin-left: 8px; /* Space between buttons */
+  width: 140px; /* Set explicit width for both buttons */
+  height: 38px; /* Set explicit height for both buttons */
+  box-sizing: border-box; /* Ensure padding doesn't affect height */
+  justify-content: center;
   margin-bottom: 0; /* Override default label margin */
 }
 
@@ -3689,8 +3674,11 @@
 /* Additional style for file/link button container */
 .assignments-content .assignment-form-container .form-group .attachment-buttons {
   display: flex;
-  gap: 8px;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 16px;
   margin-bottom: 16px;
+  width: 100%;
 }
 
 /* Link attachment in the list */
@@ -3730,6 +3718,10 @@
   font-size: 14px;
   font-weight: 500;
   transition: background-color 0.2s, border-color 0.2s;
+  height: 38px; /* Set fixed height to match upload-btn */
+  min-width: 120px; /* Set minimum width */
+  box-sizing: border-box; /* Ensure padding doesn't affect height */
+  justify-content: center; /* Center content horizontally */
 }
 
 .assignment-details-modal .upload-submission .link-btn:hover {
@@ -3737,23 +3729,45 @@
   border-color: #c6cace;
 }
 
+/* Fix for alignment of upload-btn and link-btn in upload-submission section */
+.upload-submission .attachment-buttons {
+  display: flex;
+  align-items: stretch; /* Make all children stretch to the same height */
+}
+
+.upload-submission .upload-btn,
+.upload-submission .link-btn {
+  height: 38px; /* Set explicit height for both */
+  box-sizing: border-box; /* Ensure padding doesn't affect height */
+  min-width: 120px; /* Ensure both have the same minimum width */
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0; /* Remove any margin that might affect alignment */
+  font-size: 14px; /* Ensure consistent font size */
+  line-height: 1; /* Consistent line height */
+  overflow: visible; /* Prevent overflow issues */
+  padding: 0 16px; /* Consistent padding */
+  position: relative; /* Establish positioning context */
+}
+
 /* Link attachment styling in selected files */
 .assignment-details-modal .selected-file .file-name svg,
 .assignments-content .assignment-form-container .selected-file .file-name svg {
   margin-right: 5px;
-  color: #1a73e8;
+  color: black ;
 }
 
 /* Link file styling */
 .assignment-details-modal .selected-file.link-file .file-name,
 .assignments-content .assignment-form-container .selected-file.link-file .file-name {
-  color: #1a73e8;
+  color: black;
   text-decoration: underline;
 }
 
 .assignment-details-modal .selected-file.link-file .file-name:hover,
 .assignments-content .assignment-form-container .selected-file.link-file .file-name:hover {
-  color: #174ea6;
+  color: black;
 }
 
 /* Link URL Modal - Should appear above assignment details modal */
@@ -4296,11 +4310,7 @@ body .assignments-content .assignment-form-container .editor-attachments {
   border-radius: 0 !important;
 }
 
-/* ========================================= */
 /* ENHANCED SPECIFICITY OVERRIDES FOR COMBINEDEXAM.CSS */
-/* ========================================= */
-
-/* These rules use maximum specificity to override CombinedExam.css without !important where possible */
 
 /* 1. Override CombinedExam.css .form-group selector (line 723) */
 html body .assignments-container .assignments-content .assignment-form-container .assignment-form .form-group,
@@ -4324,7 +4334,7 @@ html body .assignments-content .assignment-form-container .form-group label {
   font-size: 14px;
   font-weight: 500;
   color: #000000;
-  margin-bottom: 8px;
+  
 }
 
 /* 3. Override CombinedExam.css .form-group input, .form-group textarea selectors (lines 734-743) */
@@ -4519,9 +4529,7 @@ html body .assignments-container .assignments-content .assignment-form-container
   box-shadow: 0 0 0 1px #000000;
 }
 
-/* ========================================= */
 /* END ENHANCED SPECIFICITY OVERRIDES */
-/* ========================================= */
 
 .assignments-container .assignment-card .assignment-actions .options-menu button.delete-btn svg,
 .assignments-content .assignment-card .assignment-actions .options-menu button.delete-btn svg {
@@ -4543,9 +4551,7 @@ html body .assignments-container .assignments-content .assignment-form-container
   color: #FF7171 !important;
 }
 
-/* ========================================= */
 /* END ENHANCED SPECIFICITY OVERRIDES */
-/* ========================================= */
 
 /* TESTING: Ensure form-group borders are clearly visible */
 /* This section can be used to test if borders are working */
@@ -4713,7 +4719,10 @@ html body div.assignments-container.assignments-container div.assignments-conten
   font-weight: 500;
   transition: background-color 0.2s, border-color 0.2s;
   min-width: 120px;
+  width: 140px; /* Set explicit width for both buttons */
+  height: 38px; /* Set explicit height for both buttons */
   justify-content: center;
+  box-sizing: border-box; /* Ensure padding doesn't affect height */
 }
 
 .attach-btn:hover, .link-btn:hover {
@@ -4763,7 +4772,10 @@ html body div.assignments-container.assignments-container div.assignments-conten
   font-weight: 500;
   transition: background-color 0.2s, border-color 0.2s;
   min-width: 120px;
+  width: 140px; /* Set explicit width for both buttons */
+  height: 38px; /* Set explicit height for both buttons */
   justify-content: center;
+  box-sizing: border-box; /* Ensure padding doesn't affect height */
 }
 
 .assignments-container .assignment-form-container .form-group .attach-btn:hover,
@@ -4784,3 +4796,52 @@ html body div.assignments-container.assignments-container div.assignments-conten
 .student-name.missing-assignment {
   color: #d93025 !important; /* Red color for missing assignments */
 }
+
+/* Link button in assignment details modal - style similar to upload-btn */
+.assignment-details-modal .upload-submission .link-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background-color: #f1f3f4;
+  color: #3c4043;
+  border: 1px solid #dadce0;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: background-color 0.2s, border-color 0.2s;
+  height: 38px; /* Set fixed height to match upload-btn */
+  width: 140px; /* Set explicit width for consistency */
+  min-width: 120px; /* Set minimum width */
+  box-sizing: border-box; /* Ensure padding doesn't affect height */
+  justify-content: center; /* Center content horizontally */
+}
+
+.assignment-details-modal .upload-submission .link-btn:hover {
+  background-color: #e8eaed;
+  border-color: #c6cace;
+}
+
+/* Fix for alignment of upload-btn and link-btn in upload-submission section */
+.upload-submission .attachment-buttons {
+  display: flex;
+  align-items: stretch; /* Make all children stretch to the same height */
+}
+
+.upload-submission .upload-btn,
+.upload-submission .link-btn {
+  height: 38px; /* Set explicit height for both */
+  box-sizing: border-box; /* Ensure padding doesn't affect height */
+  min-width: 120px; /* Ensure both have the same minimum width */
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0; /* Remove any margin that might affect alignment */
+  font-size: 14px; /* Ensure consistent font size */
+  line-height: 1; /* Consistent line height */
+  overflow: visible; /* Prevent overflow issues */
+  padding: 0 16px; /* Consistent padding */
+  position: relative; /* Establish positioning context */
+}
+

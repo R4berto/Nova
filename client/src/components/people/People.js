@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, Link, useNavigate, useLocation } from 'react-router-dom';
+import { toast } from 'react-hot-toast';
 import { MdSettings, MdMoreVert, MdErrorOutline, MdRefresh, MdPersonRemove, MdBlock } from 'react-icons/md';
 import { FaCheckCircle } from 'react-icons/fa';
 import { 
@@ -31,6 +32,7 @@ import {
 import './People.css';
 import '../dashboard.css';
 import Sidebar from '../Sidebar';
+import LoadingIndicator from '../common/LoadingIndicator';
 
 const People = ({ setAuth }) => {
   const { courseId } = useParams();
@@ -42,6 +44,11 @@ const People = ({ setAuth }) => {
   const [showActionMenu, setShowActionMenu] = useState({});
   const [dropdownPosition, setDropdownPosition] = useState({ top: 0, left: 0 });
   const [courseDetails, setCourseDetails] = useState(null);
+  
+  // Add enrollment approval state
+  const [pendingEnrollments, setPendingEnrollments] = useState([]);
+  const [loadingPending, setLoadingPending] = useState(false);
+  const [pendingError, setPendingError] = useState(null);
   
   // Restore State
   const [inputs, setInputs] = useState({
@@ -56,7 +63,7 @@ const People = ({ setAuth }) => {
   const { first_name, last_name } = inputs; // Keep for display
   const [isTeacher, setIsTeacher] = useState(false);
   const [isCoursesSubmenuOpen, setIsCoursesSubmenuOpen] = useState(false);
-  // Add state for the active tab (students or banned)
+  // Add state for the active tab (students, banned, or pending)
   const [activePeopleTab, setActivePeopleTab] = useState('students');
   const [courses, setCourses] = useState([]);
   const [loadingCourses, setLoadingCourses] = useState(true);
@@ -65,6 +72,18 @@ const People = ({ setAuth }) => {
     const savedState = localStorage.getItem("sidebarCollapsed");
     return savedState === "true";
   });
+
+  // Set active tab from URL on load and on location change
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const tab = params.get('tab');
+    if (tab && ['students', 'banned', 'pending'].includes(tab)) {
+      setActivePeopleTab(tab);
+    } else {
+      // Default to 'students' tab if no valid tab is in the URL
+      setActivePeopleTab('students');
+    }
+  }, [location.search]);
 
   // Restore Mobile Check Effect
   useEffect(() => {
@@ -192,6 +211,95 @@ const People = ({ setAuth }) => {
     setIsCoursesSubmenuOpen(!isCoursesSubmenuOpen);
   };
 
+  // Add fetch pending enrollments function
+  const fetchPendingEnrollments = useCallback(async () => {
+    if (!isTeacher) return;
+    setLoadingPending(true);
+    setPendingError(null);
+    try {
+      const token = localStorage.token;
+      const response = await fetch(
+        `${process.env.REACT_APP_API_URL || 'http://localhost:5000'}/enrollment-approval/pending/${courseId}`,
+        { headers: { "jwt_token": token } }
+      );
+      if (!response.ok) throw new Error(await response.text());
+      const data = await response.json();
+      setPendingEnrollments(data);
+    } catch (err) {
+      setPendingError(err.message || "Failed to fetch pending enrollments");
+    } finally {
+      setLoadingPending(false);
+    }
+  }, [courseId, isTeacher]);
+
+  // Add approve enrollment handler with confirmation
+  const handleApprove = async (pendingId, studentName) => {
+    const confirmed = window.confirm(
+      `Are you sure you want to approve ${studentName}'s enrollment request? They will be able to access the course immediately.`
+    );
+    if (!confirmed) return;
+
+    // Optimistic UI update: Store original state and remove pending request
+    const originalPendingEnrollments = [...pendingEnrollments];
+    setPendingEnrollments(prev => prev.filter(p => p.pending_id !== pendingId));
+
+    try {
+      const token = localStorage.token;
+      const response = await fetch(
+        `${process.env.REACT_APP_API_URL || 'http://localhost:5000'}/enrollment-approval/approve/${pendingId}`,
+        { 
+          method: "POST", 
+          headers: { 
+            "Content-Type": "application/json", 
+            "jwt_token": token 
+          }, 
+          body: JSON.stringify({ review_notes: "" }) 
+        }
+      );
+      if (!response.ok) throw new Error(await response.text());
+      
+      fetchCourseMembers(); // Refresh enrolled students list
+      toast.success("Enrollment approved successfully!");
+    } catch (err) {
+      toast.error(err.message || "Failed to approve enrollment");
+      // Revert optimistic update on failure
+      setPendingEnrollments(originalPendingEnrollments);
+    }
+  };
+
+  // Add reject enrollment handler with confirmation
+  const handleReject = async (pendingId, studentName) => {
+    const confirmed = window.confirm(
+      `Are you sure you want to reject ${studentName}'s enrollment request? They will not be able to join the course.`
+    );
+    if (!confirmed) return;
+
+    // Optimistic UI update
+    const originalPendingEnrollments = [...pendingEnrollments];
+    setPendingEnrollments(prev => prev.filter(p => p.pending_id !== pendingId));
+
+    try {
+      const token = localStorage.token;
+      const response = await fetch(
+        `${process.env.REACT_APP_API_URL || 'http://localhost:5000'}/enrollment-approval/reject/${pendingId}`,
+        { 
+          method: "POST", 
+          headers: { 
+            "Content-Type": "application/json", 
+            "jwt_token": token 
+          }, 
+          body: JSON.stringify({ review_notes: "" }) 
+        }
+      );
+      if (!response.ok) throw new Error(await response.text());
+      toast.success("Enrollment request rejected.");
+    } catch (err) {
+      toast.error(err.message || "Failed to reject enrollment");
+      // Revert optimistic update on failure
+      setPendingEnrollments(originalPendingEnrollments);
+    }
+  };
+
    // Restore Initial Load Effect
    useEffect(() => {
     const initialLoad = async () => {
@@ -202,12 +310,12 @@ const People = ({ setAuth }) => {
       await getProfile();   // Then fetch profile
       await fetchCourseMembers(); // Fetch members
       await fetchCourseDetails(); // Fetch course details including status
+      if (isTeacher) await fetchPendingEnrollments(); // Fetch pending enrollments for teachers
       setLoading(false);
       console.log("Initial load finished.");
     }
     initialLoad();
-  }, [courseId, fetchUserRole, getProfile]); // Add fetchCourseDetails dependency
-
+  }, [courseId, fetchUserRole, getProfile, fetchPendingEnrollments]); // Add fetchPendingEnrollments dependency
 
   // Restore fetchCourseMembers Function (with useCallback)
   const fetchCourseMembers = useCallback(async () => {
@@ -636,6 +744,12 @@ const People = ({ setAuth }) => {
     };
   }, [showActionMenu]);
 
+  // Handler to change tab and update URL
+  const handleTabClick = (tabName) => {
+    setActivePeopleTab(tabName);
+    navigate(`/courses/${courseId}/people?tab=${tabName}`, { replace: true });
+  };
+
   // Dropdown Item Click Handler
   const handleDropdownItemClick = (e, action, userId) => {
     e.stopPropagation();
@@ -694,11 +808,10 @@ const People = ({ setAuth }) => {
           console.warn("Could not parse JSON success response for unenroll:", jsonError);
       }
       
-      alert(successMessage);
+      toast.success(successMessage);
       navigate("/dashboard"); // Navigate after successful unenrollment
     } catch (err) {
-      console.error("Error unenrolling from course:", err);
-      alert(err.message || 'Failed to unenroll from course');
+      toast.error(err.message || 'Failed to unenroll from course');
        if (err.message.includes('No authentication token found')) {
            localStorage.removeItem("token");
            if(setAuth) setAuth(false);
@@ -740,20 +853,13 @@ const People = ({ setAuth }) => {
   if (loading) {
     return (
       <div className="dashboard-container dashboard-page people-page">
-         {/* Render basic sidebar/topbar placeholders during load */}
-         <div className={`sidebar ${sidebarOpen ? 'open' : ''} loading`}> 
-             {/* Minimal sidebar structure */}
-         </div>
-         <div className="main-content loading">
-             <div className="content-wrapper">
-                <div className="top-bar loading"> {/* Minimal top bar */} </div> 
-                {/* Centered Loading Indicator */}
-      <div className="loading-container">
-        <div className="loading-spinner"></div>
-        <p>Loading course members...</p>
-                 </div>
-             </div>
-         </div>
+        <div className={`sidebar ${sidebarOpen ? 'open' : ''}`} style={{width: '280px', borderRight: '1px solid #e0e0e0'}}></div>
+        <div className="main-content" style={{marginLeft: '280px'}}>
+          <div className="content-wrapper">
+            <div className="top-bar" style={{height: '60px', borderBottom: '1px solid #e0e0e0', marginBottom:'24px'}}></div>
+            <LoadingIndicator text="Loading People" />
+          </div>
+        </div>
       </div>
     );
   }
@@ -920,15 +1026,21 @@ const People = ({ setAuth }) => {
             <div className="people-tabs">
               <button 
                 className={`tab-btn ${activePeopleTab === 'students' ? 'active' : ''}`}
-                onClick={() => setActivePeopleTab('students')}
+                onClick={() => handleTabClick('students')}
               >
                 Students ({courseMembers.students.length})
               </button>
               <button 
                 className={`tab-btn ${activePeopleTab === 'banned' ? 'active' : ''}`}
-                onClick={() => setActivePeopleTab('banned')}
+                onClick={() => handleTabClick('banned')}
               >
                 Blocklist ({courseMembers.banned.length})
+              </button>
+              <button 
+                className={`tab-btn ${activePeopleTab === 'pending' ? 'active' : ''}`}
+                onClick={() => handleTabClick('pending')}
+              >
+                Pending Requests ({pendingEnrollments.length})
               </button>
             </div>
 
@@ -1034,6 +1146,67 @@ const People = ({ setAuth }) => {
                       ))
                     )}
                   </div>
+                </section>
+              )}
+
+              {activePeopleTab === 'pending' && (
+                <section className="pending-section">
+                  <div className="section-header">
+                    <h2>Pending Enrollment Requests</h2>
+                  </div>
+                  {loadingPending ? (
+                    <div className="loading-container">
+                      <div className="loading-spinner"></div>
+                      <p>Loading pending requests...</p>
+                    </div>
+                  ) : pendingError ? (
+                    <div className="error-message">
+                      <MdErrorOutline size={24} />
+                      <p>{pendingError}</p>
+                      <button onClick={fetchPendingEnrollments} className="retry-button">
+                        <MdRefresh /> Retry
+                      </button>
+                    </div>
+                  ) : pendingEnrollments.length === 0 ? (
+                    <div className="pending-empty-state">
+                      <HiOutlineUserGroup size={48} />
+                      <p>No pending enrollment requests.</p>
+                    </div>
+                  ) : (
+                    <div className="pending-list">
+                      {pendingEnrollments.map(req => (
+                        <div key={req.pending_id} className="pending-item">
+                          <div className="person-avatar">{renderAvatar(req)}</div>
+                          <div className="person-info">
+                            <div className="person-name">{req.first_name} {req.last_name}</div>
+                            <div className="person-email">{req.email}</div>
+                            <div className="request-date">
+                              Requested: {new Date(req.requested_at).toLocaleDateString()}
+                            </div>
+                          </div>
+                          {/* Only show actions if course is not archived */}
+                          {courseDetails?.status !== 'archived' && (
+                            <div className="pending-actions">
+                              <button 
+                                onClick={() => handleApprove(req.pending_id, `${req.first_name} ${req.last_name}`)} 
+                                className="approve-btn"
+                                title="Approve enrollment request"
+                              >
+                                <FaCheckCircle size={16} /> Approve
+                              </button>
+                              <button 
+                                onClick={() => handleReject(req.pending_id, `${req.first_name} ${req.last_name}`)} 
+                                className="reject-btn"
+                                title="Reject enrollment request"
+                              >
+                                <MdBlock size={16} /> Reject
+                              </button>
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </section>
               )}
             </div>
